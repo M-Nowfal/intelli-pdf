@@ -1,0 +1,224 @@
+"use client";
+
+import {
+  Sidebar, SidebarContent, SidebarFooter, SidebarHeader,
+  SidebarMenu, SidebarMenuButton, SidebarMenuItem,
+  SidebarRail, SidebarGroup, SidebarMenuSub,
+  SidebarMenuSubButton, SidebarMenuSubItem, useSidebar,
+} from "@/components/ui/sidebar";
+import {
+  LayoutDashboard, FileText,
+  Settings, BadgeCheck, Bell, ChevronsUpDown, LogOut,
+  Sparkles,
+  X,
+  GalleryVerticalEnd,
+  Home,
+} from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuGroup,
+  DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
+import {
+  Collapsible, CollapsibleContent, CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Logo } from "@/components/common/logo";
+import { APP_NAME } from "@/utils/constants";
+import { signOut, useSession } from "next-auth/react";
+import { Alert } from "@/components/common/alert";
+import { UserAvatar } from "@/components/common/avatar";
+import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { data: session } = useSession();
+  const { isMobile, toggleSidebar } = useSidebar();
+  const pathname = usePathname();
+
+  async function handleLogout() {
+    await signOut({ callbackUrl: "/login" });
+  }
+
+  const isActive = (url: string) => pathname === url;
+
+  const navMainItems = [
+    { title: "Home", url: "/", icon: Home },
+    { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+    {
+      title: "Documents", url: "/pdf", icon: FileText, items: [
+        { title: "All Documents", url: "/pdf" },
+        { title: "Upload PDF", url: "/pdf/upload" },
+      ]
+    },
+    { title: "AI Chat", url: "/chat", icon: Sparkles },
+    { title: "Flash Cards", url: "/flashcards", icon: GalleryVerticalEnd },
+    { title: "Settings", url: "/settings", icon: Settings },
+  ];
+
+  return (
+    <Sidebar collapsible="icon" {...props}>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              size="lg"
+              className="hover:bg-transparent data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            >
+              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                <Logo onlyLogo />
+              </div>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-medium">{APP_NAME}</span>
+              </div>
+              {isMobile && <Button asChild variant="none" size="none" className="ml-auto p-0" onClick={toggleSidebar}>
+                <X />
+              </Button>}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarMenu>
+            {navMainItems.map((item) => {
+              const hasChildren = !!item.items?.length
+
+              return (
+                <SidebarMenuItem key={item.title}>
+                  {hasChildren ? (
+                    <Collapsible
+                      defaultOpen={item.items?.some(sub => isActive(sub.url))}
+                      className="group/collapsible"
+                    >
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton tooltip={item.title}
+                          className={`px-3 py-5 transition-colors ${pathname.startsWith(item.url)
+                            ? "bg-slate-200 dark:bg-sidebar-accent text-sidebar-accent-foreground"
+                            : "hover:bg-sidebar-accent"
+                            }`}>
+                          {item.icon && <item.icon className="h-4 w-4" />}
+                          <span>{item.title}</span>
+                          <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+
+                      <CollapsibleContent>
+                        <SidebarMenuSub className="mt-2">
+                          {item.items!.map((subItem) => (
+                            <SidebarMenuSubItem key={subItem.title}>
+                              <SidebarMenuSubButton
+                                asChild
+                                className="py-4"
+                              >
+                                <Link href={subItem.url} className="flex justify-between" replace>
+                                  <span>{subItem.title}</span>
+                                  {isActive(subItem.url) && <div className="w-2 h-2 bg-accent-foreground rounded-full" />}
+                                </Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ))}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  ) : (
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={item.title}
+                      className={`px-3 py-5 transition-colors ${isActive(item.url)
+                        ? "bg-slate-200 dark:bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                        : "hover:bg-sidebar-accent"
+                        }`}
+                    >
+                      <Link href={item.url} replace>
+                        {item.icon && <item.icon className="h-4 w-4" />}
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  )}
+                </SidebarMenuItem>
+              )
+            })}
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
+                  <UserAvatar
+                    src={session?.user?.image ?? ""}
+                    fallback={session?.user?.name ?? "U"}
+                  />
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">{session?.user?.name ?? ""}</span>
+                    <span className="truncate text-xs">{session?.user?.email ?? ""}</span>
+                  </div>
+                  <ChevronsUpDown className="ml-auto size-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+                side={isMobile ? "bottom" : "right"}
+                align="end"
+                sideOffset={4}
+              >
+                <DropdownMenuLabel className="p-0 font-normal">
+                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                    <UserAvatar
+                      src={session?.user?.image ?? ""}
+                      fallback={session?.user?.name ?? ""}
+                    />
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-medium">{session?.user?.name ?? ""}</span>
+                      <span className="truncate text-xs">{session?.user?.email ?? ""}</span>
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>
+                    <Sparkles />
+                    Upgrade to Pro
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>
+                    <Link href="/account" replace className="flex items-center gap-2 w-full">
+                      <BadgeCheck />
+                      Account
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Bell />
+                    Notifications
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <Alert
+                  trigger={
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                      <LogOut className="text-red-500" />
+                      <span className="text-red-500">Log out</span>
+                    </DropdownMenuItem>
+                  }
+                  title="Log out of your account?"
+                  description="You're about to end your current session. Any unsaved changes will be lost, and you'll need to sign in again to continue."
+                  onContinue={handleLogout}
+                />
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+      <SidebarRail />
+    </Sidebar>
+  );
+}
