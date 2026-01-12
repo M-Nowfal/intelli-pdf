@@ -33,6 +33,7 @@ import { useRouter } from "next/navigation";
 
 import { generateReactHelpers } from "@uploadthing/react";
 import type { OurFileRouter } from "@/app/api/uploadthing/core";
+import api from "@/lib/axios";
 
 const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 
@@ -58,20 +59,19 @@ export function PDFUpload() {
       const uploadedFile = res[0];
 
       try {
-        const response = await fetch("/api/pdf/process", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+        const response = await api.post(
+          "/pdf/process",
+          {
             fileUrl: uploadedFile.ufsUrl,
             fileKey: uploadedFile.key,
             fileName: uploadedFile.name,
             fileSize: uploadedFile.size,
-          }),
-        });
+          },
+          { headers: { "Content-Type": "application/json" } }
+        );
 
-        if (!response.ok) throw new Error("Failed to process file on server");
-
-        await response.json();
+        if (response.status !== 200)
+          throw new Error("Failed to process file on server");
 
         setSuccess(true);
         toast.success("PDF uploaded & processed successfully!");

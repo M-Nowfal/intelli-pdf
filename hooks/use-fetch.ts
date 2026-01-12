@@ -1,7 +1,7 @@
 "use client"
 
-import { API_URL } from "@/utils/constants";
-import axios, { AxiosError } from "axios";
+import api from "@/lib/axios";
+import { AxiosError } from "axios";
 import { useState } from "react"
 
 interface UseFetch {
@@ -20,7 +20,7 @@ export function useFetch(): UseFetch {
   async function fetchData(url: string) {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_URL}${url}`, { withCredentials: true });
+      const response = await api.get(url, { withCredentials: true });
       if (response.status === 200)
         setData(response.data);
     } catch (err: unknown) {

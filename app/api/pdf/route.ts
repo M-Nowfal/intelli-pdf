@@ -63,7 +63,7 @@ export async function DELETE(req: NextRequest) {
     await Summary.deleteMany({ pdfId });
     await Quiz.deleteMany({ pdfId });
 
-    return NextResponse.json({ success: true, message: "PDF deleted" });
+    return NextResponse.json({ success: true, message: `PDF "${pdf.title}" deleted successfully` });
 
   } catch (err: unknown) {
     console.error(err);

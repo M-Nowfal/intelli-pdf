@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { useFetch } from "@/hooks/use-fetch";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,22 +17,13 @@ import { usePdfStore } from "@/store/usePdfStore";
 import { Loader } from "@/components/ui/loader";
 
 export default function PDFList() {
-  const { data, loading, error, refetch } = useFetch();
-  const { pdfs, setPdfs, removePdf } = usePdfStore();
+  const { pdfs, fetchPdfs, isLoading, error, removePdf } = usePdfStore();
   const removePDF = useMutate("DELETE");
   const router = useRouter();
 
   useEffect(() => {
-    if (pdfs.length === 0) {
-      refetch("/pdf");
-    }
-  }, []);
-
-  useEffect(() => {
-    if (data) {
-      setPdfs(data);
-    }
-  }, [data]);
+    fetchPdfs();
+  }, [fetchPdfs]);
 
   useEffect(() => {
     if (removePDF.data && !removePDF.error)
@@ -58,7 +48,7 @@ export default function PDFList() {
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[1, 2, 3].map((i) => (
@@ -87,7 +77,7 @@ export default function PDFList() {
         <Button
           variant="outline"
           className="mt-4 border-destructive/50 hover:bg-destructive/10"
-          onClick={() => refetch("/pdf")}
+          onClick={() => fetchPdfs()}
         >
           Try Again
         </Button>
@@ -97,7 +87,7 @@ export default function PDFList() {
 
   const pdfList: IPDF[] = Array.isArray(pdfs) ? pdfs : [];
 
-  if (!loading && pdfList.length === 0) {
+  if (!isLoading && pdfList.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-10 text-center border-2 border-dashed rounded-lg bg-muted/30">
         <div className="bg-background p-4 rounded-full mb-4 shadow-sm">
@@ -180,7 +170,7 @@ export default function PDFList() {
                   {removePDF.loading ? <Loader /> : <Trash2 className="h-4 w-4" />}
                 </Button>
               }
-              title="Delete this PDF?"
+              title={`Delete "${pdf.title}"?`}
               description="This will permanently remove the PDF and all related data like chats, summaries, quizzes, and flashcards. This action can't be undone."
               onContinue={() => handleRemovePDF(pdf._id)}
             />

@@ -163,7 +163,6 @@ npm install
 Create a `.env.local` file:
 
 ```env
-NEXT_PUBLIC_API_URL=your_api_url
 
 MONGO_URI=your_db_uri
 DB_NAME=your_db_name

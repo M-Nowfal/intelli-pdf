@@ -12,6 +12,30 @@ const UserSchema = new Schema<IUser>({
     trim: true,
     unique: true
   },
+  stats: {
+    totalDocuments: {
+      type: Number,
+      default: 0
+    },
+    flashcardsMastered: {
+      type: Number,
+      default: 0
+    },
+    studyStreak: {
+      streak: {
+        type: Number,
+        default: 0
+      },
+      lastActive: {
+        type: Date,
+        default: Date.now
+      }
+    },
+    aiCredits: {
+      type: Number,
+      default: 1000
+    }
+  },
   password: {
     type: String
   },

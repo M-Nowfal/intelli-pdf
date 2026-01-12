@@ -13,8 +13,23 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { useDashboardStore } from "@/store/useDashboardStore";
+import { useEffect } from "react";
+import { Loader } from "@/components/ui/loader";
+import { toast } from "sonner";
 
 export function DashboardStats() {
+  const { stats, fetchStats, isLoading, error } = useDashboardStore();
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
+
+  useEffect(() => {
+    if (error) 
+      toast.error(error);
+  }, [error]);
+
   return (
     <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
       <Card className="bg-linear-to-br from-blue-50 to-blue-100/30 dark:from-blue-950/20 dark:to-blue-900/10">
@@ -25,7 +40,9 @@ export function DashboardStats() {
           <FileText className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">12</div>
+          <div className="text-2xl font-bold">
+            {isLoading ? <Loader /> : stats?.totalDocuments}
+          </div>
           <p className="text-xs text-muted-foreground">
             +2 uploaded this week
           </p>
@@ -39,7 +56,9 @@ export function DashboardStats() {
           <GalleryVerticalEnd className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">342</div>
+          <div className="text-2xl font-bold">
+            {isLoading ? <Loader /> : stats?.flashcardsMastered}
+          </div>
           <p className="text-xs text-muted-foreground">
             +18% from last month
           </p>
@@ -53,7 +72,9 @@ export function DashboardStats() {
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">5 Days</div>
+          <div className="text-2xl font-bold">
+            {isLoading ? <Loader /> : stats?.studyStreak?.streak} Days
+          </div>
           <p className="text-xs text-muted-foreground">
             Keep it up!
           </p>
@@ -67,8 +88,10 @@ export function DashboardStats() {
           <Brain className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">850</div>
-          <Progress value={85} className="mt-2 h-2" />
+          <div className="text-2xl font-bold">
+            {isLoading ? <Loader /> : stats?.aiCredits}
+          </div>
+          <Progress value={(stats?.aiCredits || 0) / 10} className="mt-2 h-2" />
         </CardContent>
       </Card>
     </div>

@@ -9,6 +9,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { vibrate } from "@/lib/haptics";
 import { JSX } from "react";
 
 interface AlertDialogProps {
@@ -31,8 +32,11 @@ export function Alert({ trigger, title, description, onContinue, loading }: Aler
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-row justify-end">
-          <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onContinue} disabled={loading}>Continue</AlertDialogAction>
+          <AlertDialogCancel onClick={() => vibrate()} disabled={loading}>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={() => {
+            vibrate();
+            onContinue();
+          }} disabled={loading}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

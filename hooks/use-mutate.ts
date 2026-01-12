@@ -1,7 +1,7 @@
 "use client";
 
-import { API_URL } from "@/utils/constants";
-import axios, { AxiosError } from "axios";
+import api from "@/lib/axios";
+import { AxiosError } from "axios";
 import { useState } from "react";
 
 type HTTPMethods = "POST" | "PATCH" | "PUT" | "DELETE";
@@ -20,21 +20,20 @@ export function useMutate(method: HTTPMethods = "POST") {
     setLoading(true);
     setError("");
     try {
-      const config = { withCredentials: true, headers };
       let response;
       const finalHTTPMethod = method2 || method;
       switch (finalHTTPMethod) {
         case "POST":
-          response = await axios.post(API_URL + url, body, config);
+          response = await api.post(url, body, headers);
           break;
         case "PATCH":
-          response = await axios.patch(API_URL + url, body, config);
+          response = await api.patch(url, body, headers);
           break;
         case "PUT":
-          response = await axios.put(API_URL + url, body, config);
+          response = await api.put(url, body, headers);
           break;
         case "DELETE":
-          response = await axios.delete(API_URL + url, config);
+          response = await api.delete(url, headers);
           break;
       }
 

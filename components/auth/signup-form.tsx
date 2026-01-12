@@ -91,7 +91,7 @@ export function SignupForm({
             <FieldDescription>
               Already have an account?{" "}
               <Link
-                href="/login/"
+                href="/login"
                 className={cn(
                   "underline",
                   loading && "pointer-events-none opacity-50"
