@@ -18,7 +18,7 @@ export function Hero() {
       <div className="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-primary/5 via-background to-background pointer-events-none" />
       <div className="absolute -top-24 -left-24 w-72 h-72 md:w-96 md:h-96 bg-primary/10 rounded-full blur-3xl opacity-70 animate-pulse pointer-events-none" />
       <div className="absolute -bottom-24 -right-24 w-72 h-72 md:w-96 md:h-96 bg-blue-500/10 rounded-full blur-3xl opacity-70 animate-pulse delay-1000 pointer-events-none" />
- 
+
       <FloatingDoc
         className="top-[5%] left-[2%] md:top-[15%] md:left-[10%] -rotate-12 animate-float-slow"
         delay="0s"
@@ -54,7 +54,7 @@ export function Hero() {
 
       <div className="relative z-10 px-4 md:px-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-both">
         <div className="mx-auto flex max-w-4xl flex-col items-center gap-8 text-center">
-          
+
           <Badge variant="secondary" className="px-4 py-2 gap-2 text-sm backdrop-blur-md bg-secondary/80 border-secondary-foreground/10 shadow-sm">
             <Zap className="h-4 w-4 text-yellow-500 fill-yellow-500" />
             <span>Now running on Gemini 1.5 Flash</span>
@@ -104,26 +104,26 @@ export function Hero() {
   );
 }
 
-function FloatingDoc({ 
-  className, 
-  delay, 
-  icon, 
+function FloatingDoc({
+  className,
+  delay,
+  icon,
   title = "Document.pdf",
   bgClass = "bg-primary/10",
-  size = "md" 
-}: { 
-  className?: string, 
-  delay?: string, 
-  icon?: React.ReactNode, 
+  size = "md"
+}: {
+  className?: string,
+  delay?: string,
+  icon?: React.ReactNode,
   title?: string,
   bgClass?: string,
-  size?: "sm" | "md" 
+  size?: "sm" | "md"
 }) {
   const widthClass = size === "sm" ? "w-28 md:w-32" : "w-40 md:w-48";
   const paddingClass = size === "sm" ? "p-3" : "p-4 md:p-5";
   const iconSizeClass = size === "sm" ? "h-6 w-6 md:h-8 md:w-8" : "h-8 w-8 md:h-12 md:w-12";
-  
-  const mobileOpacity = "opacity-40 md:opacity-100";
+
+  const mobileOpacity = "opacity-40 xl:opacity-100";
 
   return (
     <Card
@@ -133,15 +133,15 @@ function FloatingDoc({
       <div className="flex items-center gap-3">
         <div className={`rounded-full ${bgClass} p-2 shrink-0`}>
           <div className={`${iconSizeClass}`}>
-             {icon}
+            {icon}
           </div>
         </div>
         <div className="space-y-1.5 w-full">
-           <div className="h-2 w-full bg-foreground/10 rounded-full" />
-           <div className="h-2 w-2/3 bg-foreground/10 rounded-full" />
+          <div className="h-2 w-full bg-foreground/10 rounded-full" />
+          <div className="h-2 w-2/3 bg-foreground/10 rounded-full" />
         </div>
       </div>
-      
+
       <div className="mt-1 flex items-center gap-2">
         <div className="h-2 w-2 rounded-full bg-green-500/50" />
         <span className="text-[10px] md:text-xs font-medium text-muted-foreground truncate">

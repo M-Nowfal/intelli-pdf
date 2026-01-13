@@ -11,9 +11,9 @@ export function DashboardTitle() {
     <div className="flex items-center">
       <div className="flex items-center gap-2">
         <div className="p-1.5 rounded-lg bg-accent border">
-          <LayoutDashboard className="h-6 w-6 text-primary" strokeWidth={3} />
+          <LayoutDashboard className="h-5 w-5 sm:h-6 sm:w-6 text-primary" strokeWidth={3} />
         </div>
-        <h2 className="text-3xl font-bold tracking-tight text-foreground">Dashboard</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Dashboard</h2>
       </div>
       <Button className="ml-auto gap-2" onClick={() => router.push("/pdf/upload")}>
         <Plus className="h-4 w-4" />

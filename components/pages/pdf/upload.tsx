@@ -197,7 +197,7 @@ export function PDFUpload() {
       <Card className="w-full shadow-lg border-primary/10 py-0 pt-5">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-2xl">
-            <FileUp className="h-6 w-6 text-primary" />
+            <FileUp className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             Upload Your Document
           </CardTitle>
           <CardDescription className="text-base">

@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { Alert } from "@/components/common/alert";
 import { usePdfStore } from "@/store/usePdfStore";
 import { Loader } from "@/components/ui/loader";
+import { formatFileSize } from "@/helpers/file.helper";
 
 export default function PDFList() {
   const { pdfs, fetchPdfs, isLoading, error, removePdf } = usePdfStore();
@@ -33,14 +34,6 @@ export default function PDFList() {
       toast.error(removePDF.error);
   }, [removePDF.data, removePDF.error]);
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 B";
-    const k = 1024;
-    const sizes = ["B", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
-  };
-
   const handleRemovePDF = async (pdfId: string) => {
     await removePDF.mutate(`/pdf?id=${pdfId}`);
     if (!removePDF.error) {
@@ -58,9 +51,9 @@ export default function PDFList() {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-lg bg-accent border">
-              <Library className="h-6 w-6 text-primary" strokeWidth={3} />
+              <Library className="h-5 w-5 sm:h-6 sm:w-6 text-primary" strokeWidth={3} />
             </div>
-            <h2 className="text-3xl font-bold tracking-tight text-foreground">My Library</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">My Library</h2>
           </div>
           <p className="text-muted-foreground text-sm">
             Manage your uploaded documents and track your study progress.

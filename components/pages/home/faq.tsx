@@ -21,7 +21,7 @@ export function FAQ() {
         <AccordionItem value="item-2">
           <AccordionTrigger>What kind of files can I upload?</AccordionTrigger>
           <AccordionContent>
-            Currently, we support PDF files up to 10MB in size. We are working on adding support for Word documents and PowerPoint presentations soon.
+            Currently, we support PDF files up to 50MB in size. We are working on adding support for Word documents and PowerPoint presentations soon.
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-3">
@@ -33,7 +33,7 @@ export function FAQ() {
         <AccordionItem value="item-4">
           <AccordionTrigger>How accurate is the AI?</AccordionTrigger>
           <AccordionContent>
-            We use advanced Large Language Models (LLMs) like Google Gemini and OpenAI to ensure high accuracy. However, as with all AI, we recommend verifying critical information.
+            We use advanced Large Language Models (LLMs) like Google Gemini to ensure high accuracy. However, as with all AI, we recommend verifying critical information.
           </AccordionContent>
         </AccordionItem>
       </Accordion>
