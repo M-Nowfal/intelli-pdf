@@ -14,9 +14,10 @@ import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { signIn } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useState } from "react"
 import { Loader } from "@/components/ui/loader"
+import { useAuthIntent } from "@/providers/authintent-provider"
 
 type LoginFormData = {
   email: string
@@ -36,10 +37,28 @@ export function LoginForm({
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>();
+  const { setIntent } = useAuthIntent();
+  const error = useSearchParams().get("error");
+
+  useEffect(() => {
+    if (error === "AccountNotFound") {
+      toast.error("No account found. Please sign up first.", {
+        action: {
+          label: "Sign Up",
+          onClick: () => {
+            router.push("/signup");
+          }
+        },
+        duration: 10000,
+      });
+    } else if (error === "ServerSideError") {
+      toast.error("Something went wrong. Please try again.");
+    }
+  }, [error]);
 
   const onSubmit = async (data: LoginFormData) => {
     setLoading("credentials");
-
+    setIntent("login");
     try {
       const result = await signIn("credentials", {
         email: data.email,
@@ -71,6 +90,7 @@ export function LoginForm({
 
   const handleGoogleLogin = async () => {
     setLoading("google");
+    setIntent("login");
     try {
       await signIn("google", { callbackUrl: "/dashboard" });
     } catch (error) {

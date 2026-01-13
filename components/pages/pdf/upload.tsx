@@ -45,6 +45,7 @@ export function PDFUpload() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [success, setSuccess] = useState(false);
+  const progressInterval = useRef<NodeJS.Timeout | null>(null);
 
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -52,10 +53,19 @@ export function PDFUpload() {
 
   const { startUpload, isUploading } = useUploadThing("pdfUploader", {
     onUploadProgress: (p) => {
-      setUploadProgress(p);
+      setUploadProgress(p * 0.8);
     },
     onClientUploadComplete: async (res) => {
       setIsProcessing(true);
+
+      setUploadProgress(80);
+      progressInterval.current = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 99) return prev;
+          return prev + 1;
+        });
+      }, 500);
+
       const uploadedFile = res[0];
 
       try {
@@ -73,6 +83,7 @@ export function PDFUpload() {
         if (response.status !== 200)
           throw new Error("Failed to process file on server");
 
+        setUploadProgress(100);
         setSuccess(true);
         toast.success("PDF uploaded & processed successfully!");
       } catch (error) {
@@ -80,12 +91,20 @@ export function PDFUpload() {
         toast.error("Processing Failed", {
           description: "File uploaded, but failed to save to database."
         });
+        setUploadProgress(0);
       } finally {
+        if (progressInterval.current) {
+          clearInterval(progressInterval.current);
+        }
         setIsProcessing(false);
       }
     },
-    onUploadError: (error: Error) => {
-      toast.error(`Upload Failed: ${error.message}`);
+    onUploadError: (err: Error) => {
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current);
+      }
+      toast.error(`Upload Failed: ${err.message}`);
+      setUploadProgress(0);
     },
   });
 

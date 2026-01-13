@@ -1,15 +1,14 @@
 import { getColorFromName, getFirstLetter } from "@/helpers/name.helper";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 interface UserAvatarProps {
-  src: string | undefined | null;
-  alt?: string;
-  fallback: string | undefined | null;
   size?: "sm" | "md" | "lg" | "xl";
 }
 
-export function UserAvatar({ src, alt, fallback, size = "sm" }: UserAvatarProps) {
-  
+export function UserAvatar({ size = "sm" }: UserAvatarProps) {
+  const { name, avatar } = useCurrentUser();
+
   const sizes = {
     sm: "w-8 h-8",
     md: "w-12 h-12",
@@ -21,10 +20,13 @@ export function UserAvatar({ src, alt, fallback, size = "sm" }: UserAvatarProps)
 
   return (
     <Avatar className={`${sizes[size]} text-white font-semibold border cursor-pointer`}>
-      <AvatarImage src={src || ""} alt={alt} />
+      <AvatarImage src={avatar || ""} alt={name || ""} />
+
       <AvatarFallback
-        className={fallbackBgColors[getColorFromName(fallback || "UN")]}
-      >{getFirstLetter(fallback)}</AvatarFallback>
+        className={fallbackBgColors[getColorFromName(name || "")]}
+      >
+        {getFirstLetter(name)}
+      </AvatarFallback>
     </Avatar>
   );
 }

@@ -5,6 +5,7 @@ import { connectDB } from "@/lib/db";
 import { User } from "@/models/user.model";
 import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, NEXTAUTH_SECRET } from "@/utils/constants";
 import { compare } from "@/lib/password";
+import { cookies } from "next/headers";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -59,8 +60,8 @@ export const authOptions: NextAuthOptions = {
   ],
 
   pages: {
-    signIn: '/auth/login',
-    error: '/auth/login',
+    signIn: '/login',
+    error: '/login',
   },
 
   session: {
@@ -98,22 +99,49 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
         try {
+          const cookieStore = await cookies();
+          const intent = cookieStore.get("auth_intent")?.value;
+
           await connectDB();
 
           const existingUser = await User.findOne({ email: user.email });
+          console.log("Intent = ", intent)
+          if (intent === "login" && !existingUser) {
+            return `/login?error=AccountNotFound`;
+          }
 
-          if (existingUser) return true;
-          
-          await User.create({
-            name: user.name,
-            email: user.email,
-            isVerified: true,
-          });
+          if (intent === "signup" && existingUser) {
+            return true;
+          }
+
+          if (intent === "signup" && !existingUser) {
+            await User.create({
+              name: user.name,
+              email: user.email,
+              avatar: user.image,
+              isVerified: true,
+              stats: {
+                totalDocuments: 0,
+                flashcardsMastered: 0,
+                studyStreak: {
+                  streak: 0,
+                  lastActive: Date.now()
+                },
+                aiCredits: 1000
+              },
+              provider: "google"
+            });
+            return true;
+          }
+
+          if (!existingUser) {
+            return `/login?error=AccountNotFound`;
+          }
 
           return true;
         } catch (err: unknown) {
           console.error("Error in Google sign-in:", err);
-          return false;
+          return "/login?error=ServerSideError";
         }
       }
 

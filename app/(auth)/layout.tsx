@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import { AuthHeader } from "@/layout/auth-header";
+import { AuthIntentProvider } from "@/providers/authintent-provider";
 
 export default async function AuthLayout({
   children,
@@ -17,7 +18,9 @@ export default async function AuthLayout({
   return (
     <>
       <AuthHeader />
-      {children}
+      <AuthIntentProvider>
+        {children}
+      </AuthIntentProvider>
     </>
   );
 }

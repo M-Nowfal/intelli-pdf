@@ -3,14 +3,14 @@
 import { DashboardStats } from "@/components/pages/dashboard/stats";
 import { DashboardRecentActivity } from "@/components/pages/dashboard/recent-activity";
 import { DashboardTitle } from "@/components/pages/dashboard/title";
-import { useSession } from "next-auth/react";
 import DashboardSkeloton from "./dashboard-skeloton";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 export function Dashboard() {
-  const { status } = useSession();
+  const { isLoading } = useCurrentUser();
 
   return (
-    status === "loading" ? (
+    isLoading ? (
       <DashboardSkeloton />
     ) : (
       <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background w-full">

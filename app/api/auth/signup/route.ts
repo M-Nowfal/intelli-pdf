@@ -55,6 +55,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       email,
       password: hashedPassword,
       isVerified: false,
+      stats: {
+        totalDocuments: 0,
+        flashcardsMastered: 0,
+        studyStreak: {
+          streak: 0,
+          lastActive: Date.now()
+        },
+        aiCredits: 1000
+      },
+      provider: "credentials"
     });
 
     await sendOtpAndPrepareFlow(email, res);

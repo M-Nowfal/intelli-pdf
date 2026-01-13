@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Calendar, Layers, ExternalLink, Trash2 } from "lucide-react";
+import { FileText, Calendar, Layers, ExternalLink, Trash2, Plus, Library } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { IPDF } from "@/types/pdf";
 import { useRouter } from "next/navigation";
@@ -48,135 +48,148 @@ export default function PDFList() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1, 2, 3].map((i) => (
-          <Card key={i} className="overflow-hidden">
-            <CardHeader className="pb-2">
-              <Skeleton className="h-6 w-3/4" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-4 w-1/2 mb-2" />
-              <Skeleton className="h-4 w-1/3" />
-            </CardContent>
-            <CardFooter>
-              <Skeleton className="h-9 w-full" />
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center py-10 bg-destructive/10 rounded-lg border border-destructive/20">
-        <h3 className="text-lg font-semibold text-destructive">Error loading PDFs</h3>
-        <p className="text-muted-foreground">{error}</p>
-        <Button
-          variant="outline"
-          className="mt-4 border-destructive/50 hover:bg-destructive/10"
-          onClick={() => fetchPdfs()}
-        >
-          Try Again
-        </Button>
-      </div>
-    );
-  }
-
   const pdfList: IPDF[] = Array.isArray(pdfs) ? pdfs : [];
-
-  if (!isLoading && pdfList.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-10 text-center border-2 border-dashed rounded-lg bg-muted/30">
-        <div className="bg-background p-4 rounded-full mb-4 shadow-sm">
-          <FileText className="h-8 w-8 text-muted-foreground" />
-        </div>
-        <h3 className="text-xl font-semibold tracking-tight">No PDFs Uploaded Yet</h3>
-        <p className="text-sm text-muted-foreground mt-2 max-w-sm">
-          Upload your first PDF to generate embeddings and start chatting with it.
-        </p>
-        <Button
-          className="mt-6"
-          onClick={() => router.push("/pdf/upload")}
-        >
-          Upload PDF
-        </Button>
-      </div>
-    );
-  }
+  const hasPdfs = pdfList.length > 0;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-      {pdfList.map((pdf) => (
-        <Card key={pdf._id} className="group hover:shadow-lg transition-all duration-300 border-border/60">
-          <CardHeader className="flex flex-row items-start justify-between space-y-0">
-            <div className="flex-1 space-y-1">
-              <CardTitle className="text-base font-semibold line-clamp-1" title={pdf.title}>
-                {pdf.title}
-              </CardTitle>
-              <div className="text-xs text-muted-foreground flex items-center gap-2">
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-3 w-3" />
-                  {formatDistanceToNow(new Date(pdf.createdAt), { addSuffix: true })}
-                </span>
-              </div>
-            </div>
-            <div className="bg-primary/10 p-2 rounded-full text-primary">
-              <FileText className="h-4 w-4" />
-            </div>
-          </CardHeader>
+    <div className="space-y-8 w-full">
 
-          <CardContent className="pb-1">
-            <div className="flex items-center gap-4">
-              <Badge variant="secondary" className="font-normal text-xs flex gap-1">
-                <Layers className="h-3 w-3" /> {pdf.pages} Pages
-              </Badge>
-              <span className="text-xs text-muted-foreground">
-                {formatFileSize(pdf.fileSize)}
-              </span>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-accent border">
+              <Library className="h-6 w-6 text-primary" strokeWidth={3} />
             </div>
-          </CardContent>
+            <h2 className="text-3xl font-bold tracking-tight text-foreground">My Library</h2>
+          </div>
+          <p className="text-muted-foreground text-sm">
+            Manage your uploaded documents and track your study progress.
+          </p>
+        </div>
+        {hasPdfs && !isLoading && (
+          <Button onClick={() => router.push("/pdf/upload")} className="shadow-sm">
+            <Plus className="mr-2 h-4 w-4" /> Upload New PDF
+          </Button>
+        )}
+      </div>
 
-          <CardFooter className="pt-0 flex gap-2">
-            <Button className="flex-1 gap-2" variant="default" asChild>
-              <Link
-                href={removePDF.loading ? "" : pdf.fileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={removePDF.loading ? "pointer-events-none opacity-50" : ""}
-              >
-                {removePDF.loading ? (
-                  <>
-                    Removing PDF
-                  </>
-                ) : (
-                  <>
-                    <ExternalLink className="h-4 w-4" />
-                    View PDF
-                  </>
-                )}
-              </Link>
+      <div className="min-h-100">
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="overflow-hidden">
+                <CardHeader className="pb-2">
+                  <Skeleton className="h-6 w-3/4" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-4 w-1/2 mb-2" />
+                  <Skeleton className="h-4 w-1/3" />
+                </CardContent>
+                <CardFooter>
+                  <Skeleton className="h-9 w-full" />
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center bg-destructive/5 rounded-xl border border-destructive/20">
+            <h3 className="text-lg font-semibold text-destructive mb-2">Error loading PDFs</h3>
+            <p className="text-muted-foreground mb-6">{error}</p>
+            <Button
+              variant="outline"
+              className="border-destructive/30 hover:bg-destructive/10"
+              onClick={() => fetchPdfs()}
+            >
+              Try Again
             </Button>
-            <Alert
-              trigger={
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                  disabled={removePDF.loading}
-                >
-                  {removePDF.loading ? <Loader /> : <Trash2 className="h-4 w-4" />}
-                </Button>
-              }
-              title={`Delete "${pdf.title}"?`}
-              description="This will permanently remove the PDF and all related data like chats, summaries, quizzes, and flashcards. This action can't be undone."
-              onContinue={() => handleRemovePDF(pdf._id)}
-            />
-          </CardFooter>
-        </Card>
-      ))}
+          </div>
+        ) : !hasPdfs ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed rounded-xl bg-muted/10 hover:bg-muted/20 transition-colors">
+            <div className="bg-background p-4 rounded-full mb-4 shadow-sm ring-1 ring-border">
+              <FileText className="h-10 w-10 text-muted-foreground/50" />
+            </div>
+            <h3 className="text-xl font-semibold tracking-tight text-foreground">No PDFs Uploaded Yet</h3>
+            <p className="text-sm text-muted-foreground mt-2 max-w-sm">
+              Upload your first PDF to generate embeddings and start chatting with it.
+            </p>
+            <Button
+              className="mt-8"
+              onClick={() => router.push("/pdf/upload")}
+            >
+              <Plus className="mr-2 h-4 w-4" /> Upload PDF
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {pdfList.map((pdf) => (
+              <Card key={pdf._id} className="group gap-2 hover:shadow-lg transition-all duration-300 border-border/60 flex flex-col">
+                <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
+                  <div className="flex-1 space-y-3 pr-4">
+                    <CardTitle className="text-base font-semibold line-clamp-1 leading-tight" title={pdf.title}>
+                      {pdf.title}
+                    </CardTitle>
+                    <div className="text-xs text-muted-foreground flex items-center gap-2">
+                      <span className="flex items-center gap-1.5 bg-muted/50 px-2 py-0.5 rounded-md">
+                        <Calendar className="h-3 w-3" />
+                        {formatDistanceToNow(new Date(pdf.createdAt), { addSuffix: true })}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="bg-primary/10 p-2.5 rounded-xl text-primary shrink-0">
+                    <FileText className="h-5 w-5" />
+                  </div>
+                </CardHeader>
+
+                <CardContent className="pb-4 flex-1">
+                  <div className="flex items-center gap-3">
+                    <Badge variant="secondary" className="font-normal text-xs flex gap-1.5 px-2.5 py-1">
+                      <Layers className="h-3 w-3" /> {pdf.pages} Pages
+                    </Badge>
+                    <span className="text-xs text-muted-foreground border-l pl-3">
+                      {formatFileSize(pdf.fileSize)}
+                    </span>
+                  </div>
+                </CardContent>
+
+                <CardFooter className="bg-muted/5 flex gap-2">
+                  <Button className="flex-1 gap-2 shadow-sm" variant="default" asChild>
+                    <Link
+                      href={removePDF.loading ? "" : pdf.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={removePDF.loading ? "pointer-events-none opacity-50" : ""}
+                    >
+                      {removePDF.loading ? (
+                        <>Removing...</>
+                      ) : (
+                        <>
+                          <ExternalLink className="h-4 w-4" />
+                          View
+                        </>
+                      )}
+                    </Link>
+                  </Button>
+                  <Alert
+                    trigger={
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:border-destructive/30 transition-colors"
+                        disabled={removePDF.loading}
+                      >
+                        {removePDF.loading ? <Loader size={16} /> : <Trash2 className="h-4 w-4" />}
+                      </Button>
+                    }
+                    title={`Delete "${pdf.title}"?`}
+                    description="This will permanently remove the PDF and all related data like chats, summaries, quizzes, and flashcards. This action can't be undone."
+                    onContinue={() => handleRemovePDF(pdf._id)}
+                  />
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

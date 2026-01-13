@@ -20,6 +20,7 @@ import { signIn } from "next-auth/react"
 import { Loader } from "../ui/loader"
 import { useRouter } from "next/navigation"
 import { AxiosError } from "axios"
+import { useAuthIntent } from "@/providers/authintent-provider"
 
 type SignupFormData = {
   name: string
@@ -37,6 +38,7 @@ export function SignupForm({
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState<AuthLoading>(null);
   const router = useRouter();
+  const { setIntent } = useAuthIntent();
 
   const {
     register,
@@ -49,6 +51,7 @@ export function SignupForm({
 
   const onSubmit = async (data: SignupFormData) => {
     setLoading("credentials");
+    setIntent("signup");
     try {
       const res = await api.post("/auth/signup", {
         name: data.name,
@@ -74,6 +77,7 @@ export function SignupForm({
 
   const handleGoogleSignin = async () => {
     setLoading("google");
+    setIntent("signup");
     try {
       await signIn("google", { callbackUrl: "/dashboard" });
     } catch (err: unknown) {

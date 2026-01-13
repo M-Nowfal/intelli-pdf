@@ -12,6 +12,9 @@ const UserSchema = new Schema<IUser>({
     trim: true,
     unique: true
   },
+  avatar: {
+    type: String
+  },
   stats: {
     totalDocuments: {
       type: Number,
@@ -38,6 +41,11 @@ const UserSchema = new Schema<IUser>({
   },
   password: {
     type: String
+  },
+  provider: {
+    type: String,
+    enum: ["credentials", "google"],
+    required: true
   },
   isVerified: {
     type: Boolean,

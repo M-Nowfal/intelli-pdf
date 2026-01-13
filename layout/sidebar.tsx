@@ -26,14 +26,15 @@ import {
 } from "@/components/ui/collapsible";
 import { Logo } from "@/components/common/logo";
 import { APP_NAME } from "@/utils/constants";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { Alert } from "@/components/common/alert";
 import { UserAvatar } from "@/components/common/avatar";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: session } = useSession();
+  const { name, email } = useCurrentUser();
   const { isMobile, toggleSidebar } = useSidebar();
   const pathname = usePathname();
 
@@ -152,13 +153,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   size="lg"
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
-                  <UserAvatar
-                    src={session?.user?.image ?? ""}
-                    fallback={session?.user?.name ?? "U"}
-                  />
+                  <UserAvatar />
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{session?.user?.name ?? ""}</span>
-                    <span className="truncate text-xs">{session?.user?.email ?? ""}</span>
+                    <span className="truncate font-medium">{name}</span>
+                    <span className="truncate text-xs">{email}</span>
                   </div>
                   <ChevronsUpDown className="ml-auto size-4" />
                 </SidebarMenuButton>
@@ -171,13 +169,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               >
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                    <UserAvatar
-                      src={session?.user?.image ?? ""}
-                      fallback={session?.user?.name ?? ""}
-                    />
+                    <UserAvatar />
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-medium">{session?.user?.name ?? ""}</span>
-                      <span className="truncate text-xs">{session?.user?.email ?? ""}</span>
+                      <span className="truncate font-medium">{name}</span>
+                      <span className="truncate text-xs">{email}</span>
                     </div>
                   </div>
                 </DropdownMenuLabel>

@@ -697,6 +697,10 @@ function SidebarMenuSubButton({
         className
       )}
       {...props}
+      onClick={(e) => {
+        vibrate();
+        props.onClick?.(e);
+      }}
     />
   )
 }
