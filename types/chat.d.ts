@@ -1,14 +1,18 @@
-import { Schema } from "mongoose";
+import { Types } from "mongoose";
 
-interface IChatMessage {
+export interface IChatMessage {
+  _id: string | Types.ObjectId;
   role: "user" | "assistant";
   content: string;
+  sources: number[];
+  createdAt: Date;
 }
 
-interface IChat {
-  _id: string;
-  userId: string | Schema.Types.ObjectId;
-  pdfId: string | Schema.Types.ObjectId;
+export interface IChat {
+  _id: string | Types.ObjectId;
+  userId: string | Types.ObjectId;
+  pdfId: string | Types.ObjectId;
   messages: IChatMessage[];
   createdAt: Date;
+  updatedAt: Date;
 }

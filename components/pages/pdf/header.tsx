@@ -9,9 +9,9 @@ export function PDFHeader() {
         <div className="space-y-5">
           <div className="flex items-center gap-3">
             <div className="p-1.5 rounded-lg bg-accent border">
-              <BookOpen className="h-6 w-6 text-primary" strokeWidth={3} />
+              <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-primary" strokeWidth={3} />
             </div>
-            <h1 className="text-3xl font-bold tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
               AI Study Assistant
             </h1>
           </div>

@@ -60,8 +60,9 @@ export default function PDFList() {
           </p>
         </div>
         {hasPdfs && !isLoading && (
-          <Button onClick={() => router.push("/pdf/upload")} className="shadow-sm">
-            <Plus className="mr-2 h-4 w-4" /> Upload New PDF
+          <Button onClick={() => router.push("/pdf/upload")} className="shadow-sm w-fit ms-auto">
+            Upload New PDF
+            <Plus className="h-4 w-4" />
           </Button>
         )}
       </div>
@@ -109,7 +110,8 @@ export default function PDFList() {
               className="mt-8"
               onClick={() => router.push("/pdf/upload")}
             >
-              <Plus className="mr-2 h-4 w-4" /> Upload PDF
+              Upload PDF
+              <Plus className="mr-2 h-4 w-4" />
             </Button>
           </div>
         ) : (

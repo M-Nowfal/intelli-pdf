@@ -17,16 +17,22 @@ const ChatSchema = new Schema<IChat>(
       {
         role: {
           type: String,
-          enum: ["assistant", "user"]
+          enum: ["assistant", "user"],
+          required: true
         },
-        content: String,
+        content: {
+          type: String,
+          required: true
+        },
+        sources: { type: [Number], default: [] },
+        createdAt: {
+          type: Date,
+          default: Date.now
+        }
       },
     ],
-    createdAt: {
-      type: Date,
-      default: Date.now
-    }
-  }
+  },
+  { timestamps: true }
 );
 
 export const Chat = models.Chat || model<IChat>("Chat", ChatSchema);

@@ -1,11 +1,20 @@
+import { SelectPDF } from "@/components/pages/chat/select-pdf";
+
 export const metadata = {
-  title: "Intelli-PDF - AI Chat",
-  description: "Engage in intelligent conversations with your PDFs using Intelli-PDF's AI Chat feature.",
+  title: "Intelli-PDF - Select Document",
+  description: "Select a document to start chatting.",
 };
 
-export default async function AIChatPage() {
-
-  return <div className="h-screen flex items-center justify-center">
-    <h1 className="text-3xl font-semibold">AI Chat coming soon...</h1>
-  </div>
+export default function AIChatPage() {
+  return (
+    <div className="container max-w-6xl mx-auto p-4 space-y-8">
+      <div className="flex flex-col gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Select a Document</h1>
+        <p className="text-muted-foreground">
+          Choose a PDF from your library to start a new AI conversation.
+        </p>
+      </div>
+      <SelectPDF />
+    </div>
+  );
 }

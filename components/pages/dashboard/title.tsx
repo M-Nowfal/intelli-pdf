@@ -16,8 +16,8 @@ export function DashboardTitle() {
         <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Dashboard</h2>
       </div>
       <Button className="ml-auto gap-2" onClick={() => router.push("/pdf/upload")}>
+        Upload New PDF
         <Plus className="h-4 w-4" />
-        Upload PDF
       </Button>
     </div>
   );

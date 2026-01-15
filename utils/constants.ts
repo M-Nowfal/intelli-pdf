@@ -4,6 +4,8 @@ const DB_NAME: string = process.env.DB_NAME!;
 const ICON: string = "/icon0.svg";
 const APP_NAME: "Intelli-PDF" = "Intelli-PDF";
 
+const BOT: string = "/bot.png";
+
 const NEXTAUTH_SECRET: string = process.env.NEXTAUTH_SECRET!;
 
 const GOOGLE_CLIENT_ID: string = process.env.GOOGLE_CLIENT_ID!;
@@ -21,6 +23,7 @@ const GOOGLE_API_KEY: string = process.env.GOOGLE_API_KEY!;
 export {
   DB_URI, DB_NAME,
   ICON, APP_NAME,
+  BOT,
   NEXTAUTH_SECRET,
   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET,
   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS,
