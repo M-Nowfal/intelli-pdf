@@ -12,7 +12,9 @@ import {
   Sparkles,
   X,
   GalleryVerticalEnd,
-  Home,
+  Home, MessageCircle,
+  LucideIcon,
+  ListChecks, FileSearch
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuGroup,
@@ -32,11 +34,25 @@ import { UserAvatar } from "@/components/common/avatar";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { useChatStore } from "@/store/useChatStore";
+import { useEffect } from "react";
+import { formatChatListTitle } from "@/helpers/name.helper";
+
+type SubMenuItem = {
+  title: string;
+  url: string;
+  icon?: LucideIcon;
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { name, email } = useCurrentUser();
   const { isMobile, toggleSidebar } = useSidebar();
   const pathname = usePathname();
+  const { chatList, fetchChatList } = useChatStore();
+
+  useEffect(() => {
+    fetchChatList();
+  }, [fetchChatList]);
 
   async function handleLogout() {
     await signOut({ callbackUrl: "/login" });
@@ -53,8 +69,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         { title: "Upload PDF", url: "/pdf/upload" },
       ]
     },
-    { title: "AI Chat", url: "/chat", icon: Sparkles },
+    {
+      title: "AI Chat", url: "/chat", icon: Sparkles, items: [
+        { title: "New Chat", url: "/chat", icon: MessageCircle },
+        ...chatList.map(list => (
+          { title: formatChatListTitle(list.pdfId.title), url: `/chat/${list.pdfId._id}` }
+        ))
+      ]
+    },
     { title: "Flash Cards", url: "/flashcards", icon: GalleryVerticalEnd },
+    { title: "Summarise PDF", url: "/summarize", icon: FileSearch },
+    { title: "Quiz", url: "/quiz", icon: ListChecks },
     { title: "Settings", url: "/settings", icon: Settings },
   ];
 
@@ -107,14 +132,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
                       <CollapsibleContent>
                         <SidebarMenuSub className="mt-2">
-                          {item.items!.map((subItem) => (
-                            <SidebarMenuSubItem key={subItem.title}>
+                          {item.items!.map((subItem: SubMenuItem, idx) => (
+                            <SidebarMenuSubItem key={idx}>
                               <SidebarMenuSubButton
                                 asChild
                                 className="py-4"
                               >
-                                <Link href={subItem.url} className="flex justify-between" replace>
-                                  <span>{subItem.title}</span>
+                                <Link
+                                  href={subItem.url}
+                                  className="flex justify-between"
+                                  replace
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {subItem.icon && <subItem.icon className="h-4 w-4" />}
+                                    <span>{subItem.title}</span>
+                                  </div>
                                   {isActive(subItem.url) && <div className="w-2 h-2 bg-accent-foreground rounded-full" />}
                                 </Link>
                               </SidebarMenuSubButton>

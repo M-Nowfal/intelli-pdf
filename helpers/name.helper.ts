@@ -20,3 +20,12 @@ export const getColorFromName = (name: string) => {
   }
   return Math.abs(hash) % 5;
 };
+
+export function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function formatChatListTitle(title: string): string {
+  const cleanTitle = title.replace(/\(\d+\)|\d+|\.pdf/gi, "").trim();
+  return capitalize(cleanTitle);
+}

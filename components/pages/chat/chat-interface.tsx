@@ -13,98 +13,90 @@ import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
 import api from "@/lib/axios";
 import Link from "next/link";
-
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  sources?: number[];
-}
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useChatStore, Message } from "@/store/useChatStore";
 
 interface ChatInterfaceProps {
   pdfId: string;
+  title: string;
 }
 
-export function ChatInterface({ pdfId }: ChatInterfaceProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isHistoryLoading, setIsHistoryLoading] = useState(true);
+export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
+  const {
+    messages,
+    isMessagesLoading,
+    fetchMessages,
+    addMessage,
+    updateMessageContent,
+    setStreaming,
+    isStreaming,
+    addChat,
+    fetchChatList,
+    setChatId
+  } = useChatStore();
 
+  const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const scrollToBottom = () => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    const fetchChatHistory = async () => {
-      try {
-        setIsHistoryLoading(true);
-        const res = await api.get(`/chat?pdfId=${pdfId}`);
-
-        const formattedMessages: Message[] = res.data?.map((msg: any) => ({
-          id: msg._id,
-          role: msg.role,
-          content: msg.content,
-          sources: msg.sources || []
-        }));
-
-        setMessages(formattedMessages);
-      } catch (err: unknown) {
-        console.error("Error fetching history:", err);
-        toast.error("Error", { description: "Failed to load previous conversations." });
-      } finally {
-        setIsHistoryLoading(false);
-      }
-    };
-
     if (pdfId) {
-      fetchChatHistory();
+      fetchMessages(pdfId);
     }
-  }, [pdfId, toast]);
+  }, [pdfId, fetchMessages]);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, isHistoryLoading, isLoading]);
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isMessagesLoading, isStreaming]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
 
   const handleSend = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isStreaming) return;
+
+    const isNewConversation = messages.length === 0;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
       content: input,
     };
-
-    const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
+    addMessage(userMessage);
     setInput("");
-    setIsLoading(true);
+    setStreaming(true);
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMessages, pdfId }),
-      });
-
-      if (!response.ok) throw new Error("Failed to fetch response");
-
-      const sourcesHeader = response.headers.get("x-sources");
-      const sources = sourcesHeader ? JSON.parse(sourcesHeader) : [];
-
-      if (!response.body) throw new Error("No response body");
-
       const aiMessageId = (Date.now() + 1).toString();
-      setMessages((prev) => [
-        ...prev,
-        { id: aiMessageId, role: "assistant", content: "", sources },
-      ]);
+      addMessage({ id: aiMessageId, role: "assistant", content: "", sources: [] });
 
-      const reader = response.body.getReader();
+      const response = await api.post(
+        "/chat",
+        { messages: [...messages, userMessage], pdfId },
+        { adapter: "fetch", responseType: "stream" }
+      );
+
+      if (isNewConversation) {
+        const newChatId = response.headers["x-chat-id"];
+
+        if (newChatId) {
+          addChat({
+            _id: newChatId,
+            pdfId: { _id: pdfId, title }
+          });
+          setChatId(newChatId);
+        } else {
+          setTimeout(() => fetchChatList(), 1000);
+        }
+      }
+
+      const reader = response.data.getReader();
       const decoder = new TextDecoder();
       let done = false;
       let accumulatedText = "";
@@ -114,31 +106,18 @@ export function ChatInterface({ pdfId }: ChatInterfaceProps) {
         done = doneReading;
         const chunkValue = decoder.decode(value, { stream: true });
         accumulatedText += chunkValue;
-
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === aiMessageId ? { ...msg, content: accumulatedText } : msg
-          )
-        );
+        updateMessageContent(aiMessageId, accumulatedText);
       }
-    } catch (error) {
-      console.error("Stream Error:", error);
-      toast.error("Error", { description: "Failed to generate response." });
+    } catch (err) {
+      toast.error("Error generating response");
     } finally {
-      setIsLoading(false);
+      setStreaming(false);
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
-
-  if (isHistoryLoading) {
+  if (isMessagesLoading) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex justify-center p-10">
         <Loader size={50} />
       </div>
     );
@@ -187,10 +166,21 @@ export function ChatInterface({ pdfId }: ChatInterfaceProps) {
                       remarkPlugins={[remarkGfm]}
                       components={{
                         p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
-                        ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1">{children}</ul>,
-                        ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-1">{children}</ol>,
-                        li: ({ children }) => <li className="mb-1">{children}</li>,
                         strong: ({ children }) => <span className="font-semibold text-foreground">{children}</span>,
+                        em: ({ children }) => <span className="italic">{children}</span>,
+                        del: ({ children }) => <span className="line-through text-muted-foreground">{children}</span>, // Strikethrough
+
+                        h1: ({ children }) => <h1 className="mt-8 mb-4 text-3xl font-bold tracking-tight text-foreground">{children}</h1>,
+                        h2: ({ children }) => <h2 className="mt-6 mb-3 text-2xl font-semibold tracking-tight text-foreground">{children}</h2>,
+                        h3: ({ children }) => <h3 className="mt-5 mb-2 text-xl font-semibold tracking-tight text-foreground">{children}</h3>,
+                        h4: ({ children }) => <h4 className="mt-4 mb-2 text-lg font-semibold tracking-tight text-foreground">{children}</h4>,
+                        h5: ({ children }) => <h5 className="mt-4 mb-2 text-base font-semibold tracking-tight text-foreground">{children}</h5>,
+                        h6: ({ children }) => <h6 className="mt-4 mb-2 text-sm font-semibold tracking-tight text-foreground">{children}</h6>,
+
+                        ul: ({ children }) => <ul className="list-disc pl-6 mb-4 space-y-1">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal pl-6 mb-4 space-y-1">{children}</ol>,
+                        li: ({ children }) => <li className="mb-1 leading-relaxed">{children}</li>,
+
                         a: ({ children, href }) => (
                           <Link
                             href={href || "#"}
@@ -201,6 +191,41 @@ export function ChatInterface({ pdfId }: ChatInterfaceProps) {
                             {children}
                           </Link>
                         ),
+
+                        pre: ({ children }) => (
+                          <div className="my-4 w-full overflow-hidden rounded-lg bg-muted border border-border">
+                            <div className="overflow-x-auto p-4">
+                              <pre className="font-mono text-sm">{children}</pre>
+                            </div>
+                          </div>
+                        ),
+                        code: ({ node, className, children, ...props }) => {
+                          const content = String(children).replace(/\n$/, "");
+                          const isUrl = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/.test(content);
+
+                          if (isUrl) {
+                            const href = content.startsWith("http") ? content : `https://${content}`;
+                            return (
+                              <Link
+                                href={href}
+                                className="text-primary underline underline-offset-4 hover:text-primary/80 transition-colors"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {content}
+                              </Link>
+                            );
+                          }
+
+                          return (
+                            <code
+                              className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-foreground"
+                              {...props}
+                            >
+                              {children}
+                            </code>
+                          );
+                        },
 
                         table: ({ children }) => (
                           <div className="my-4 w-full overflow-hidden rounded-md border border-border bg-card">
@@ -214,31 +239,28 @@ export function ChatInterface({ pdfId }: ChatInterfaceProps) {
                             {children}
                           </thead>
                         ),
-                        tbody: ({ children }) => (
-                          <tbody className="divide-y divide-border">
-                            {children}
-                          </tbody>
-                        ),
-                        tr: ({ children }) => (
-                          <tr className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                            {children}
-                          </tr>
-                        ),
+                        tbody: ({ children }) => <tbody className="divide-y divide-border">{children}</tbody>,
+                        tr: ({ children }) => <tr className="transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">{children}</tr>,
                         th: ({ children }) => (
                           <th className="h-10 px-4 py-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">
                             {children}
                           </th>
                         ),
-                        td: ({ children }) => (
-                          <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0">
-                            {children}
-                          </td>
-                        ),
+                        td: ({ children }) => <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0">{children}</td>,
+
                         blockquote: ({ children }) => (
-                          <blockquote className="mt-6 border-l-2 border-primary pl-6 italic text-muted-foreground">
+                          <blockquote className="mt-4 border-l-2 border-primary pl-4 italic text-muted-foreground">
                             {children}
                           </blockquote>
                         ),
+                        img: ({ src, alt }) => (
+                          <img
+                            src={src}
+                            alt={alt}
+                            className="rounded-md border border-border my-4 max-w-full h-auto"
+                          />
+                        ),
+                        hr: () => <hr className="my-6 border-border" />,
                       }}
                     >
                       {message.content}
@@ -249,13 +271,16 @@ export function ChatInterface({ pdfId }: ChatInterfaceProps) {
                     <div className="flex items-center gap-2 mt-1 px-1">
                       <span className="text-xs text-muted-foreground font-medium">Source:</span>
                       {message.sources.map((page, idx) => (
-                        <span
-                          key={idx}
-                          className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium flex items-center gap-1 cursor-default hover:bg-primary/20 transition-colors"
-                          title={`Found on Page ${page}`}
-                        >
-                          <FileText className="w-3 h-3" /> Page {page}
-                        </span>
+                        <Tooltip key={idx}>
+                          <TooltipTrigger>
+                            <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium flex items-center gap-1 cursor-default hover:bg-primary/20 transition-colors">
+                              <FileText className="w-3 h-3" /> Page {page}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">
+                            Found on Page {page}
+                          </TooltipContent>
+                        </Tooltip>
                       ))}
                     </div>
                   )}
@@ -263,7 +288,7 @@ export function ChatInterface({ pdfId }: ChatInterfaceProps) {
               </div>
             ))}
 
-            {isLoading && messages[messages.length - 1]?.role === "user" && (
+            {isStreaming && messages[messages.length - 1]?.role === "user" && (
               <div className="flex items-start gap-4">
                 <Avatar className="h-8 w-8 border shrink-0 mt-1">
                   <AvatarImage src={BOT} />
@@ -281,7 +306,7 @@ export function ChatInterface({ pdfId }: ChatInterfaceProps) {
         )}
       </div>
 
-      <div className="p-4 bg-background shrink-0">
+      <div className="px-4 pt-4 pb-2 bg-background shrink-0">
         <form
           onSubmit={handleSend}
           className="relative flex items-end w-full p-2 bg-muted/50 border rounded-2xl shadow-sm focus-within:shadow-lg dark:focus-within:shadow-neutral-900 transition-all"
@@ -295,20 +320,20 @@ export function ChatInterface({ pdfId }: ChatInterfaceProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            disabled={isLoading}
+            disabled={isStreaming}
           />
 
           <div className="pb-1 pr-1">
             <Button
               type="submit"
               size="icon"
-              disabled={!input.trim() || isLoading}
+              disabled={!input.trim() || isStreaming}
               className={cn(
                 "h-8 w-8 rounded-full transition-all",
-                (!input.trim() || isLoading) ? "opacity-50 cursor-not-allowed" : "hover:bg-primary/90"
+                (!input.trim() || isStreaming) ? "opacity-50 cursor-not-allowed" : "hover:bg-primary/90"
               )}
             >
-              {isLoading ? (
+              {isStreaming ? (
                 <StopCircle className="h-4 w-4" />
               ) : (
                 <Send className="h-4 w-4" />
@@ -316,11 +341,11 @@ export function ChatInterface({ pdfId }: ChatInterfaceProps) {
             </Button>
           </div>
         </form>
-        <div className="flex justify-between mt-2 px-5">
-          <p className="text-[10px] text-muted-foreground">
+        <div className="flex justify-center md:justify-between mt-2 px-5">
+          <p className="not-md:hidden text-xs text-muted-foreground text-center">
             Press <kbd className="font-sans">Enter</kbd> to send, <kbd className="font-sans">Shift + Enter</kbd> for new line
           </p>
-          <p className="text-[10px] text-muted-foreground">
+          <p className="text-xs text-muted-foreground text-center">
             Intelli-AI can make mistakes, so double-check it
           </p>
         </div>

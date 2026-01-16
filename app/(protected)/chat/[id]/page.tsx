@@ -12,6 +12,8 @@ import { Loader } from "@/components/ui/loader";
 import { ChatInterface } from "@/components/pages/chat/chat-interface";
 import { PdfViewer } from "@/components/pages/chat/pdf-viewer";
 import { formatFileSize } from "@/helpers/file.helper";
+import { formatChatListTitle } from "@/helpers/name.helper";
+import { ChatActionMenu } from "@/components/pages/chat/chat-actions";
 
 export default function ChatPage() {
   const params = useParams();
@@ -46,7 +48,7 @@ export default function ChatPage() {
 
         <ResizablePanel
           defaultSize={20}
-          minSize={15}
+          minSize={0}
           className="hidden xl:block"
         >
           <div className="h-full w-full bg-gray-100 dark:bg-neutral-900 overflow-hidden">
@@ -60,16 +62,19 @@ export default function ChatPage() {
           <div className="flex flex-col h-full w-full">
             <div className="flex items-center justify-between border-b px-4 py-2 bg-background shrink-0">
               <h1 className="text-sm font-medium truncate max-w-40 md:max-w-md">
-                {activePdf.title}
+                {formatChatListTitle(activePdf.title)}
               </h1>
-              <div className="text-xs text-muted-foreground hidden sm:block">
-                {activePdf.pages} Pages • {formatFileSize(activePdf.fileSize)}
+              <div className="flex items-center gap-4">
+                <div className="text-xs text-muted-foreground hidden sm:block">
+                  {activePdf.pages} Pages • {formatFileSize(activePdf.fileSize)}
+                </div>
+                <ChatActionMenu title={activePdf.title} />
               </div>
             </div>
 
             <div className="flex-1 overflow-hidden w-full bg-background">
               <div className="h-full w-full max-w-5xl mx-auto flex flex-col">
-                <ChatInterface pdfId={activePdf._id} />
+                <ChatInterface pdfId={activePdf._id} title={activePdf.title} />
               </div>
             </div>
           </div>

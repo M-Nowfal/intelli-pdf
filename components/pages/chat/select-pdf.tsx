@@ -10,6 +10,7 @@ import { FileText, Calendar, Layers, MessageSquare, ArrowRight, Plus } from "luc
 import { formatDistanceToNow } from "date-fns";
 import { formatFileSize } from "@/helpers/file.helper";
 import { usePdfStore } from "@/store/usePdfStore";
+import { vibrate } from "@/lib/haptics";
 
 export function SelectPDF() {
   const { pdfs, fetchPdfs, isLoading } = usePdfStore();
@@ -67,8 +68,11 @@ export function SelectPDF() {
       {pdfs.map((pdf) => (
         <Card
           key={pdf._id}
-          onClick={() => handleSelect(pdf._id)}
-          className="gap-2 group relative flex flex-col overflow-hidden border-muted-foreground/20 transition-all duration-300 hover:shadow-lg hover:border-primary/20 cursor-pointer bg-card hover:bg-accent/30"
+          onClick={() => {
+            vibrate();
+            handleSelect(pdf._id);
+          }}
+          className="gap-2 group relative flex flex-col overflow-hidden border-muted-foreground/20 transition-all duration-300 hover:shadow-lg hover:border-primary/20 cursor-pointer bg-card hover:bg-accent/30 active:scale-95"
         >
           <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
             <div className="flex-1 space-y-2 pr-4">

@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     const newPDF = await PDF.create({
-      userId: session.user.id,
+      userId: session.user?.id,
       title: fileName,
       fileUrl: fileUrl,
       publicId: fileKey,
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     await generateAndStoreEmbeddings(newPDF._id.toString(), extractedText);
 
     return NextResponse.json({ success: true, pdfId: newPDF._id });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Processing Error:", err);
     return NextResponse.json({ 
       message: "Failed to process PDF", 

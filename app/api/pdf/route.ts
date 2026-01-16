@@ -21,7 +21,7 @@ export async function GET() {
 
     await connectDB();
 
-    const pdfs = await PDF.find({ userId: session.user.id }).sort({ createdAt: -1 });
+    const pdfs = await PDF.find({ userId: session.user?.id }).sort({ createdAt: -1 });
 
     return NextResponse.json(pdfs);
   } catch (err: unknown) {
@@ -47,7 +47,7 @@ export async function DELETE(req: NextRequest) {
 
     await connectDB();
 
-    const pdf = await PDF.findOne({ _id: pdfId, userId: session.user.id });
+    const pdf = await PDF.findOne({ _id: pdfId, userId: session.user?.id });
     if (!pdf) {
       return NextResponse.json({ message: "PDF not found or access denied" }, { status: 404 });
     }

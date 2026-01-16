@@ -122,8 +122,13 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const response = new NextResponse(stream);
-    response.headers.set("x-sources", JSON.stringify(pageNumbers));
+    const response = new NextResponse(stream,
+      {
+        headers: {
+          "x-chat-id": chat._id.toString(),
+          "x-sources": JSON.stringify(pageNumbers)
+        }
+      });
 
     return response;
 
@@ -153,7 +158,7 @@ export async function GET(req: NextRequest) {
     await connectDB();
 
     const chat = await Chat.findOne({
-      userId: session.user.id,
+      userId: session.user?.id,
       pdfId: pdfId
     }).select("messages");
 
@@ -161,7 +166,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json([]);
     }
 
-    return NextResponse.json(chat.messages);
+    return NextResponse.json(chat);
 
   } catch (err: unknown) {
     console.error("Chat API Error:", err);

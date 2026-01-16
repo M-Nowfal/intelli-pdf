@@ -1,8 +1,7 @@
+import { Chat } from "@/models/chat.model";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "../../auth/[...nextauth]/route";
-import { connectDB } from "@/lib/db";
-import { User } from "@/models/user.model";
 
 export async function GET() {
   try {
@@ -11,18 +10,17 @@ export async function GET() {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    await connectDB();
+    const chatLists = await Chat.find({ userId: session.user?.id })
+      .select("pdfId -_id")
+      .populate("pdfId", "title _id")
+      .limit(10);
+      
+    return NextResponse.json(chatLists || []);
 
-    const user = await User.findById(session.user?.id);
-
-    if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
-    }
-
-    return NextResponse.json({ success: true, stats: user.stats });
   } catch (err: unknown) {
+    console.error("Chat List API Error:", err);
     return NextResponse.json(
-      { message: "Internal Server error", error: err instanceof Error ? err.message : "Unknown error" },
+      { message: "Internal Server Error", error: err instanceof Error ? err.message : "Unknown error" },
       { status: 500 }
     );
   }
