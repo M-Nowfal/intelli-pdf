@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,7 +13,8 @@ import { usePdfStore } from "@/store/usePdfStore";
 import { vibrate } from "@/lib/haptics";
 
 export function SelectPDF() {
-  const { pdfs, fetchPdfs, isLoading } = usePdfStore();
+  const { pdfs, fetchPdfs, isPdfLoading, selectPdf } = usePdfStore();
+  const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
@@ -21,10 +22,11 @@ export function SelectPDF() {
   }, [fetchPdfs]);
 
   const handleSelect = (id: string) => {
-    router.push(`/chat/${id}`);
+    router.push((pathname === "/summarize" ? `/summarize` : `/chat`) + `/${id}`);
+    selectPdf(id);
   };
 
-  if (isLoading) {
+  if (isPdfLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {[1, 2, 3, 4].map((i) => (

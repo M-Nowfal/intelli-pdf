@@ -16,7 +16,7 @@ export default function ChatPage() {
   const params = useParams();
   const id = params.id as string;
 
-  const { pdfs, fetchPdfs, selectPdf, isLoading, getActivePdf } = usePdfStore();
+  const { pdfs, fetchPdfs, selectPdf, isPdfLoading, getActivePdf } = usePdfStore();
   const activePdf = getActivePdf();
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function ChatPage() {
     );
   }
 
-  if (isLoading || !activePdf) {
+  if (isPdfLoading || !activePdf) {
     return (
       <div className="flex h-[calc(100vh-4rem)] w-full items-center justify-center">
         <Loader size={50} />

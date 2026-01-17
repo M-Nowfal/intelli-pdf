@@ -12,9 +12,10 @@ import {
   Sparkles,
   X,
   GalleryVerticalEnd,
-  Home, MessageCircle,
+  Home, MessageCircleDashed,
   LucideIcon,
-  ListChecks, FileSearch
+  ListChecks,
+  FilePlus, ScrollText
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuGroup,
@@ -37,6 +38,7 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { useChatStore } from "@/store/useChatStore";
 import { useEffect } from "react";
 import { formatChatListTitle } from "@/helpers/name.helper";
+import { usePdfStore } from "@/store/usePdfStore";
 
 type SubMenuItem = {
   title: string;
@@ -49,10 +51,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isMobile, toggleSidebar } = useSidebar();
   const pathname = usePathname();
   const { chatList, fetchChatList } = useChatStore();
+  const { summaryList, fetchSummaryList } = usePdfStore();
 
   useEffect(() => {
     fetchChatList();
-  }, [fetchChatList]);
+    fetchSummaryList();
+  }, [fetchChatList, fetchSummaryList]);
 
   async function handleLogout() {
     await signOut({ callbackUrl: "/login" });
@@ -71,14 +75,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
     {
       title: "AI Chat", url: "/chat", icon: Sparkles, items: [
-        { title: "New Chat", url: "/chat", icon: MessageCircle },
+        { title: "New Chat", url: "/chat", icon: MessageCircleDashed },
         ...chatList.map(list => (
           { title: formatChatListTitle(list.pdfId.title), url: `/chat/${list.pdfId._id}` }
         ))
       ]
     },
     { title: "Flash Cards", url: "/flashcards", icon: GalleryVerticalEnd },
-    { title: "Summarise PDF", url: "/summarise", icon: FileSearch },
+    {
+      title: "Summarize PDF", url: "/summarize", icon: ScrollText, items: [
+        { title: "New Summary", url: "/summarize", icon: FilePlus },
+        ...summaryList.map(list => (
+          { title: formatChatListTitle(list.title || ""), url: `/summarize/${list.id}` }
+        ))
+      ]
+    },
     { title: "Quiz", url: "/quiz", icon: ListChecks },
     { title: "Settings", url: "/settings", icon: Settings },
   ];
@@ -90,7 +101,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
-              className="hover:bg-transparent data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="hover:bg-transparent data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground active:bg-transparent"
             >
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                 <Logo onlyLogo />
@@ -98,7 +109,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{APP_NAME}</span>
               </div>
-              {isMobile && <Button asChild variant="none" size="none" className="ml-auto p-0" onClick={toggleSidebar}>
+              {isMobile && <Button asChild variant="ghost" size="none" className="ml-auto" onClick={toggleSidebar}>
                 <X />
               </Button>}
             </SidebarMenuButton>

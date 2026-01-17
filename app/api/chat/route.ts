@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 import { GOOGLE_API_KEY } from "@/utils/constants";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
+import { GENERATE_CHAT_PROMPT } from "@/lib/prompts";
 
 export const maxDuration = 30;
 
@@ -68,22 +69,7 @@ export async function POST(req: NextRequest) {
 
     const contextText = similarDocs.map((doc) => doc.content).join("\n\n");
 
-    const prompt = `
-    You are an intelligent teaching assistant named "Intelli-AI". 
-    You are analyzing a PDF document.
-    Traits: Friendly, Concise, Professional.
-
-    YOUR STRICT INSTRUCTIONS:
-    1. Use ONLY the following "CONTEXT" to answer the user's question.
-    2. If the answer is NOT found in the context, explicitly say: "I'm sorry, I couldn't find that information in the document."
-    3. Format your answer using Markdown.
-
-    CONTEXT:
-    ${contextText}
-
-    USER QUESTION:
-    ${userQuestion}
-    `;
+    const prompt = GENERATE_CHAT_PROMPT(contextText, userQuestion);
 
     const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
     const streamingResponse = await model.generateContentStream(prompt);

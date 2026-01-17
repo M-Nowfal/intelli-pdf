@@ -19,7 +19,10 @@ import { formatFileSize } from "@/helpers/file.helper";
 import { useChatStore } from "@/store/useChatStore";
 
 export default function PDFList() {
-  const { pdfs, fetchPdfs, isLoading, error, removePdf } = usePdfStore();
+  const { 
+    pdfs, fetchPdfs, isPdfLoading, 
+    pdfError, removePdf, removeSummary 
+  } = usePdfStore();
   const { removeChatFromList } = useChatStore();
   const removePDF = useMutate("DELETE");
   const router = useRouter();
@@ -41,6 +44,7 @@ export default function PDFList() {
     if (!removePDF.error) {
       removePdf(pdfId);
       removeChatFromList(pdfId);
+      removeSummary(pdfId);
     }
   };
 
@@ -62,7 +66,7 @@ export default function PDFList() {
             Manage your uploaded documents and track your study progress.
           </p>
         </div>
-        {hasPdfs && !isLoading && (
+        {hasPdfs && !isPdfLoading && (
           <Button onClick={() => router.push("/pdf/upload")} className="shadow-sm w-fit ms-auto">
             Upload New PDF
             <Plus className="h-4 w-4" />
@@ -71,7 +75,7 @@ export default function PDFList() {
       </div>
 
       <div className="min-h-100">
-        {isLoading ? (
+        {isPdfLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
               <Card key={i} className="overflow-hidden">
@@ -88,10 +92,10 @@ export default function PDFList() {
               </Card>
             ))}
           </div>
-        ) : error ? (
+        ) : pdfError ? (
           <div className="flex flex-col items-center justify-center py-16 text-center bg-destructive/5 rounded-xl border border-destructive/20">
             <h3 className="text-lg font-semibold text-destructive mb-2">Error loading PDFs</h3>
-            <p className="text-muted-foreground mb-6">{error}</p>
+            <p className="text-muted-foreground mb-6">{pdfError}</p>
             <Button
               variant="outline"
               className="border-destructive/30 hover:bg-destructive/10"

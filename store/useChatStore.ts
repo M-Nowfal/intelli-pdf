@@ -111,14 +111,12 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   deleteChat: async (chatId, onSuccess) => {
-    const previousList = get().chatList;
-
     try {
       await api.delete(`/chat/action?chatId=${chatId}`);
-      set({ chatList: previousList.filter(chat => chat._id !== chatId) });
+      set({ chatList: get().chatList.filter(chat => chat._id !== chatId) });
       if (onSuccess) onSuccess();
     } catch (err: unknown) {
-      set({ chatList: previousList });
+      set({ chatList: get().chatList });
       console.error("Failed to delete chat", err);
     }
   },

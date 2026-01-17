@@ -21,7 +21,7 @@ import { useRouter } from "next/navigation";
 import { Loader } from "@/components/ui/loader";
 
 export function DashboardRecentActivity() {
-  const { pdfs, isLoading, fetchPdfs } = usePdfStore();
+  const { pdfs, isPdfLoading, fetchPdfs } = usePdfStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export function DashboardRecentActivity() {
           </Link>
         </Button>}
       </CardHeader>
-      {isLoading && <CardContent>
+      {isPdfLoading && <CardContent>
         <div className="flex justify-center">
           <Loader size={30} />
         </div>
