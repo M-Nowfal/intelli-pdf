@@ -3,9 +3,14 @@ import { Schema, model, models } from "mongoose";
 
 const FlashcardSchema = new Schema<IFlashcard>(
   {
-    pdfId: { 
-      type: Schema.Types.ObjectId, 
+    pdfId: {
+      type: Schema.Types.ObjectId,
       ref: "PDF",
+      required: true
+    },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
       required: true
     },
     question: {

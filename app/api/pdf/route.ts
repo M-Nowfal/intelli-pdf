@@ -56,12 +56,14 @@ export async function DELETE(req: NextRequest) {
       await utapi.deleteFiles(pdf.publicId);
     }
 
-    await PDF.findByIdAndDelete(pdfId);
-    await Embedding.deleteMany({ pdfId });
-    await Flashcard.deleteMany({ pdfId });
-    await Chat.deleteMany({ pdfId });
-    await Summary.deleteMany({ pdfId });
-    await Quiz.deleteMany({ pdfId });
+    await Promise.all([
+      PDF.findByIdAndDelete(pdfId),
+      Embedding.deleteMany({ pdfId }),
+      Flashcard.deleteMany({ pdfId }),
+      Chat.deleteMany({ pdfId }),
+      Summary.deleteMany({ pdfId }),
+      Quiz.deleteMany({ pdfId }),
+    ]);
 
     return NextResponse.json({ success: true, message: `PDF "${pdf.title}" deleted successfully` });
 

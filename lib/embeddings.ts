@@ -9,6 +9,7 @@ const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
 
 export async function generateAndStoreEmbeddings(
   pdfId: string,
+  userId: string,
   fullText: string
 ) {
   try {
@@ -29,6 +30,7 @@ export async function generateAndStoreEmbeddings(
 
       return {
         pdfId: pdfId,
+        userId,
         content: doc.pageContent,
         embedding: vector,
         metadata: {

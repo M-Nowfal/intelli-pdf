@@ -26,7 +26,7 @@ export function HomeLayout({
   const { isLoading, isAuthenticated } = useCurrentUser();
   const { getActivePdf } = usePdfStore();
 
-  const paths = ["/login", "/signup", "/otp", "/signout", "/forgot-password", "/account"];
+  const paths = ["/login", "/signup", "/otp", "/signout", "/forgot-password"];
   const isAuthPath = () => paths.some(path => path === pathname);
   const hideHeader = isAuthPath();
 

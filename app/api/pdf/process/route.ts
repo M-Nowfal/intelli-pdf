@@ -39,14 +39,14 @@ export async function POST(req: NextRequest) {
       fileSize: fileSize,
     });
 
-    await generateAndStoreEmbeddings(newPDF._id.toString(), extractedText);
+    await generateAndStoreEmbeddings(newPDF._id.toString(), session.user?.id, extractedText);
 
     return NextResponse.json({ success: true, newPDF });
   } catch (err: unknown) {
     console.error("Processing Error:", err);
-    return NextResponse.json({ 
-      message: "Failed to process PDF", 
-      error: err instanceof Error ? err.message : "Unknown error" 
+    return NextResponse.json({
+      message: "Failed to process PDF",
+      error: err instanceof Error ? err.message : "Unknown error"
     }, { status: 500 });
   }
 }

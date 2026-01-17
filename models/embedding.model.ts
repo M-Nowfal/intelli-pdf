@@ -7,6 +7,11 @@ const EmbeddingSchema = new Schema<IEmbedding>({
     ref: "PDF",
     required: true
   },
+  userId: {
+    type: Schema.Types.ObjectId, 
+    ref: "User",
+    required: true
+  },
   content: {
     type: String,
     required: true

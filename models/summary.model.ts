@@ -3,9 +3,14 @@ import { Schema, model, models } from "mongoose";
 
 const SummarySchema = new Schema<ISummary>(
   {
-    pdfId: { 
-      type: Schema.Types.ObjectId, 
-      ref: "PDF" 
+    pdfId: {
+      type: Schema.Types.ObjectId,
+      ref: "PDF"
+    },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true
     },
     content: {
       type: String,
