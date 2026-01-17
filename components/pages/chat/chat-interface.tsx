@@ -68,14 +68,12 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
       role: "user",
       content: input,
     };
+    
     addMessage(userMessage);
     setInput("");
     setStreaming(true);
 
     try {
-      const aiMessageId = (Date.now() + 1).toString();
-      addMessage({ id: aiMessageId, role: "assistant", content: "", sources: [] });
-
       const response = await api.post(
         "/chat",
         { messages: [...messages, userMessage], pdfId },
@@ -84,7 +82,6 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
 
       if (isNewConversation) {
         const newChatId = response.headers["x-chat-id"];
-
         if (newChatId) {
           addChat({
             _id: newChatId,
@@ -101,11 +98,20 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
       let done = false;
       let accumulatedText = "";
 
+      const aiMessageId = (Date.now() + 1).toString();
+      let isFirstChunk = true;
+
       while (!done) {
         const { value, done: doneReading } = await reader.read();
         done = doneReading;
         const chunkValue = decoder.decode(value, { stream: true });
         accumulatedText += chunkValue;
+
+        if (isFirstChunk) {
+          addMessage({ id: aiMessageId, role: "assistant", content: "", sources: [] });
+          isFirstChunk = false;
+        }
+
         updateMessageContent(aiMessageId, accumulatedText);
       }
     } catch (err) {
@@ -117,7 +123,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
 
   if (isMessagesLoading) {
     return (
-      <div className="flex justify-center p-10">
+      <div className="flex justify-center items-center h-screen">
         <Loader size={50} />
       </div>
     );

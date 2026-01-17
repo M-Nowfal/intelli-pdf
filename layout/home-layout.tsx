@@ -13,6 +13,8 @@ import { APP_NAME } from "@/utils/constants";
 import { usePathname, useRouter } from "next/navigation";
 import { AppSidebar } from "./sidebar";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { ChatActionMenu } from "@/components/pages/chat/chat-actions";
+import { usePdfStore } from "@/store/usePdfStore";
 
 export function HomeLayout({
   children,
@@ -22,6 +24,7 @@ export function HomeLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { isLoading, isAuthenticated } = useCurrentUser();
+  const { getActivePdf } = usePdfStore();
 
   const paths = ["/login", "/signup", "/otp", "/signout", "/forgot-password", "/account"];
   const isAuthPath = () => paths.some(path => path === pathname);
@@ -44,7 +47,10 @@ export function HomeLayout({
                   <Loader size={14} />
                 </div>
               ) : isAuthenticated ? (
-                <UserAvatar />
+                <>
+                  {pathname.startsWith("/chat/") && <ChatActionMenu activePdf={getActivePdf()!} />}
+                  <UserAvatar />
+                </>
               ) : (
                 <Button variant="outline" onClick={() => router.push("/login")}>
                   Login

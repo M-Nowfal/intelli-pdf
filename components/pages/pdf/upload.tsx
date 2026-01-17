@@ -34,6 +34,7 @@ import { useRouter } from "next/navigation";
 import { generateReactHelpers } from "@uploadthing/react";
 import type { OurFileRouter } from "@/app/api/uploadthing/core";
 import api from "@/lib/axios";
+import { usePdfStore } from "@/store/usePdfStore";
 
 const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 
@@ -46,6 +47,7 @@ export function PDFUpload() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [success, setSuccess] = useState(false);
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
+  const { addPdf } = usePdfStore();
 
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -69,21 +71,19 @@ export function PDFUpload() {
       const uploadedFile = res[0];
 
       try {
-        const response = await api.post(
-          "/pdf/process",
-          {
-            fileUrl: uploadedFile.ufsUrl,
-            fileKey: uploadedFile.key,
-            fileName: uploadedFile.name,
-            fileSize: uploadedFile.size,
-          },
-          { headers: { "Content-Type": "application/json" } }
-        );
+        const res = await api.post("/pdf/process", {
+          fileUrl: uploadedFile.ufsUrl,
+          fileKey: uploadedFile.key,
+          fileName: uploadedFile.name,
+          fileSize: uploadedFile.size,
+        });
 
-        if (response.status !== 200)
+        if (res.status !== 200) {
           throw new Error("Failed to process file on server");
+        }
 
         setUploadProgress(100);
+        addPdf(res.data.newPDF);
         setSuccess(true);
         toast.success("PDF uploaded & processed successfully!");
       } catch (error) {

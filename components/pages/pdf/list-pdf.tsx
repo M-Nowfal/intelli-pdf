@@ -16,9 +16,11 @@ import { Alert } from "@/components/common/alert";
 import { usePdfStore } from "@/store/usePdfStore";
 import { Loader } from "@/components/ui/loader";
 import { formatFileSize } from "@/helpers/file.helper";
+import { useChatStore } from "@/store/useChatStore";
 
 export default function PDFList() {
   const { pdfs, fetchPdfs, isLoading, error, removePdf } = usePdfStore();
+  const { removeChatFromList } = useChatStore();
   const removePDF = useMutate("DELETE");
   const router = useRouter();
 
@@ -38,6 +40,7 @@ export default function PDFList() {
     await removePDF.mutate(`/pdf?id=${pdfId}`);
     if (!removePDF.error) {
       removePdf(pdfId);
+      removeChatFromList(pdfId);
     }
   };
 

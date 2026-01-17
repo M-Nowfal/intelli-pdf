@@ -78,7 +78,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       ]
     },
     { title: "Flash Cards", url: "/flashcards", icon: GalleryVerticalEnd },
-    { title: "Summarise PDF", url: "/summarize", icon: FileSearch },
+    { title: "Summarise PDF", url: "/summarise", icon: FileSearch },
     { title: "Quiz", url: "/quiz", icon: ListChecks },
     { title: "Settings", url: "/settings", icon: Settings },
   ];

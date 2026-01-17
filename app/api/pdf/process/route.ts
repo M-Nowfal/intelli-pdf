@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 
     await generateAndStoreEmbeddings(newPDF._id.toString(), extractedText);
 
-    return NextResponse.json({ success: true, pdfId: newPDF._id });
+    return NextResponse.json({ success: true, newPDF });
   } catch (err: unknown) {
     console.error("Processing Error:", err);
     return NextResponse.json({ 

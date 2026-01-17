@@ -38,6 +38,8 @@ interface ChatState {
   addChat: (newChat: ChatItem) => void;
   clearChat: (chatId: string) => Promise<void>;
   deleteChat: (chatId: string, onSuccess?: () => void) => Promise<void>;
+
+  removeChatFromList: (pdfId: string) => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -111,14 +113,18 @@ export const useChatStore = create<ChatState>((set, get) => ({
   deleteChat: async (chatId, onSuccess) => {
     const previousList = get().chatList;
 
-    set({ chatList: previousList.filter(chat => chat._id !== chatId) });
-
     try {
       await api.delete(`/chat/action?chatId=${chatId}`);
+      set({ chatList: previousList.filter(chat => chat._id !== chatId) });
       if (onSuccess) onSuccess();
     } catch (err: unknown) {
       set({ chatList: previousList });
       console.error("Failed to delete chat", err);
     }
-  }
+  },
+
+  removeChatFromList: (pdfId) => set((state) => {
+    const filteredChats = state.chatList.filter(chats => chats.pdfId._id !== pdfId);
+    return { chatList: filteredChats };
+  })
 }));
