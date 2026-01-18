@@ -9,10 +9,10 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Sparkles, FileText, AlertCircle, FileSearch, Trash2 } from "lucide-react";
 import { MarkDown } from "@/components/common/react-markdown";
-import { usePdfStore } from "@/store/usePdfStore";
 import { Button } from "@/components/ui/button";
 import { Alert as AlertDialog } from "@/components/common/alert";
 import { toast } from "sonner";
+import { useSummaryStore } from "@/store/useSummaryStore";
 
 export default function SummarizePage() {
   const params = useParams();
@@ -24,32 +24,35 @@ export default function SummarizePage() {
     isSummaryLoading,
     summaryError,
     fetchSummary,
-    fetchSummaryList,
     deleteSummary
-  } = usePdfStore();
+  } = useSummaryStore();
 
   useEffect(() => {
     if (id) {
       fetchSummary(id);
-      fetchSummaryList();
     }
   }, [id, fetchSummary]);
 
   return (
-    <div className="max-w-4xl mx-auto py-5 px-4">
+    <div className="p-4">
       <div className="space-y-4 pb-6">
         <div className="flex items-center justify-between gap-5">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-accent border">
-              <FileSearch className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-accent border">
+                <FileSearch className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold">Document Summary</h1>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Document Summary</h1>
+            <p className="sm:text-lg ms-2">
+              A detailed breakdown of the key concepts and arguments found in your PDF.
+            </p>
           </div>
           <AlertDialog
             trigger={
               <Button size="sm">
                 <Trash2 />
-                Delete Summary
+                <span className="hidden sm:inline">Delete Summary</span>
               </Button>
             }
             title={`Delete ${summary?.title} Summary?`}
@@ -60,12 +63,9 @@ export default function SummarizePage() {
             })}
           />
         </div>
-        <p className="sm:text-lg">
-          A detailed breakdown of the key concepts and arguments found in your PDF.
-        </p>
       </div>
 
-      <Card className="shadow-lg border-border bg-card">
+      <Card className="max-w-4xl mx-auto mt-5 shadow-lg border-border bg-card">
         <CardHeader className="space-y-1">
           <div className="flex items-center gap-2 text-primary">
             <div className="p-2 bg-primary/10 rounded-full">

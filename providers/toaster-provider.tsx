@@ -9,7 +9,6 @@ export function ToasterProvider() {
     <Toaster 
       position="top-center"
       swipeDirections={["left", "right", "top"]}
-      expand
       duration={5000}
       theme={theme as "light" | "dark" | "system" | undefined}
     />

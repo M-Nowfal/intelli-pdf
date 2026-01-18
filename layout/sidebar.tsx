@@ -38,7 +38,7 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { useChatStore } from "@/store/useChatStore";
 import { useEffect } from "react";
 import { formatChatListTitle } from "@/helpers/name.helper";
-import { usePdfStore } from "@/store/usePdfStore";
+import { useSummaryStore } from "@/store/useSummaryStore";
 
 type SubMenuItem = {
   title: string;
@@ -51,7 +51,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isMobile, toggleSidebar } = useSidebar();
   const pathname = usePathname();
   const { chatList, fetchChatList } = useChatStore();
-  const { summaryList, fetchSummaryList } = usePdfStore();
+  const { summaryList, fetchSummaryList } = useSummaryStore();
 
   useEffect(() => {
     fetchChatList();
@@ -222,14 +222,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
-                    <Sparkles />
-                    Upgrade to Pro
+                    <Link href="/account/upgrade" className="flex items-center gap-2 w-full">
+                      <Sparkles />
+                      Upgrade to Pro
+                    </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
-                    <Link href="/account" replace className="flex items-center gap-2 w-full">
+                    <Link href="/account" className="flex items-center gap-2 w-full">
                       <BadgeCheck />
                       Account
                     </Link>

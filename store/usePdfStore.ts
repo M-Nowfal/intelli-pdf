@@ -6,12 +6,6 @@ interface PdfState {
   pdfs: IPDF[];
   activePdfId: string | null;
   isPdfLoading: boolean;
-
-  summary: { title: string, content: string } | null;
-  summaryList: { id: string, title: string }[];
-  isSummaryLoading: boolean;
-
-  summaryError: string | null;
   pdfError: string | null;
 
   fetchPdfs: () => Promise<void>;
@@ -19,23 +13,12 @@ interface PdfState {
   removePdf: (id: string) => void;
   selectPdf: (id: string) => void;
   getActivePdf: () => IPDF | undefined;
-
-  fetchSummary: (pdfId: string) => Promise<void>;
-  fetchSummaryList: () => Promise<void>;
-  removeSummary: (id: string) => void;
-  deleteSummary: (id: string, onSuccess: () => void) => void;
 }
 
 export const usePdfStore = create<PdfState>((set, get) => ({
   pdfs: [],
   activePdfId: null,
   isPdfLoading: false,
-
-  summary: null,
-  summaryList: [],
-  isSummaryLoading: false,
-
-  summaryError: null,
   pdfError: null,
 
   fetchPdfs: async () => {
@@ -71,73 +54,5 @@ export const usePdfStore = create<PdfState>((set, get) => ({
   getActivePdf: () => {
     const { pdfs, activePdfId } = get();
     return pdfs.find((pdf) => pdf._id === activePdfId);
-  },
-
-  fetchSummary: async (pdfId: string) => {
-    set({ isSummaryLoading: true, summaryError: null, summary: null });
-
-    try {
-      const res = await api.post(`/summary/${pdfId}`);
-
-      if (res.status !== 200) {
-        throw new Error("Failed to fetch summary");
-      }
-
-      set({
-        summary: {
-          title: res.data.pdfTitle,
-          content: res.data.summary
-        }
-      });
-    } catch (err: unknown) {
-      console.error(err);
-      set({ summaryError: "Could not generate summary. Please try again later." });
-    } finally {
-      set({ isSummaryLoading: false });
-    }
-  },
-  fetchSummaryList: async () => {
-    try {
-      if (get().summaryList.length > 0) return;
-      
-      const res = await api.get(`/summary`);
-
-      if (res.status !== 200) {
-        throw new Error("Failed to fetch summary list");
-      }
-
-      set({ summaryList: res.data });
-    } catch (err: unknown) {
-      console.error(err);
-      set({ summaryError: "Could not get summary list. Please try again later." });
-    } finally {
-      set({ isSummaryLoading: false });
-    }
-  },
-  removeSummary: (id) => set(state => {
-    return { summaryList: state.summaryList.filter(list => list.id !== id) };
-  }),
-  deleteSummary: async (id, onSuccess) => {
-    try {
-      set({ isSummaryLoading: true, summaryError: null });
-
-      const res = await api.delete(`/summary?pdfId=${id}`);
-
-      if (res.status !== 200) {
-        throw new Error("Failed to delete summary");
-      }
-
-      set({ summaryList: get().summaryList.filter(list => list.id !== id) });
-
-      if (onSuccess) {
-        onSuccess();
-      }
-
-    } catch (err: unknown) {
-      console.error(err);
-      set({ summaryError: "Deletion failed, please try again later." });
-    } finally {
-      set({ isSummaryLoading: false });
-    }
   },
 }));

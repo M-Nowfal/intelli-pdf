@@ -17,12 +17,14 @@ import { usePdfStore } from "@/store/usePdfStore";
 import { Loader } from "@/components/ui/loader";
 import { formatFileSize } from "@/helpers/file.helper";
 import { useChatStore } from "@/store/useChatStore";
+import { useSummaryStore } from "@/store/useSummaryStore";
 
 export default function PDFList() {
   const { 
     pdfs, fetchPdfs, isPdfLoading, 
-    pdfError, removePdf, removeSummary 
+    pdfError, removePdf 
   } = usePdfStore();
+  const { removeSummary } = useSummaryStore();
   const { removeChatFromList } = useChatStore();
   const removePDF = useMutate("DELETE");
   const router = useRouter();
