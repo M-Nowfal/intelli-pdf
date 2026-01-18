@@ -29,3 +29,15 @@ export const GENERATE_SUMMARY_PROMPT = (text: string) => `
   Here is the document text:
   ${text} 
 `;
+
+export const GENERATE_FLASHCARD_PROMPT = (text: string, count: number = 5) => `
+  You are a teacher creating study flashcards.
+  Based on the text below, generate ${count} distinct flashcards (Question and Answer).
+  
+  STRICT OUTPUT FORMAT: 
+  Return ONLY a raw JSON array of objects. Do not wrap in markdown code blocks.
+  Example: [{"question": "What is...", "answer": "It is..."}]
+
+  TEXT CONTENT:
+  ${text}
+`;

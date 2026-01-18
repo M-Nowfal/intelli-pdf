@@ -3,27 +3,32 @@ import { Schema, model, models } from "mongoose";
 
 const FlashcardSchema = new Schema<IFlashcard>(
   {
-    pdfId: {
-      type: Schema.Types.ObjectId,
-      ref: "PDF",
-      required: true
-    },
     userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true
     },
-    question: {
-      type: String,
-      required: true,
-      trim: true
+    pdfId: {
+      type: Schema.Types.ObjectId,
+      ref: "PDF",
+      required: true
     },
-    answer: {
-      type: String,
-      required: true,
-      trim: true
-    }
-  }
+    cards: [
+      {
+        question: {
+          type: String,
+          required: true,
+          trim: true
+        },
+        answer: {
+          type: String,
+          required: true,
+          trim: true
+        }
+      }
+    ]
+  },
+  { timestamps: true }
 );
 
 export const Flashcard = models.Flashcard || model<IFlashcard>("Flashcard", FlashcardSchema);

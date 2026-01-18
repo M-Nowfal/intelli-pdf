@@ -22,7 +22,7 @@ export function SelectPDF() {
   }, [fetchPdfs]);
 
   const handleSelect = (id: string) => {
-    router.push((pathname === "/summarize" ? `/summarize` : `/chat`) + `/${id}`);
+    router.push(`${pathname}/${id}`);
     selectPdf(id);
   };
 
