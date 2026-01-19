@@ -1,20 +1,23 @@
 import { create } from "zustand";
-import { IFlashcardItem } from "@/types/flashcard";
+import { IFlashcard, IFlashcardItem } from "@/types/flashcard";
 import { toast } from "sonner";
 import api from "@/lib/axios";
 
 interface FlashCardStore {
   flashCards: IFlashcardItem[];
+  flashCardList: IFlashcard[];
   isLoading: boolean;
   isGenerating: boolean;
 
   fetchFlashCards: (pdfId: string) => Promise<void>;
+  fetchFlashCardList: () => Promise<void>;
   generateFlashCards: (pdfId: string, count: number) => Promise<void>;
   deleteFlashCard: (pdfId: string, cardId: string) => Promise<void>;
 }
 
 export const useFlashCardStore = create<FlashCardStore>((set, get) => ({
   flashCards: [],
+  flashCardList: [],
   isLoading: false,
   isGenerating: false,
 
@@ -26,6 +29,18 @@ export const useFlashCardStore = create<FlashCardStore>((set, get) => ({
     } catch (err: unknown) {
       console.error(err);
       toast.error("Failed to load flashcards");
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+  fetchFlashCardList: async () => {
+    set({ isLoading: true });
+    try {
+      const res = await api.get("/flashcard");
+      set({ flashCardList: res.data });
+    } catch (err: unknown) {
+      console.error(err);
+      toast.error("Failed to fetch your flashcard decks");
     } finally {
       set({ isLoading: false });
     }

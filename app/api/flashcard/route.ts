@@ -10,7 +10,9 @@ export async function GET() {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const cards = await Flashcard.find({ userId: session.user?.id });
+    const cards = await Flashcard.find({ userId: session.user?.id })
+    .populate("pdfId", "title -_id")
+    .sort({ createdAt: -1 });
 
     return NextResponse.json(cards || []);
   } catch (err: unknown) {

@@ -15,7 +15,7 @@ import {
   Home, MessageCircleDashed,
   LucideIcon,
   ListChecks,
-  FilePlus, ScrollText
+  ScrollText
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuGroup,
@@ -38,7 +38,6 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { useChatStore } from "@/store/useChatStore";
 import { useEffect } from "react";
 import { formatChatListTitle } from "@/helpers/name.helper";
-import { useSummaryStore } from "@/store/useSummaryStore";
 
 type SubMenuItem = {
   title: string;
@@ -51,12 +50,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isMobile, toggleSidebar } = useSidebar();
   const pathname = usePathname();
   const { chatList, fetchChatList } = useChatStore();
-  const { summaryList, fetchSummaryList } = useSummaryStore();
 
   useEffect(() => {
     fetchChatList();
-    fetchSummaryList();
-  }, [fetchChatList, fetchSummaryList]);
+  }, [fetchChatList]);
 
   async function handleLogout() {
     await signOut({ callbackUrl: "/login" });
@@ -82,14 +79,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       ]
     },
     { title: "Flash Cards", url: "/flashcards", icon: GalleryVerticalEnd },
-    {
-      title: "Summarize PDF", url: "/summarize", icon: ScrollText, items: [
-        { title: "New Summary", url: "/summarize", icon: FilePlus },
-        ...summaryList.map(list => (
-          { title: formatChatListTitle(list.title || ""), url: `/summarize/${list.id}` }
-        ))
-      ]
-    },
+    { title: "Summarize PDF", url: "/summarize", icon: ScrollText },
     { title: "Quiz", url: "/quiz", icon: ListChecks },
     { title: "Settings", url: "/settings", icon: Settings },
   ];

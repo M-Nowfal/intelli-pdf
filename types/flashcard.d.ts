@@ -11,4 +11,5 @@ export interface IFlashcard {
   userId: string | Schema.Types.ObjectId;
   pdfId: string | Schema.Types.ObjectId;
   cards: IFlashcardItem[];
+  createdAt: Date;
 }
