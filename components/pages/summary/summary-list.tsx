@@ -9,11 +9,9 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-  CardContent,
   CardFooter
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   FilePlus,
   ScrollText,
@@ -22,6 +20,7 @@ import {
   FileText,
   Sparkles
 } from "lucide-react";
+import { CardSkeloton } from "@/components/common/card-skeloton";
 
 export function SummaryList() {
   const router = useRouter();
@@ -35,14 +34,13 @@ export function SummaryList() {
 
   return (
     <div className="flex flex-col h-full p-4 space-y-8">
-
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 shadow-sm">
-              <ScrollText className="h-6 w-6 text-primary" />
+              <ScrollText className="h-4 w-4 sm:h-6 sm:w-6 text-primary" />
             </div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
               My Summaries
             </h1>
           </div>
@@ -59,22 +57,7 @@ export function SummaryList() {
 
       <div className="flex-1 min-h-100">
         {isSummaryLoading && summaryList.length === 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="h-50 flex flex-col justify-between">
-                <CardHeader className="pb-2">
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-4 w-1/4 mt-2" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-4 w-1/2" />
-                </CardContent>
-                <CardFooter>
-                  <Skeleton className="h-9 w-full" />
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
+          <CardSkeloton />
         ) : summaryList.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-100 border-2 border-dashed rounded-3xl bg-muted/10 text-center px-4">
             <div className="p-5 rounded-full bg-primary/5 mb-4 ring-1 ring-primary/10">

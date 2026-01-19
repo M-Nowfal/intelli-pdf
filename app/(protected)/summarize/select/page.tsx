@@ -1,4 +1,4 @@
-import { SelectPDF } from "@/components/pages/chat/select-pdf";
+import { SelectPDF } from "@/components/pages/select-pdf";
 import { ScrollText } from "lucide-react";
 
 export const metadata = {

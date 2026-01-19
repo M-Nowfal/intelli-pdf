@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader } from "@/components/ui/loader";
 import {
   GalleryVerticalEnd,
   ArrowRight,
@@ -20,6 +19,8 @@ import {
   Plus,
   CalendarDays
 } from "lucide-react";
+import { vibrate } from "@/lib/haptics";
+import { CardSkeloton } from "@/components/common/card-skeloton";
 
 export function FlashCardList() {
   const router = useRouter();
@@ -29,7 +30,7 @@ export function FlashCardList() {
     fetchFlashCardList();
   }, [fetchFlashCardList]);
 
-  const handleCreateNew = () => router.push("/flashcard/select");
+  const handleCreateNew = () => router.push("/flashcards/select");
 
   return (
     <div className="flex flex-col h-full space-y-8">
@@ -55,10 +56,7 @@ export function FlashCardList() {
 
       <div className="flex-1 min-h-100">
         {isLoading && flashCardList.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 gap-4">
-            <Loader size={40} />
-            <p className="text-muted-foreground animate-pulse">Loading your decks...</p>
-          </div>
+          <CardSkeloton />
         ) : flashCardList.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-100 border-2 border-dashed rounded-3xl bg-muted/10 text-center px-4">
             <div className="p-5 rounded-full bg-primary/5 mb-4 ring-1 ring-primary/10">
@@ -79,7 +77,7 @@ export function FlashCardList() {
               <FlashcardDeckItem
                 key={item._id}
                 item={item}
-                onClick={() => router.push(`/flashcards/${item.pdfId._id || item.pdfId}`)}
+                onClick={() => router.push(`/flashcards/${item.pdfId._id}`)}
               />
             ))}
           </div>
@@ -95,13 +93,15 @@ function FlashcardDeckItem({ item, onClick }: { item: any; onClick: () => void }
 
   return (
     <Card
-      className="flex flex-col justify-between overflow-hidden border border-border/60 hover:border-primary/20 hover:shadow-xl transition-all cursor-pointer h-full"
-      onClick={onClick}
+      className="gap-2 group relative flex flex-col overflow-hidden border-muted-foreground/20 transition-all duration-300 hover:shadow-lg hover:border-primary/20 cursor-pointer bg-card hover:bg-accent/30 active:scale-95"
+      onClick={() => {
+        vibrate();
+        onClick();
+      }}
     >
-
       <CardHeader className="relative z-10">
         <div className="flex justify-between items-start">
-          <div className="p-2.5 rounded-lg bg-secondary/50 text-secondary-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+          <div className="bg-primary/10 p-2.5 rounded-xl text-primary shrink-0 group-hover:bg-primary group-hover:text-background transition-colors duration-300">
             <Layers className="h-5 w-5" />
           </div>
           <Badge variant="outline" className="text-[10px] font-medium group-hover:border-primary/30 transition-colors">
@@ -123,14 +123,12 @@ function FlashcardDeckItem({ item, onClick }: { item: any; onClick: () => void }
       </CardHeader>
 
       <CardFooter>
-        <div className="w-full flex justify-between items-center text-sm font-medium text-muted-foreground group-hover:text-foreground">
+        <div className="w-full flex justify-between items-center text-sm font-medium text-muted-foreground group-hover:text-foreground transition-all duration-300">
           <div className="flex items-center gap-2 text-xs">
             <CalendarDays className="h-3.5 w-3.5" />
             <span>Practice Now</span>
           </div>
-          <div className="bg-background rounded-full p-1.5 shadow-sm border group-hover:border-primary/30 transition-colors">
-            <ArrowRight className="h-3.5 w-3.5 text-primary -translate-x-0.5 group-hover:translate-x-0 transition-transform" />
-          </div>
+          <ArrowRight className="h-4 w-4 -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300" />
         </div>
       </CardFooter>
     </Card>

@@ -1,5 +1,5 @@
-import { SelectPDF } from "@/components/pages/chat/select-pdf";
-import { GalleryVertical } from "lucide-react";
+import { SelectPDF } from "@/components/pages/select-pdf";
+import { GalleryVerticalEnd } from "lucide-react";
 
 export const metadata = {
   title: "Intelli-PDF - AI Flashcards",
@@ -13,7 +13,7 @@ export default async function SelectPDFToGenerateFlashCardPage() {
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
           <div className="p-1.5 rounded-lg bg-accent border">
-            <GalleryVertical className="h-5 w-5 sm:h-6 sm:w-6 text-primary" strokeWidth={3} />
+            <GalleryVerticalEnd className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
             Select a Document to Generate FlashCard

@@ -4,13 +4,13 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { FileText, Calendar, Layers, MessageSquare, ArrowRight, Plus } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { formatFileSize } from "@/helpers/file.helper";
 import { usePdfStore } from "@/store/usePdfStore";
 import { vibrate } from "@/lib/haptics";
+import { CardSkeloton } from "@/components/common/card-skeloton";
 
 export function SelectPDF() {
   const { pdfs, fetchPdfs, isPdfLoading, selectPdf } = usePdfStore();
@@ -28,22 +28,7 @@ export function SelectPDF() {
 
   if (isPdfLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {[1, 2, 3, 4].map((i) => (
-          <Card key={i} className="h-50 flex flex-col justify-between">
-            <CardHeader className="pb-2">
-              <Skeleton className="h-6 w-3/4" />
-              <Skeleton className="h-4 w-1/4 mt-2" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-4 w-1/2" />
-            </CardContent>
-            <CardFooter>
-              <Skeleton className="h-9 w-full" />
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+      <CardSkeloton />
     );
   }
 

@@ -16,12 +16,9 @@ import {
 import { motion } from "framer-motion";
 import { Loader } from "@/components/ui/loader";
 import { FlashCardCount } from "./flashcard-count";
+import { Alert } from "@/components/common/alert";
 
-interface FlashcardViewProps {
-  pdfId: string;
-}
-
-export function FlashcardView({ pdfId }: FlashcardViewProps) {
+export function FlashcardView({ pdfId }: { pdfId: string }) {
   const {
     flashCards,
     isLoading,
@@ -73,8 +70,8 @@ export function FlashcardView({ pdfId }: FlashcardViewProps) {
             </div>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Flashcards</h2>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Master concepts one card at a time.
+          <p className="text-sm ms-2 text-muted-foreground">
+            Learn smarter, not harder. Build your knowledge one flashcard at a time and keep leveling up effortlessly.
           </p>
         </div>
         <FlashCardCount pdfId={pdfId} />
@@ -116,7 +113,7 @@ export function FlashcardView({ pdfId }: FlashcardViewProps) {
                 onClick={() => setIsFlipped(!isFlipped)}
                 style={{ transformStyle: "preserve-3d" }}
               >
-                <Card className="absolute inset-0 flex flex-col items-center justify-center p-6 sm:p-12 backface-hidden shadow-xl border-border/50 bg-card hover:border-primary/50 transition-colors">
+                <Card className="absolute inset-0 flex flex-col items-center justify-center p-6 sm:p-12 backface-hidden shadow-xl border-border/50 bg-card hover:border-primary/20 transition-colors">
                   <div className="absolute top-4 left-4 sm:top-6 sm:left-6">
                     <span className="text-[10px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest border border-border px-2 sm:px-3 py-1 rounded-full">
                       Question
@@ -135,22 +132,23 @@ export function FlashcardView({ pdfId }: FlashcardViewProps) {
                   </div>
                 </Card>
 
-                <Card className="absolute inset-0 flex flex-col items-center justify-center p-6 sm:p-12 backface-hidden shadow-xl bg-primary text-primary-foreground border-none"
+                <Card
+                  className="absolute inset-0 flex flex-col items-center justify-center p-6 sm:p-12 backface-hidden shadow-xl bg-green-50/90 dark:bg-green-950/20 border border-green-200/50 dark:border-green-900/50"
                   style={{ transform: "rotateY(180deg)" }}
                 >
                   <div className="absolute top-4 left-4 sm:top-6 sm:left-6">
-                    <span className="text-[10px] sm:text-xs font-bold text-primary-foreground/70 uppercase tracking-widest border border-primary-foreground/20 px-2 sm:px-3 py-1 rounded-full">
+                    <span className="text-[10px] sm:text-xs font-bold text-green-700 dark:text-green-400 uppercase tracking-widest border border-green-200 dark:border-green-800 px-2 sm:px-3 py-1 rounded-full">
                       Answer
                     </span>
                   </div>
 
                   <div className="overflow-y-auto w-full text-center hide-scrollbar max-h-full flex items-center justify-center">
-                    <p className="text-base sm:text-xl font-medium leading-relaxed text-primary-foreground/95 select-none px-2">
+                    <p className="text-base sm:text-xl font-medium leading-relaxed text-green-950/90 dark:text-green-50/90 select-none px-2">
                       {currentCard.answer}
                     </p>
                   </div>
 
-                  <div className="absolute bottom-4 sm:bottom-6 flex items-center gap-2 text-[10px] sm:text-xs text-primary-foreground/50">
+                  <div className="absolute bottom-4 sm:bottom-6 flex items-center gap-2 text-[10px] sm:text-xs text-green-600/60 dark:text-green-400/50">
                     <RotateCw className="w-3 h-3" />
                     Tap to flip back
                   </div>
@@ -170,16 +168,22 @@ export function FlashcardView({ pdfId }: FlashcardViewProps) {
               </Button>
 
               <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                  onClick={handleDelete}
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Delete Card</span>
-                  <span className="sm:hidden">Delete</span>
-                </Button>
+                <Alert
+                  trigger={
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      <span className="hidden sm:inline">Delete Card</span>
+                      <span className="sm:hidden">Delete</span>
+                    </Button>
+                  }
+                  title="Remove This Card?"
+                  description="Are you sure you want to delete this card? This action cannot be undone."
+                  onContinue={handleDelete}
+                />
               </div>
 
               <Button

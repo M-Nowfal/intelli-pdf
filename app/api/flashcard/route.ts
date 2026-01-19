@@ -11,7 +11,7 @@ export async function GET() {
     }
 
     const cards = await Flashcard.find({ userId: session.user?.id })
-    .populate("pdfId", "title -_id")
+    .populate("pdfId", "title _id")
     .sort({ createdAt: -1 });
 
     return NextResponse.json(cards || []);
