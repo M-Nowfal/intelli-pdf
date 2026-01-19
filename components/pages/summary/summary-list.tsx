@@ -18,9 +18,14 @@ import {
   ArrowRight,
   CalendarDays,
   FileText,
-  Sparkles
+  Sparkles,
+  Trash2
 } from "lucide-react";
 import { CardSkeloton } from "@/components/common/card-skeloton";
+import Link from "next/link";
+import { vibrate } from "@/lib/haptics";
+import { Alert } from "@/components/common/alert";
+import { toast } from "sonner";
 
 export function SummaryList() {
   const router = useRouter();
@@ -78,7 +83,6 @@ export function SummaryList() {
               <SummaryCard
                 key={item.id}
                 item={item}
-                onClick={() => router.push(`/summarize/${item.id}`)}
               />
             ))}
           </div>
@@ -88,22 +92,48 @@ export function SummaryList() {
   );
 }
 
-function SummaryCard({ item, onClick }: { item: { id: string, title: string }, onClick: () => void }) {
+function SummaryCard({ item }: { item: { id: string, title: string } }) {
+  const { deleteSummary } = useSummaryStore();
+  const router = useRouter();
+
   return (
-    <Card
-      className="relative flex flex-col justify-between overflow-hidden border hover:border-primary/20 hover:shadow-xl transition-all cursor-pointer h-full"
-      onClick={onClick}
-    >
+    <Card className="gap-2 group relative flex flex-col border-muted-foreground/20 transition-all duration-300 hover:shadow-lg hover:border-primary/20 bg-card hover:bg-accent/30 active:scale-95 overflow-hidden">
+      <Link
+        href={`/summarize/${item.id}`}
+        onClick={() => vibrate()}
+        className="absolute inset-0 z-20"
+      >
+        <span className="sr-only">View Deck</span>
+      </Link>
+      <div className="absolute top-2 right-2 z-20">
+        <Alert
+          trigger={
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="h-8 w-8 transition-all duration-300 opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
+            >
+              <Trash2 className="h-4 w-4" />
+              <span className="sr-only">Delete Deck</span>
+            </Button>
+          }
+          title={`Delete Summary?`}
+          description="This action will remove this summary permanently. You won't be able to recover it."
+          onContinue={() => deleteSummary(item.id, () => {
+            toast.success("Summary deleted successfully");
+            router.push("/summarize");
+          })}
+        />
+      </div>
       <CardHeader className="relative z-10 space-y-4">
-        <div className="flex justify-between items-start">
-          <div className="p-2.5 rounded-lg bg-secondary/50 text-secondary-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+        <div className="flex items-center gap-5">
+          <div className="bg-primary/10 p-2.5 rounded-xl text-primary shrink-0 group-hover:bg-primary group-hover:text-background transition-colors duration-300">
             <FileText className="h-5 w-5" />
           </div>
           <Badge variant="secondary" className="text-[10px] font-medium bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
             AI Summary
           </Badge>
         </div>
-
         <div className="space-y-1">
           <CardTitle className="line-clamp-2 text-lg font-bold leading-tight group-hover:text-primary transition-colors">
             {item.title || "Untitled Document"}
@@ -111,7 +141,7 @@ function SummaryCard({ item, onClick }: { item: { id: string, title: string }, o
           <CardDescription className="flex items-center gap-2 text-xs font-mono pt-1">
             <span>ID:</span>
             <span className="bg-muted px-1.5 py-0.5 rounded text-foreground/70">
-              {item.id.slice(-6).toUpperCase()}
+              {item.id.slice(-7).toUpperCase()}
             </span>
           </CardDescription>
         </div>
@@ -119,14 +149,11 @@ function SummaryCard({ item, onClick }: { item: { id: string, title: string }, o
 
       <CardFooter>
         <div className="w-full flex justify-between items-center text-sm font-medium text-muted-foreground group-hover:text-foreground">
-          <div className="flex items-center gap-2 text-xs">
+          <div className="flex items-center gap-2 text-xs transition-all duration-300">
             <CalendarDays className="h-3.5 w-3.5" />
             <span>View Full Summary</span>
           </div>
-          <div className="bg-background rounded-full p-1.5 shadow-sm border group-hover:border-primary/30 transition-colors">
-            <ArrowRight className="h-3.5 w-3.5 text-primary -translate-x-0.5 group-hover:translate-x-0 transition-transform" />
-          </div>
-        </div>
+          <ArrowRight className="h-4 w-4 -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300" />          </div>
       </CardFooter>
     </Card>
   );

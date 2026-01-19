@@ -13,6 +13,7 @@ interface FlashCardStore {
   fetchFlashCardList: () => Promise<void>;
   generateFlashCards: (pdfId: string, count: number) => Promise<void>;
   deleteFlashCard: (pdfId: string, cardId: string) => Promise<void>;
+  deleteFlashCards: (deckId: string) => Promise<void>;
 }
 
 export const useFlashCardStore = create<FlashCardStore>((set, get) => ({
@@ -72,4 +73,25 @@ export const useFlashCardStore = create<FlashCardStore>((set, get) => ({
       toast.error("Could not delete flashcard");
     }
   },
+  deleteFlashCards: async (deckId: string) => {
+    const originalList = get().flashCardList;
+
+    set((state) => ({
+      flashCardList: state.flashCardList.filter((deck) => deck._id !== deckId)
+    }));
+
+    try {
+      const res = await api.delete(`/flashcard?flashCardId=${deckId}`);
+
+      if (res.status !== 200) {
+        throw new Error("Failed to delete");
+      }
+
+      toast.success("Deck deleted successfully");
+    } catch (err: unknown) {
+      console.error(err);
+      set({ flashCardList: originalList });
+      toast.error("Failed to delete deck");
+    }
+  }
 }));

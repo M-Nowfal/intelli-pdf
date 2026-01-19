@@ -70,7 +70,7 @@ export function FlashcardView({ pdfId }: { pdfId: string }) {
             </div>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Flashcards</h2>
           </div>
-          <p className="text-sm ms-2 text-muted-foreground">
+          <p className="text-sm ms-2 max-w-md text-muted-foreground">
             Learn smarter, not harder. Build your knowledge one flashcard at a time and keep leveling up effortlessly.
           </p>
         </div>
@@ -96,7 +96,7 @@ export function FlashcardView({ pdfId }: { pdfId: string }) {
             </div>
           </div>
         ) : (
-          <div className="w-full max-w-2xl space-y-8 flex flex-col justify-center h-[60vh] lg:h-[80vh]">
+          <div className="w-full max-w-2xl space-y-8 flex flex-col justify-center mt-8 h-[60vh]">
             <div className="space-y-2">
               <div className="flex justify-between text-sm font-medium text-muted-foreground">
                 <span>Card {currentIndex + 1} of {flashCards.length}</span>

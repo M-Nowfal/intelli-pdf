@@ -18,7 +18,7 @@ import { toast } from "sonner";
 
 export function FlashCardCount({ pdfId }: { pdfId: string }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [numCardsToGenerate, setNumCardsToGenerate] = useState(5);
+  const [numCardsToGenerate, setNumCardsToGenerate] = useState(0);
   const { generateFlashCards, isGenerating, isLoading } = useFlashCardStore(); 
 
   const handleGenerate = async () => {
@@ -41,12 +41,12 @@ export function FlashCardCount({ pdfId }: { pdfId: string }) {
           {isGenerating ? (
             <Loader />
           ) : (
-            <Sparkles className="w-4 h-4 mr-2" />
+            <Sparkles />
           )}
           {isGenerating ? "Generating" : "Generate New Cards"}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-106.25">
+      <DialogContent className="sm:max-w-106.25" onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Generate Flashcards</DialogTitle>
           <DialogDescription>
@@ -60,17 +60,17 @@ export function FlashCardCount({ pdfId }: { pdfId: string }) {
             </Label>
             <Input
               id="numCards"
-              type="number"
+              type="string"
               min={1}
               max={20}
               value={numCardsToGenerate}
-              onChange={(e) => setNumCardsToGenerate(parseInt(e.target.value) || 5)}
+              onChange={(e) => setNumCardsToGenerate(parseInt(e.target.value) || 0)}
               className="col-span-4"
             />
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit" onClick={handleGenerate} disabled={isGenerating}>
+          <Button type="submit" onClick={handleGenerate} disabled={numCardsToGenerate === 0 || isGenerating}>
             {isGenerating ? "Creating" : "Generate"}
             {isGenerating && <Loader />}
           </Button>
