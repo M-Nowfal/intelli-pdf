@@ -78,6 +78,9 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
         { adapter: "fetch", responseType: "stream" }
       );
 
+      const sourcesHeader = response.headers["x-sources"];
+      const sources = sourcesHeader ? JSON.parse(sourcesHeader) : [];
+
       if (isNewConversation) {
         const newChatId = response.headers["x-chat-id"];
         if (newChatId) {
@@ -106,7 +109,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
         accumulatedText += chunkValue;
 
         if (isFirstChunk) {
-          addMessage({ id: aiMessageId, role: "assistant", content: "", sources: [] });
+          addMessage({ id: aiMessageId, role: "assistant", content: "", sources });
           isFirstChunk = false;
         }
 
@@ -170,20 +173,24 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
                   </div>
 
                   {message.role === "assistant" && message.sources && message.sources.length > 0 && (
-                    <div className="flex items-center gap-2 mt-1 px-1">
-                      <span className="text-xs text-muted-foreground font-medium">Source:</span>
-                      {message.sources.map((page, idx) => (
-                        <Tooltip key={idx}>
-                          <TooltipTrigger>
-                            <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium flex items-center gap-1 cursor-default hover:bg-primary/20 transition-colors">
-                              <FileText className="w-3 h-3" /> Page {page}
+                    <div className="mt-2 px-1">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="inline-flex items-center gap-1.5 text-xs bg-primary/10 text-primary px-3 py-1.5 rounded-full font-medium cursor-default hover:bg-primary/20 transition-colors border border-primary/20 select-none">
+                            <FileText className="w-3.5 h-3.5" />
+                            <span>
+                              Sources: Page {message.sources.slice(0, 2).join(", ")}
+                              {message.sources.length > 2 ? "..." : ""}
                             </span>
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom">
-                            Found on Page {page}
-                          </TooltipContent>
-                        </Tooltip>
-                      ))}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="max-w-75 wrap-break-word">
+                          <p>
+                            <span className="font-semibold">Found on Pages:</span>{" "}
+                            {message.sources.join(", ")}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   )}
                 </div>

@@ -7,47 +7,60 @@ import { GOOGLE_API_KEY } from "@/utils/constants";
 const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
 const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
 
+type PageData = {
+  text: string;
+  pageNumber: number;
+};
+
 export async function generateAndStoreEmbeddings(
   pdfId: string,
   userId: string,
-  fullText: string
+  pages: PageData[]
 ) {
   try {
     await connectDB();
-
-    const cleanedText = fullText.replace(/\s+/g, " ").trim();
 
     const splitter = new RecursiveCharacterTextSplitter({
       chunkSize: 1000,
       chunkOverlap: 200,
     });
 
-    const docs = await splitter.createDocuments([cleanedText]);
+    const embeddingData = [];
 
-    const embeddingPromises = docs.map(async (doc) => {
-      const result = await model.embedContent(doc.pageContent);
-      const vector = result.embedding.values;
+    console.log(`Processing ${pages.length} pages for PDF ${pdfId}...`);
 
-      return {
-        pdfId: pdfId,
-        userId,
-        content: doc.pageContent,
-        embedding: vector,
-        metadata: {
-          loc: doc.metadata.loc,
-        }
-      };
-    });
+    for (const page of pages) {
+      const cleanedText = page.text.replace(/\s+/g, " ").trim();
+      
+      if (cleanedText.length < 10) continue;
 
-    const embeddingData = await Promise.all(embeddingPromises);
+      const chunks = await splitter.createDocuments([cleanedText]);
 
-    await Embedding.insertMany(embeddingData);
+      for (const chunk of chunks) {
+        const result = await model.embedContent(chunk.pageContent);
+        const vector = result.embedding.values;
+
+        embeddingData.push({
+          pdfId: pdfId,
+          userId,
+          content: chunk.pageContent,
+          embedding: vector,
+          metadata: {
+            pageNumber: page.pageNumber,
+          },
+        });
+      }
+    }
+
+    if (embeddingData.length > 0) {
+      await Embedding.insertMany(embeddingData);
+    }
 
     console.log(`Stored ${embeddingData.length} chunks for PDF ${pdfId}`);
     return { success: true };
 
-  } catch (error) {
-    console.error("Error generating embeddings:", error);
-    throw error;
+  } catch (err: unknown) {
+    console.error("Error generating embeddings:", err);
+    throw err;
   }
 }

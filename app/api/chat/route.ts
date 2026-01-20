@@ -64,7 +64,10 @@ export async function POST(req: NextRequest) {
     ]);
 
     const pageNumbers = Array.from(
-      new Set(similarDocs.map((doc) => doc.metadata.pageNumber))
+      new Set(
+        similarDocs.map(doc => doc.metadata?.pageNumber)
+          .filter(num => num !== undefined && num !== null)
+      )
     ).sort((a, b) => a - b);
 
     const contextText = similarDocs.map((doc) => doc.content).join("\n\n");

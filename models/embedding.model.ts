@@ -22,8 +22,7 @@ const EmbeddingSchema = new Schema<IEmbedding>({
     index: true
   },
   metadata: {
-    pageNumber: Number,
-    loc: { lines: { from: Number, to: Number } }
+    pageNumber: Number
   }
 });
 

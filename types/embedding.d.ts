@@ -8,6 +8,5 @@ interface IEmbedding {
   embedding: number[];
   metadata: {
     pageNumber?: number;
-    loc?: { lines: { from: number; to: number } };
   }
 }

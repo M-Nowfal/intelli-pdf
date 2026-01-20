@@ -9,7 +9,9 @@ import pdfParse from "pdf-parse";
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    if (!session || !session.user?.id) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
 
     const { fileUrl, fileKey, fileName, fileSize } = await req.json();
     if (!fileUrl) return NextResponse.json({ message: "Missing file URL" }, { status: 400 });
@@ -17,7 +19,26 @@ export async function POST(req: NextRequest) {
     const res = await fetch(fileUrl);
     const buffer = Buffer.from(await res.arrayBuffer());
 
-    const parsed = await pdfParse(buffer);
+    const pages: { text: string; pageNumber: number }[] = [];
+
+    const parsed = await pdfParse(buffer, {
+      pagerender: function (pageData: any) {
+        return pageData.getTextContent().then(function (textContent: any) {
+          let text = "";
+          for (let item of textContent.items) {
+            text += item.str + " ";
+          }
+          
+          pages.push({
+            text: text,
+            pageNumber: pageData.pageIndex + 1
+          });
+          
+          return text;
+        });
+      }
+    });
+
     const extractedText = parsed.text;
     const pageCount = parsed.numpages;
 
@@ -31,7 +52,7 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     const newPDF = await PDF.create({
-      userId: session.user?.id,
+      userId: session.user.id,
       title: fileName,
       fileUrl: fileUrl,
       publicId: fileKey,
@@ -39,9 +60,10 @@ export async function POST(req: NextRequest) {
       fileSize: fileSize,
     });
 
-    await generateAndStoreEmbeddings(newPDF._id.toString(), session.user?.id, extractedText);
+    await generateAndStoreEmbeddings(newPDF._id.toString(), session.user.id, pages);
 
     return NextResponse.json({ success: true, newPDF });
+
   } catch (err: unknown) {
     console.error("Processing Error:", err);
     return NextResponse.json({
