@@ -138,6 +138,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                               <SidebarMenuSubButton
                                 asChild
                                 className="py-4"
+                                onClick={toggleSidebar}
                               >
                                 <Link
                                   href={subItem.url}
@@ -164,6 +165,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         ? "bg-slate-200 dark:bg-sidebar-accent text-sidebar-accent-foreground font-medium"
                         : "hover:bg-sidebar-accent"
                         }`}
+                      onClick={toggleSidebar}
                     >
                       <Link href={item.url} replace>
                         {item.icon && <item.icon className="h-4 w-4" />}

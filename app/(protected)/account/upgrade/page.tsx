@@ -29,8 +29,8 @@ export default function UpgradePage() {
   return (
     <div className="min-h-[calc(100vh-4rem)] w-full bg-background flex flex-col items-center justify-center py-12 px-4 md:px-6">
       
-      <div className="text-center space-y-4 mb-10 max-w-3xl">
-        <h1 className="text-3xl md:text-5xl font-bold tracking-tight">
+      <div className="text-center mb-10 max-w-3xl">
+        <h1 className="text-3xl md:text-5xl font-bold tracking-tight not-sm:max-w-5/6 m-auto mb-5">
           Unlock the full power of <span className="text-primary">Intelli-AI</span>
         </h1>
         <p className="text-muted-foreground text-lg md:text-xl">

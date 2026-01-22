@@ -9,16 +9,33 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export function ThemeToggler({ allTheme = false }: { allTheme?: boolean }) {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const meta = document.querySelector("meta[name='theme-color']");
-    const color = theme === "dark" ? "#000" : "#fff";
-    meta?.setAttribute("content", color);
-  }, [theme]);
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    const color = resolvedTheme === "dark" ? "#000000" : "#ffffff";
+
+    let meta = document.querySelector("meta[name='theme-color']");
+    
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.setAttribute('name', 'theme-color');
+      document.head.appendChild(meta);
+    }
+
+    meta.setAttribute("content", color);
+  }, [resolvedTheme, mounted]);
+
+  if (!mounted) return null;
 
   return (
     !allTheme ? (

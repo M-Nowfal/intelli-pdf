@@ -52,7 +52,7 @@ export function DashboardRecentActivity() {
         </div>
       </CardContent>}
       {hasPdf && <CardContent>
-        <div className="grid lg:grid-cols-2">
+        <div className="grid lg:grid-cols-2 gap-3">
           {pdfs.slice(0, 5).map((pdf) => (
             <div key={pdf._id} className="flex items-center gap-4 rounded-md border p-4 transition-colors hover:bg-muted/50">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">

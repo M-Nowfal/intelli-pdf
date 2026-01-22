@@ -11,6 +11,7 @@ export function ToasterProvider() {
       swipeDirections={["left", "right", "top"]}
       duration={5000}
       theme={theme as "light" | "dark" | "system" | undefined}
+      closeButton
     />
   );
 }
