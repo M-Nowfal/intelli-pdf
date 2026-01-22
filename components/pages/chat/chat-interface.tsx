@@ -10,9 +10,38 @@ import { BOT } from "@/utils/constants";
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
 import api from "@/lib/axios";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useChatStore, Message } from "@/store/useChatStore";
 import { MarkDown } from "@/components/common/react-markdown";
+
+const SourceBadge = ({ sources }: { sources: number[] }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <TooltipProvider delayDuration={0}>
+      <Tooltip open={isOpen} onOpenChange={setIsOpen}>
+        <TooltipTrigger asChild>
+          <div
+            onClick={() => setIsOpen((prev) => !prev)}
+            className="inline-flex items-center gap-1.5 text-xs bg-primary/10 text-primary px-3 py-1.5 rounded-full font-medium cursor-pointer hover:bg-primary/20 transition-colors border border-primary/20 select-none"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span>
+              Sources: Page {sources.slice(0, 2).join(", ")}
+              {sources.length > 2 ? "..." : ""}
+            </span>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" className="max-w-62.5 wrap-break-word">
+          <p className="text-sm">
+            <span className="font-semibold">Found on Pages:</span>{" "}
+            {sources.join(", ")}
+          </p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
 
 interface ChatInterfaceProps {
   pdfId: string;
@@ -66,7 +95,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
       role: "user",
       content: input,
     };
-    
+
     addMessage(userMessage);
     setInput("");
     setStreaming(true);
@@ -174,23 +203,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
 
                   {message.role === "assistant" && message.sources && message.sources.length > 0 && (
                     <div className="mt-2 px-1">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="inline-flex items-center gap-1.5 text-xs bg-primary/10 text-primary px-3 py-1.5 rounded-full font-medium cursor-default hover:bg-primary/20 transition-colors border border-primary/20 select-none">
-                            <FileText className="w-3.5 h-3.5" />
-                            <span>
-                              Sources: Page {message.sources.slice(0, 2).join(", ")}
-                              {message.sources.length > 2 ? "..." : ""}
-                            </span>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom" className="max-w-75 wrap-break-word">
-                          <p>
-                            <span className="font-semibold">Found on Pages:</span>{" "}
-                            {message.sources.join(", ")}
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
+                      <SourceBadge sources={message.sources} />
                     </div>
                   )}
                 </div>
