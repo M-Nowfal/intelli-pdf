@@ -41,3 +41,19 @@ export const GENERATE_FLASHCARD_PROMPT = (text: string, count: number = 5) => `
   TEXT CONTENT:
   ${text}
 `;
+
+export const GENERATE_QUIZ_PROMPT = (text: string, amount: number = 5) => `
+  You are an expert teacher creating quizzes. 
+  Based on the following text context, generate a quiz with exactly ${amount} multiple-choice questions.
+  
+  CONTEXT:
+  ${text.substring(0, 15000)} 
+  
+  STRICT OUTPUT FORMAT: 
+  Return ONLY a raw JSON array of objects. Do not include markdown formatting like \`\`\`json.
+  
+  EACH OBJECT MUST HAVE:
+  - "question": string
+  - "options": array of 4 strings
+  - "answer": string (must be exactly one of the options)
+`;
