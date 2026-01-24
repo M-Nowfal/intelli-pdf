@@ -1,9 +1,10 @@
 interface DashboardStats {
   totalDocuments: number;
+  weeklyUploads: number;
   flashcardsMastered: number;
   studyStreak: {
     streak: number;
-    lastActive: Date;
+    lastStudyDate: Date | null;
   };
   aiCredits: number;
 }

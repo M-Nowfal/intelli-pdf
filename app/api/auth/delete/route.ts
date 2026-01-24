@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { connectDB } from "@/lib/db";
 import { User } from "@/models/user.model";
@@ -13,7 +13,7 @@ import { Flashcard } from "@/models/flashcard.model";
 import { Quiz } from "@/models/quiz.model";
 import { Summary } from "@/models/summary.model";
 
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -61,10 +61,10 @@ export async function DELETE(req: Request) {
 
     return NextResponse.json({ message: "Account deleted successfully" });
 
-  } catch (error: any) {
-    console.error("Delete Account Error:", error);
+  } catch (err: unknown) {
+    console.error("Delete Account Error:", err);
     return NextResponse.json(
-      { message: "Internal Server Error", error: error.message },
+      { message: "Internal Server Error", error: err instanceof Error ? err.message : "Unknown error" },
       { status: 500 }
     );
   }

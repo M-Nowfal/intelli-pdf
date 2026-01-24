@@ -9,13 +9,12 @@ interface DashboardStore {
   decrementCredits: (amount: number) => void;
 }
 
-export const useDashboardStore = create<DashboardStore>((set, get) => ({
+export const useDashboardStore = create<DashboardStore>((set) => ({
   stats: null,
   isLoading: false,
   error: null,
 
   fetchStats: async () => {
-    if (get().stats) return;
 
     set({ isLoading: true, error: null });
 
@@ -25,15 +24,8 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
       if (response.status !== 200)
         throw new Error(response.data.message || "Failed to fetch stats");
 
-      const statsData = response.data.stats;
-
       set({
-        stats: {
-          totalDocuments: statsData.totalDocuments,
-          flashcardsMastered: statsData.flashcardsMastered,
-          studyStreak: statsData.studyStreak,
-          aiCredits: statsData.aiCredits
-        },
+        stats: response.data.stats,
         error: null
       });
     } catch (error: any) {
@@ -45,9 +37,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
 
   decrementCredits: (amount) => set((state) => ({
     stats: state.stats ? {
-      totalDocuments: state.stats.totalDocuments,
-      flashcardsMastered: state.stats.flashcardsMastered,
-      studyStreak: state.stats.studyStreak,
+      ...state.stats,
       aiCredits: Math.max(0, state.stats.aiCredits - amount)
     } : null
   }))

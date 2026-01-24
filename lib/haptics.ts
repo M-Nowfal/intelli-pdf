@@ -1,6 +1,9 @@
-export function vibrate(duration: number = 60): void {
+import { useSettingsStore } from "@/store/useSettingsStore";
 
-  if (typeof navigator !== "undefined" && navigator.vibrate) {
+export function vibrate(duration: number = 60): void {
+  const { haptics } = useSettingsStore.getState();
+
+  if (haptics && typeof navigator !== "undefined" && navigator.vibrate) {
     navigator.vibrate?.(duration);
   }
 }

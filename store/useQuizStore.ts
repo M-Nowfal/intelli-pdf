@@ -39,6 +39,8 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   isLoading: false,
 
   fetchQuizzes: async () => {
+    if (get().quizzes.length > 0) return;
+    
     set({ isLoading: true });
     try {
       const res = await api.get("/quiz");

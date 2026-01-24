@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard, FileText,
-  Settings, BadgeCheck, Bell, ChevronsUpDown, LogOut,
+  Settings, ChevronsUpDown, LogOut,
   Sparkles,
   X,
   GalleryVerticalEnd,
@@ -18,8 +18,8 @@ import {
   ScrollText
 } from "lucide-react";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuGroup,
-  DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator,
+  DropdownMenu, DropdownMenuContent,
+  DropdownMenuItem, DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
@@ -32,12 +32,13 @@ import { APP_NAME } from "@/utils/constants";
 import { signOut } from "next-auth/react";
 import { Alert } from "@/components/common/alert";
 import { UserAvatar } from "@/components/common/avatar";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useChatStore } from "@/store/useChatStore";
 import { useEffect } from "react";
 import { formatChatListTitle } from "@/helpers/name.helper";
+import { vibrate } from "@/lib/haptics";
 
 type SubMenuItem = {
   title: string;
@@ -50,6 +51,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isMobile, toggleSidebar } = useSidebar();
   const pathname = usePathname();
   const { chatList, fetchChatList } = useChatStore();
+  const router = useRouter();
 
   useEffect(() => {
     fetchChatList();
@@ -147,7 +149,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 >
                                   <div className="flex items-center gap-2">
                                     {subItem.icon && <subItem.icon className="h-4 w-4" />}
-                                    <span>{subItem.title}</span>
+                                    <span className="line-clamp-1 max-w-38">{subItem.title}</span>
                                   </div>
                                   {isActive(subItem.url) && <div className="w-2 h-2 bg-accent-foreground rounded-full" />}
                                 </Link>
@@ -198,11 +200,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-                side={isMobile ? "bottom" : "right"}
+                side="bottom"
                 align="end"
-                sideOffset={4}
+                sideOffset={6}
               >
-                <DropdownMenuLabel className="p-0 font-normal">
+                <DropdownMenuItem
+                  className="p-0 font-normal cursor-pointer"
+                  onSelect={() => {
+                    vibrate();
+                    setTimeout(() => {
+                      router.push("/settings");
+                      if (isMobile) toggleSidebar();
+                    }, 150);
+                  }}
+                >
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <UserAvatar />
                     <div className="grid flex-1 text-left text-sm leading-tight">
@@ -210,29 +221,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       <span className="truncate text-xs">{email}</span>
                     </div>
                   </div>
-                </DropdownMenuLabel>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <Link href="/account/upgrade" className="flex items-center gap-2 w-full">
-                      <Sparkles />
-                      Upgrade to Pro
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <Link href="/account" className="flex items-center gap-2 w-full">
-                      <BadgeCheck />
-                      Account
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Bell />
-                    Notifications
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
+                <DropdownMenuItem
+                  onSelect={() => {
+                    vibrate();
+                    setTimeout(() => {
+                      router.push("/upgrade");
+                      if (isMobile) toggleSidebar();
+                    }, 150);
+                  }}
+                  className="cursor-pointer"
+                >
+                  <Sparkles />
+                  Upgrade to Pro
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <Alert
                   trigger={
@@ -251,6 +254,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
-    </Sidebar>
+    </Sidebar >
   );
 }

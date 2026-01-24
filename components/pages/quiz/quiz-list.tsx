@@ -8,6 +8,7 @@ import { Trash2, PlayCircle, BookOpen, ListChecks } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { Loader } from "@/components/ui/loader";
+import { Alert } from "@/components/common/alert";
 
 export function QuizList() {
   const { quizzes, fetchQuizzes, deleteQuiz, isLoading } = useQuizStore();
@@ -19,7 +20,7 @@ export function QuizList() {
 
   if (isLoading && quizzes.length === 0) {
     return (
-      <div className="flex justify-center items-center h-[50vh] mt-20">
+      <div className="flex justify-center items-center h-[80vh]">
         <Loader size={50} />
       </div>
     );
@@ -91,15 +92,21 @@ export function QuizList() {
                     <PlayCircle />
                     {quiz.score > 0 ? "Retake" : "Start"}
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="hover:text-red-500 ps-1"
-                    onClick={() => deleteQuiz(quiz.pdfId._id)}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? <Loader /> : <Trash2 />}
-                  </Button>
+                  <Alert
+                    trigger={
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:border-destructive/30 transition-colors"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? <Loader size={16} /> : <Trash2 className="h-4 w-4" />}
+                      </Button>
+                    }
+                    title={`Delete "${quiz.pdfId.title}"?`}
+                    description="This will permanently remove the quiz from the server. This action can't be undone."
+                    onContinue={() => deleteQuiz(quiz.pdfId._id)}
+                  />
                 </CardFooter>
               </Card>
             ))}

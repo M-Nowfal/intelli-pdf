@@ -26,72 +26,65 @@ export function DashboardStats() {
   }, [fetchStats]);
 
   useEffect(() => {
-    if (error) 
-      toast.error(error);
+    if (error) toast.error(error);
   }, [error]);
 
   return (
     <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+      
       <Card className="gap-3 bg-linear-to-br from-blue-50 to-blue-100/30 dark:from-blue-950/20 dark:to-blue-900/10 shadow hover:shadow-xl transition-all">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm font-medium">
-            Total Documents
-          </CardTitle>
+          <CardTitle className="text-sm font-medium">Total Documents</CardTitle>
           <FileText className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {isLoading ? <Loader /> : stats?.totalDocuments}
+            {isLoading ? <Loader size={15} /> : stats?.totalDocuments || 0}
           </div>
           <p className="text-xs text-muted-foreground">
-            +2 uploaded this week
+            {isLoading ? "..." : `+${stats?.weeklyUploads || 0} uploaded this week`}
           </p>
         </CardContent>
       </Card>
+
       <Card className="gap-3 bg-linear-to-br from-green-50 to-green-100/30 dark:from-green-950/20 dark:to-green-900/10 shadow hover:shadow-xl transition-all">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm font-medium">
-            Flashcards Mastered
-          </CardTitle>
+          <CardTitle className="text-sm font-medium">FlashCards Created</CardTitle>
           <GalleryVerticalEnd className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {isLoading ? <Loader /> : stats?.flashcardsMastered}
+            {isLoading ? <Loader size={15} /> : stats?.flashcardsMastered || 0}
           </div>
           <p className="text-xs text-muted-foreground">
-            +18% from last month
+            Lifetime generated
           </p>
         </CardContent>
       </Card>
+
       <Card className="gap-3 bg-linear-to-br from-purple-50 to-purple-100/30 dark:from-purple-950/20 dark:to-purple-900/10 shadow hover:shadow-xl transition-all">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm font-medium">
-            Study Streak
-          </CardTitle>
+          <CardTitle className="text-sm font-medium">Study Streak</CardTitle>
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {isLoading ? <Loader /> : stats?.studyStreak?.streak} Days
+            {isLoading ? <Loader size={15} /> : stats?.studyStreak?.streak || 0} Days
           </div>
-          <p className="text-xs text-muted-foreground">
-            Keep it up!
-          </p>
+          <p className="text-xs text-muted-foreground">Keep it up!</p>
         </CardContent>
       </Card>
+
       <Card className="gap-3 bg-linear-to-br from-amber-50 to-amber-100/30 dark:from-amber-950/20 dark:to-amber-900/10 shadow hover:shadow-xl transition-all">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm font-medium">
-            AI Credits
-          </CardTitle>
+          <CardTitle className="text-sm font-medium">AI Credits</CardTitle>
           <Brain className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {isLoading ? <Loader /> : stats?.aiCredits}
+            {isLoading ? <Loader size={15} /> : stats?.aiCredits || 0}
           </div>
-          <Progress value={(stats?.aiCredits || 0) / 10} className="mt-2 h-2" />
+          <Progress value={((stats?.aiCredits || 0) / 1000) * 100} className="mt-2 h-2" />
         </CardContent>
       </Card>
     </div>

@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Calendar, Layers, ExternalLink, Trash2, Plus, Library } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -18,6 +17,7 @@ import { Loader } from "@/components/ui/loader";
 import { formatFileSize } from "@/helpers/file.helper";
 import { useChatStore } from "@/store/useChatStore";
 import { useSummaryStore } from "@/store/useSummaryStore";
+import { CardSkeloton } from "@/components/common/card-skeloton";
 
 export default function PDFList() {
   const { 
@@ -78,22 +78,7 @@ export default function PDFList() {
 
       <div className="min-h-100">
         {isPdfLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="overflow-hidden">
-                <CardHeader className="pb-2">
-                  <Skeleton className="h-6 w-3/4" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-4 w-1/2 mb-2" />
-                  <Skeleton className="h-4 w-1/3" />
-                </CardContent>
-                <CardFooter>
-                  <Skeleton className="h-9 w-full" />
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
+          <CardSkeloton />
         ) : pdfError ? (
           <div className="flex flex-col items-center justify-center py-16 text-center bg-destructive/5 rounded-xl border border-destructive/20">
             <h3 className="text-lg font-semibold text-destructive mb-2">Error loading PDFs</h3>
