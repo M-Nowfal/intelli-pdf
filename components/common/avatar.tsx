@@ -11,9 +11,9 @@ export function UserAvatar({ size = "sm" }: UserAvatarProps) {
 
   const sizes = {
     sm: "w-8 h-8",
-    md: "w-12 h-12",
-    lg: "w-18 h-18",
-    xl: "w-25 h-25",
+    md: "w-12 h-12 text-xl",
+    lg: "w-18 h-18 text-3xl",
+    xl: "w-25 h-25 text-5xl",
   };
 
   const fallbackBgColors = ["bg-sky-500", "bg-emerald-600", "bg-amber-500", "bg-pink-500", "bg-purple-500"];

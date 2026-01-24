@@ -15,10 +15,12 @@ import {
   Home, MessageCircleDashed,
   LucideIcon,
   ListChecks,
-  ScrollText
+  ScrollText,
+  Palette
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem, DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -223,23 +225,39 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onSelect={() => {
-                    vibrate();
-                    setTimeout(() => {
-                      router.push("/upgrade");
-                      if (isMobile) toggleSidebar();
-                    }, 150);
-                  }}
-                  className="cursor-pointer"
-                >
-                  <Sparkles />
-                  Upgrade to Pro
-                </DropdownMenuItem>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      vibrate();
+                      setTimeout(() => {
+                        router.push("/upgrade");
+                        if (isMobile) toggleSidebar();
+                      }, 150);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <Sparkles />
+                    Upgrade to Pro
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      vibrate();
+                      setTimeout(() => {
+                        router.push("/settings?tab=appearance");
+                        if (isMobile) toggleSidebar();
+                      }, 150);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <Palette />
+                    Appearance
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <Alert
                   trigger={
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
                       <LogOut className="text-red-500" />
                       <span className="text-red-500">Log out</span>
                     </DropdownMenuItem>

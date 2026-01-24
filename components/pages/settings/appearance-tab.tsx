@@ -33,7 +33,10 @@ export function AppearanceTab() {
           <Label>Theme</Label>
           <div className="grid grid-cols-3 gap-4 max-w-md">
             <div
-              onClick={() => setTheme("light")}
+              onClick={() => {
+                vibrate();
+                setTheme("light");
+              }}
               className={`cursor-pointer rounded-lg border-2 p-2 hover:bg-muted ${theme === 'light' ? 'border-primary' : 'border-transparent'}`}
             >
               <div className="space-y-2 rounded-md bg-[#ecedef] p-2">
@@ -52,7 +55,10 @@ export function AppearanceTab() {
             </div>
 
             <div
-              onClick={() => setTheme("dark")}
+              onClick={() => {
+                vibrate();
+                setTheme("dark");
+              }}
               className={`cursor-pointer rounded-lg border-2 p-2 hover:bg-muted ${theme === 'dark' ? 'border-primary' : 'border-transparent'}`}
             >
               <div className="space-y-2 rounded-md bg-neutral-950 p-2">
@@ -71,7 +77,10 @@ export function AppearanceTab() {
             </div>
 
             <div
-              onClick={() => setTheme("system")}
+              onClick={() => {
+                vibrate();
+                setTheme("system");
+              }}
               className={`cursor-pointer rounded-lg border-2 p-2 hover:bg-muted ${theme === 'system' ? 'border-primary' : 'border-transparent'}`}
             >
               <div className="space-y-2 rounded-md bg-slate-300 p-2">

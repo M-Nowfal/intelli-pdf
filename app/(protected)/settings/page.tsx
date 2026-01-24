@@ -6,7 +6,18 @@ export const metadata = {
   description: "Manage your account settings and preferences on Intelli-PDF.",
 };
 
-export default async function SettingsPage() {
+interface SettingsPageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function SettingsPage({ searchParams }: SettingsPageProps) {
+  const resolvedParams = await searchParams;
+  const tabParam = resolvedParams.tab;
+
+  const validTabs = ["general", "billing", "appearance"];
+  const activeTab = (typeof tabParam === "string" && validTabs.includes(tabParam))
+    ? tabParam
+    : "general";
 
   return (
     <div className="p-4">
@@ -21,7 +32,7 @@ export default async function SettingsPage() {
           Manage your account settings and preferences.
         </p>
       </div>
-      <Settings />
+      <Settings tab={activeTab} />
     </div>
   );
 }
