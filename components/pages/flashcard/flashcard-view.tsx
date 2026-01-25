@@ -22,6 +22,7 @@ export function FlashcardView({ pdfId }: { pdfId: string }) {
   const {
     flashCards,
     isLoading,
+    isGenerating,
     fetchFlashCards,
     deleteFlashCard
   } = useFlashCardStore();
@@ -63,9 +64,9 @@ export function FlashcardView({ pdfId }: { pdfId: string }) {
     <div className="flex flex-col h-full space-y-6">
 
       <div className="flex flex-col sm:flex-row md:items-center justify-between gap-7 shrink-0">
-        <div className="space-y-1">
+        <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-accent border">
+            <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 shadow-sm">
               <GalleryVerticalEnd className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Flashcards</h2>
@@ -94,6 +95,10 @@ export function FlashcardView({ pdfId }: { pdfId: string }) {
                 Click the generate button above to let AI create study cards from your document.
               </p>
             </div>
+            {isGenerating && <div className="flex items-center gap-3">
+              <span className="animate-pulse md:text-xl">Generating New FlashCards</span>
+              <Loader size={30} />
+            </div>}
           </div>
         ) : (
           <div className="w-full max-w-2xl space-y-8 flex flex-col justify-center mt-8 h-[60vh]">

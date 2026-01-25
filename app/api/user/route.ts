@@ -1,8 +1,7 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { Summary } from "@/models/summary.model";
-import { connectDB } from "@/lib/db";
+import { User } from "@/models/user.model";
 
 export async function GET() {
   try {
@@ -11,22 +10,12 @@ export async function GET() {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    await connectDB();
+    const user = await User.findById(session.user.id, "provider -_id");
 
-    const summaries = await Summary.find({ userId: session.user?.id })
-      .select("pdfId -_id")
-      .populate("pdfId", "title")
-      .limit(10);
-
-    const formatted = summaries.map((item: any) => ({
-      id: item.pdfId._id.toString(),
-      title: item.pdfId.title
-    }));
-
-    return NextResponse.json(formatted);
+    return NextResponse.json(user);
 
   } catch (err: unknown) {
-    console.error("Summary Error", err);
+    console.error("User fetch Error", err);
     return NextResponse.json(
       { message: "Internal Server error", error: err instanceof Error ? err.message : "Unknown error" },
       { status: 500 }
@@ -34,28 +23,27 @@ export async function GET() {
   }
 }
 
-export async function DELETE(req: NextRequest) {
+export async function PUT(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { searchParams } = new URL(req.url);
-    const pdfId = searchParams.get("pdfId");
+    const { name } = await req.json();
 
-    if (!pdfId) {
-      return NextResponse.json({ message: "PDF ID is required." }, { status: 400 });
+    if (!name || name.trim().length < 3) {
+      return NextResponse.json({ message: "Name is Required" }, { status: 400 });
     }
 
-    await connectDB();
-
-    await Summary.findOneAndDelete({ pdfId });
+    await User.findByIdAndUpdate(session.user?.id, {
+      $set: { name }
+    });
 
     return NextResponse.json({ success: true });
 
   } catch (err: unknown) {
-    console.error("Summary Error", err);
+    console.error("User Updation Error", err);
     return NextResponse.json(
       { message: "Internal Server error", error: err instanceof Error ? err.message : "Unknown error" },
       { status: 500 }

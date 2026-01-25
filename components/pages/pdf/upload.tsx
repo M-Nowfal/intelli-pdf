@@ -86,11 +86,18 @@ export function PDFUpload() {
         addPdf(res.data.newPDF);
         setSuccess(true);
         toast.success("PDF uploaded & processed successfully!");
-      } catch (error) {
-        console.error(error);
-        toast.error("Processing Failed", {
-          description: "File uploaded, but failed to save to database."
-        });
+      } catch (err: any) {
+        await api.delete(`/uploadthing/delete?publicId=${uploadedFile.key}`);
+        console.error(err);
+        if (err.response?.status === 409) {
+          toast.error("Duplicate File", {
+            description: "You have already uploaded this document."
+          });
+        } else {
+          toast.error("Processing Failed", {
+            description: "File uploaded but failed to save."
+          });
+        }
         setUploadProgress(0);
       } finally {
         if (progressInterval.current) {

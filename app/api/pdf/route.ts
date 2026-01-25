@@ -53,7 +53,11 @@ export async function DELETE(req: NextRequest) {
     }
 
     if (pdf.publicId) {
-      await utapi.deleteFiles(pdf.publicId);
+      try {
+        await utapi.deleteFiles(pdf.publicId);
+      } catch (deleteError) {
+        console.error("Failed to delete file from UploadThing:", deleteError);
+      }
     }
 
     await Promise.all([

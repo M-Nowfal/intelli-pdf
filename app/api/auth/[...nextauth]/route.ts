@@ -46,6 +46,7 @@ export const authOptions: NextAuthOptions = {
             id: user._id.toString(),
             email: user.email,
             name: user.name,
+            image: user.avatar,
           };
         } catch (error: any) {
           throw new Error(error.message || "Authentication failed");
@@ -69,7 +70,7 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session }) {
       if (user) {
         if (account?.provider === "google") {
           await connectDB();
@@ -81,8 +82,17 @@ export const authOptions: NextAuthOptions = {
         } else {
           token.id = user.id;
         }
-        if (account) {
-          token.accessToken = account.access_token;
+        if (user.image) {
+          token.picture = user.image;
+        }
+      }
+
+      if (trigger === "update" && session) {
+        if (session.name) {
+          token.name = session.name;
+        }
+        if (session.image) {
+          token.picture = session.image;
         }
       }
 
@@ -92,6 +102,13 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
+        
+        if (token.name) {
+          session.user.name = token.name;
+        }
+        if (token.picture) {
+          session.user.image = token.picture;
+        }
       }
       return session;
     },
@@ -105,7 +122,7 @@ export const authOptions: NextAuthOptions = {
           await connectDB();
 
           const existingUser = await User.findOne({ email: user.email });
-          console.log("Intent = ", intent)
+          
           if (intent === "login" && !existingUser) {
             return `/login?error=AccountNotFound`;
           }

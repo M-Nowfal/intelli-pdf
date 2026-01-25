@@ -8,7 +8,7 @@ export function PDFHeader() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-5">
           <div className="flex items-center gap-3">
-            <div className="p-1.5 rounded-lg bg-accent border">
+            <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 shadow-sm">
               <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-primary" strokeWidth={3} />
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">

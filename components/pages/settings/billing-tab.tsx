@@ -1,21 +1,61 @@
-import { CreditCard } from "lucide-react";
+"use client";
+
+import { CreditCard, Share2, Sparkles, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Separator } from "@/components/ui/separator";
 
 export function BillingTab() {
-  const { stats } = useDashboardStore();
+  const { stats, fetchStats } = useDashboardStore();
   const router = useRouter();
+  const [isCopied, setIsCopied] = useState(false);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
+
+  const handleShare = async () => {
+    const shareUrl = window.location.origin;
+    const shareData = {
+      title: 'Intelli-PDF',
+      text: 'Check out Intelli-PDF! It uses AI to summarize documents and create quizzes instantly.',
+      url: shareUrl,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        setIsCopied(true);
+        toast.success("Link copied to clipboard!");
+
+        setTimeout(() => setIsCopied(false), 2000);
+      }
+    } catch (err) {
+      console.error("Error sharing:", err);
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success("Link copied to clipboard!");
+      } catch (clipboardErr) {
+        toast.error("Failed to copy link.");
+      }
+    }
+  };
 
   return (
-    <Card className="pb-0">
+    <Card className="pb-0 overflow-hidden">
       <CardHeader>
         <CardTitle>AI Credits Usage</CardTitle>
         <CardDescription>Monitor your AI consumption for generating quizzes and chats.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium">Monthly Credits</span>
@@ -29,19 +69,42 @@ export function BillingTab() {
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-lg border p-4">
-            <div className="flex items-center gap-2">
-              <div className="p-2 bg-primary/10 rounded-full">
-                <CreditCard className="h-4 w-4 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-medium">Free Plan</p>
-                <p className="text-xs text-muted-foreground">Currently Active</p>
-              </div>
+        <div className="rounded-lg border p-4 bg-background">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-primary/10 rounded-full">
+              <CreditCard className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-medium">Free Plan</p>
+              <p className="text-xs text-muted-foreground">Currently Active</p>
             </div>
           </div>
         </div>
+
+        <Separator />
+
+        <div className="rounded-lg border bg-linear-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/20 dark:to-purple-900/10 p-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+                <Sparkles className="h-4 w-4" />
+                <h4 className="font-semibold text-sm">Get Free Credits</h4>
+              </div>
+              <p className="text-sm text-muted-foreground max-w-75">
+                Running low? Share <strong>Intelli-PDF</strong> with your friends! Help them study smarter and earn bonus credits for spreading the word.
+              </p>
+            </div>
+            <Button
+              onClick={handleShare}
+              variant="secondary"
+              className="shrink-0 w-full sm:w-auto gap-2 shadow-sm border border-indigo-100 dark:border-indigo-900"
+            >
+              {isCopied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
+              {isCopied ? "Copied!" : "Share App"}
+            </Button>
+          </div>
+        </div>
+
       </CardContent>
       <CardFooter className="flex justify-between border-t px-6 py-4 bg-muted/20">
         <p className="text-sm text-muted-foreground">Need more power?</p>

@@ -44,14 +44,14 @@ export function FlashCardList() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-accent border">
-              <GalleryVerticalEnd className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+            <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 shadow-sm">
+              <GalleryVerticalEnd className="h-4 w-4 sm:h-6 sm:w-6 text-primary" />
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
               My FlashCards
             </h1>
           </div>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground ms-2">
             Review your study decks generated from your PDFs. Click a deck to start practicing.
           </p>
         </div>

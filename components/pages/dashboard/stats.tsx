@@ -30,7 +30,7 @@ export function DashboardStats() {
   }, [error]);
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       
       <Card className="gap-3 bg-linear-to-br from-blue-50 to-blue-100/30 dark:from-blue-950/20 dark:to-blue-900/10 shadow hover:shadow-xl transition-all">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">

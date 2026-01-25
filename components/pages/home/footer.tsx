@@ -22,7 +22,7 @@ export function Footer() {
               <li><Link href="#" className="hover:text-primary">Features</Link></li>
               <li><Link href="#" className="hover:text-primary">Pricing</Link></li>
               <li><Link href="#" className="hover:text-primary">Testimonials</Link></li>
-              <li><Link href="#" className="hover:text-primary">FAQ</Link></li>
+              <li><Link href="#faq" className="hover:text-primary">FAQ</Link></li>
             </ul>
           </div>
 

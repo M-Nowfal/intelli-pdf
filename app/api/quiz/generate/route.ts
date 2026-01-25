@@ -7,6 +7,7 @@ import { Embedding } from "@/models/embedding.model";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GOOGLE_API_KEY } from "@/utils/constants";
 import { GENERATE_QUIZ_PROMPT } from "@/lib/prompts";
+import { PDF } from "@/models/pdf.model";
 
 const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
 
@@ -25,12 +26,14 @@ export async function POST(req: NextRequest) {
 
     await connectDB();
 
-    const existingQuiz = await Quiz.findOne({ userId: session.user.id, pdfId });
+    const existingQuiz = await Quiz.findOne({ userId: session.user.id, pdfId })
+      .populate("pdfId", "title");
+
     if (existingQuiz) {
       return NextResponse.json(existingQuiz);
     }
 
-    const embeddingDocs = await Embedding.find({ pdfId }).limit(15);
+    const embeddingDocs = await Embedding.find({ pdfId });
 
     if (!embeddingDocs || embeddingDocs.length === 0) {
       return NextResponse.json({ message: "No content found for this PDF" }, { status: 404 });
@@ -48,14 +51,16 @@ export async function POST(req: NextRequest) {
     const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
     const questions = JSON.parse(cleanedText);
 
+    const pdfIdAndTitle = await PDF.findById(pdfId).select("title");
+
     const newQuiz = await Quiz.create({
       userId: session.user.id,
-      pdfId: pdfId,
+      pdfId: pdfIdAndTitle,
       questions: questions,
       score: 0
     });
 
-    return NextResponse.json({ quizId: newQuiz._id, questions: newQuiz.questions });
+    return NextResponse.json(newQuiz);
 
   } catch (err: unknown) {
     console.error("Quiz Generation Error:", err);

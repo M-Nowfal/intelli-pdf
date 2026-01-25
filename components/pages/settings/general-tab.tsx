@@ -1,31 +1,42 @@
-import { Trash2, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { UserAvatar } from "@/components/common/avatar";
-import { Alert } from "@/components/common/alert";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
+import api from "@/lib/axios";
+import { DeleteAccount } from "./danger-zone";
 
 export function GeneralTab() {
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [name, setName] = useState(session?.user?.name || "");
+  const [name, setName] = useState<string>("");
+
+  useEffect(() => {
+    setName(session?.user?.name || "");
+  }, [session]);
 
   const handleUpdateProfile = async () => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsLoading(false);
-    toast.success("Profile updation is under development.");
-  };
+    try {
+      const res = await api.put("/user", { name });
 
-  const handleDeleteAccount = async () => {
-    toast.error("Account deletion is under development.");
+      if (res.data.success) {
+        await update({ name });
+        toast.success("Profile Updated.");
+      }
+    } catch (err: unknown) {
+      console.error(err);
+      toast.error("Update failed, try again later.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -43,7 +54,7 @@ export function GeneralTab() {
               <p className="text-xs text-muted-foreground">
                 Supported formats: JPG, PNG. Max size: 2MB.
               </p>
-              <Button variant="outline" size="sm" className="mt-2">Upload New</Button>
+              <Button variant="outline" size="sm" className="mt-2" disabled>Upload New</Button>
             </div>
           </div>
 
@@ -72,7 +83,7 @@ export function GeneralTab() {
           </div>
         </CardContent>
         <CardFooter className="flex justify-end border-t px-6 py-4">
-          <Button onClick={handleUpdateProfile} disabled={isLoading}>
+          <Button onClick={handleUpdateProfile} disabled={isLoading || session?.user?.name?.trim() === name.trim()}>
             {isLoading ? <>
               Saving Changes <Loader />
             </> : <>
@@ -81,35 +92,7 @@ export function GeneralTab() {
           </Button>
         </CardFooter>
       </Card>
-
-      <Card className="border-destructive/50">
-        <CardHeader>
-          <CardTitle className="text-destructive">Danger Zone</CardTitle>
-          <CardDescription>
-            Irreversible actions for your account.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between rounded-lg border border-destructive/20 bg-destructive/5 p-4">
-            <div className="space-y-0.5">
-              <h4 className="font-medium text-destructive">Delete Account</h4>
-              <p className="text-sm text-muted-foreground">
-                Permanently remove your account and all data.
-              </p>
-            </div>
-            <Alert
-              trigger={
-                <Button variant="destructive" size="sm">
-                  <Trash2 /> Delete
-                </Button>
-              }
-              title="Are you absolutely sure?"
-              description="This action cannot be undone. This will permanently delete your account and remove your data from our servers."
-              onContinue={handleDeleteAccount}
-            />
-          </div>
-        </CardContent>
-      </Card>
+      <DeleteAccount />
     </>
   );
 }

@@ -1,6 +1,6 @@
 function StepCard({ number, title, description }: { number: string, title: string, description: string }) {
   return (
-    <div className="relative flex flex-col items-center text-center p-6 rounded-2xl bg-background border border-muted/60 shadow hover:shadow-xl transition-all">
+    <div className="relative flex flex-col items-center text-center p-6 rounded-2xl bg-background border border-muted/60 shadow dark:shadow-neutral-900 hover:shadow-xl transition-all">
       <div className="text-5xl font-extrabold text-muted-foreground mb-4 font-mono">
         {number}
       </div>

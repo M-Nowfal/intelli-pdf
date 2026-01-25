@@ -9,12 +9,13 @@ interface DashboardStore {
   decrementCredits: (amount: number) => void;
 }
 
-export const useDashboardStore = create<DashboardStore>((set) => ({
+export const useDashboardStore = create<DashboardStore>((set, get) => ({
   stats: null,
   isLoading: false,
   error: null,
 
   fetchStats: async () => {
+    if (get().stats) return;
 
     set({ isLoading: true, error: null });
 

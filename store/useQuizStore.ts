@@ -45,8 +45,8 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     try {
       const res = await api.get("/quiz");
       set({ quizzes: res.data });
-    } catch (error) {
-      console.error("Failed to fetch quizzes", error);
+    } catch (err: unknown) {
+      console.error("Failed to fetch quizzes", err);
     } finally {
       set({ isLoading: false });
     }
@@ -66,7 +66,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     try {
       const res = await api.get(`/quiz/${id}`);
       set({ currentQuiz: res.data });
-    } catch (error) {
+    } catch (err: unknown) {
       toast.error("Failed to load quiz");
     } finally {
       set({ isLoading: false });
@@ -86,7 +86,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
       }
 
       return res.data._id;
-    } catch (error) {
+    } catch (err: unknown) {
       toast.error("Failed to generate quiz");
       return null;
     } finally {
@@ -104,8 +104,8 @@ export const useQuizStore = create<QuizState>((set, get) => ({
           q._id === quizId ? { ...q, score } : q
         )
       }));
-    } catch (error) {
-      console.error("Error submitting score", error);
+    } catch (err: unknown) {
+      console.error("Error submitting score", err);
     }
   },
 
@@ -115,10 +115,10 @@ export const useQuizStore = create<QuizState>((set, get) => ({
       await api.delete(`/quiz/${quizId}`);
       set((state) => ({
         quizzes: state.quizzes.filter((q) => q.pdfId._id !== quizId),
-        currentQuiz: state.currentQuiz?._id === quizId ? null : state.currentQuiz
+        currentQuiz: state.currentQuiz?.pdfId._id === quizId ? null : state.currentQuiz
       }));
       toast.success("Quiz deleted successfully");
-    } catch (error) {
+    } catch (err: unknown) {
       toast.error("Failed to delete quiz");
     } finally {
       set({ isLoading: false });

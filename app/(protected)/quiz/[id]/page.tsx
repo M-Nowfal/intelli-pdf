@@ -23,7 +23,7 @@ export default function ActiveQuizPage({ params }: { params: Promise<{ id: strin
 
   if (isLoading || !initFinished) {
     return (
-      <div className="flex justify-center items-center w-full h-[90vh]">
+      <div className="flex justify-center items-center w-full h-[90vh] p-4">
         <Card className="w-full max-w-2xl m-auto shadow-lg">
           <CardHeader>
             <div className="flex justify-between items-center mb-2">

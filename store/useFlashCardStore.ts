@@ -52,7 +52,7 @@ export const useFlashCardStore = create<FlashCardStore>((set, get) => ({
     try {
       const res = await api.post("/flashcard/generate", { pdfId, count });
       set({ flashCards: res.data.reverse() });
-      toast.success("Generated 5 new flashcards!");
+      toast.success(`Generated ${count || 5} new flashcards!`);
     } catch (err: unknown) {
       console.error(err);
       toast.error("Failed to generate flashcards");

@@ -15,6 +15,7 @@ import { AppSidebar } from "./sidebar";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { ChatActionMenu } from "@/components/pages/chat/chat-actions";
 import { usePdfStore } from "@/store/usePdfStore";
+import Link from "next/link";
 
 export function HomeLayout({
   children,
@@ -49,7 +50,9 @@ export function HomeLayout({
               ) : isAuthenticated ? (
                 <>
                   {pathname.startsWith("/chat/") && <ChatActionMenu activePdf={getActivePdf()!} />}
-                  <UserAvatar />
+                  <Link href="/settings">
+                    <UserAvatar />
+                  </Link>
                 </>
               ) : (
                 <Button variant="outline" onClick={() => router.push("/login")}>

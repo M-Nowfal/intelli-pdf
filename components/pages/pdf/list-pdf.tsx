@@ -56,15 +56,15 @@ export default function PDFList() {
   return (
     <div className="space-y-8 w-full">
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6">
-        <div className="space-y-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-accent border">
+            <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 shadow-sm">
               <Library className="h-5 w-5 sm:h-6 sm:w-6 text-primary" strokeWidth={3} />
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">My Library</h2>
           </div>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground text-sm ms-2">
             Manage your uploaded documents and track your study progress.
           </p>
         </div>

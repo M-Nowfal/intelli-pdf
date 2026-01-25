@@ -10,11 +10,7 @@ import { cn } from "@/lib/utils";
 import { Trophy, CheckCircle2, XCircle, ArrowRight, RefreshCcw } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-interface QuizInterfaceProps {
-  quiz: QuizItem;
-}
-
-export function QuizInterface({ quiz }: QuizInterfaceProps) {
+export function QuizInterface({ quiz }: { quiz: QuizItem }) {
   const { submitScore } = useQuizStore();
   const router = useRouter();
 
