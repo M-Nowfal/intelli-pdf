@@ -6,6 +6,7 @@ interface SummaryState {
   summaryList: { id: string, title: string }[];
   isSummaryLoading: boolean;
   summaryError: string | null;
+  source: "database" | "generated" | null;
 
   fetchSummary: (pdfId: string) => Promise<void>;
   fetchSummaryList: () => Promise<void>;
@@ -18,6 +19,7 @@ export const useSummaryStore = create<SummaryState>((set, get) => ({
   summaryList: [],
   isSummaryLoading: false,
   summaryError: null,
+  source: null,
 
   fetchSummary: async (pdfId: string) => {
     set({ isSummaryLoading: true, summaryError: null, summary: null });
@@ -29,7 +31,7 @@ export const useSummaryStore = create<SummaryState>((set, get) => ({
         throw new Error("Failed to fetch summary");
       }
 
-      const { pdfTitle, summary } = res.data;
+      const { pdfTitle, summary, source } = res.data;
 
       set((state) => {
         const exists = state.summaryList.some((item) => item.id === pdfId);
@@ -41,7 +43,8 @@ export const useSummaryStore = create<SummaryState>((set, get) => ({
 
         return {
           summary: { title: pdfTitle, content: summary },
-          summaryList: newSummaryList
+          summaryList: newSummaryList,
+          source
         };
       });
     } catch (err: unknown) {

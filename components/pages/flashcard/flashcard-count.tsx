@@ -15,11 +15,13 @@ import { Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useFlashCardStore } from "@/store/useFlashCardStore";
 import { toast } from "sonner";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
 export function FlashCardCount({ pdfId }: { pdfId: string }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [numCardsToGenerate, setNumCardsToGenerate] = useState(0);
-  const { generateFlashCards, isGenerating, isLoading } = useFlashCardStore(); 
+  const { generateFlashCards, isGenerating, isLoading } = useFlashCardStore();
+  const { decrementCredits } = useDashboardStore();
 
   const handleGenerate = async () => {
     setIsDialogOpen(false);
@@ -28,6 +30,7 @@ export function FlashCardCount({ pdfId }: { pdfId: string }) {
       return;
     }
     await generateFlashCards(pdfId, numCardsToGenerate);
+    decrementCredits(20);
   };
 
   return (

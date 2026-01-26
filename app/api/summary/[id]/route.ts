@@ -8,6 +8,8 @@ import { GOOGLE_API_KEY } from "@/utils/constants";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { GENERATE_SUMMARY_PROMPT } from "@/lib/prompts";
+import { User } from "@/models/user.model";
+import { calculateStreak } from "@/lib/study-streak";
 
 const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
 
@@ -72,6 +74,18 @@ export async function POST(_req: NextRequest, { params }: Params) {
         pdfId,
         userId: session.user.id,
         content: aiSummary,
+      });
+
+      const { newStreak, today } = await calculateStreak(session.user.id);
+
+      await User.findByIdAndUpdate(session.user.id, {
+        $inc: {
+          "stats.aiCredits": -20
+        },
+        $set: {
+          "stats.studyStreak.streak": newStreak,
+          "stats.studyStreak.lastActive": today
+        }
       });
 
       return NextResponse.json({

@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { BrainCircuit } from "lucide-react";
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
 interface QuizSetupProps {
   pdfId: string;
@@ -18,6 +19,7 @@ interface QuizSetupProps {
 export function QuizSetup({ pdfId, onQuizReady }: QuizSetupProps) {
   const { generateQuiz, isLoading } = useQuizStore();
   const [amount, setAmount] = useState(5);
+  const { decrementCredits } = useDashboardStore();
 
   const handleGenerate = async () => {
     if (amount < 1 || amount > 20) {
@@ -30,6 +32,7 @@ export function QuizSetup({ pdfId, onQuizReady }: QuizSetupProps) {
     if (quizId) {
       toast.success("Quiz generated successfully!");
       onQuizReady();
+      decrementCredits(20);
     }
   };
 

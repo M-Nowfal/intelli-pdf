@@ -8,6 +8,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GOOGLE_API_KEY } from "@/utils/constants";
 import { GENERATE_QUIZ_PROMPT } from "@/lib/prompts";
 import { PDF } from "@/models/pdf.model";
+import { User } from "@/models/user.model";
+import { calculateStreak } from "@/lib/study-streak";
 
 const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
 
@@ -58,6 +60,18 @@ export async function POST(req: NextRequest) {
       pdfId: pdfIdAndTitle,
       questions: questions,
       score: 0
+    });
+
+    const { newStreak, today } = await calculateStreak(session.user.id);
+
+    await User.findByIdAndUpdate(session.user.id, {
+      $inc: {
+        "stats.aiCredits": -20
+      },
+      $set: {
+        "stats.studyStreak.streak": newStreak,
+        "stats.studyStreak.lastActive": today
+      }
     });
 
     return NextResponse.json(newQuiz);

@@ -13,6 +13,7 @@ import api from "@/lib/axios";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useChatStore, Message } from "@/store/useChatStore";
 import { MarkDown } from "@/components/common/react-markdown";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
 const SourceBadge = ({ sources }: { sources: number[] }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -61,6 +62,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
     fetchChatList,
     setChatId
   } = useChatStore();
+  const { decrementCredits } = useDashboardStore();
 
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -144,6 +146,8 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
 
         updateMessageContent(aiMessageId, accumulatedText);
       }
+
+      decrementCredits(10);
     } catch (err) {
       toast.error("Error generating response");
     } finally {

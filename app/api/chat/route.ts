@@ -9,6 +9,7 @@ import { GOOGLE_API_KEY } from "@/utils/constants";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { GENERATE_CHAT_PROMPT } from "@/lib/prompts";
+import { User } from "@/models/user.model";
 
 export const maxDuration = 30;
 
@@ -103,6 +104,12 @@ export async function POST(req: NextRequest) {
               }
             }
           );
+
+          await User.findByIdAndUpdate(session.user.id, {
+            $inc: {
+              "stats.aiCredits": -10
+            }
+          });
 
           controller.close();
         } catch (err: unknown) {

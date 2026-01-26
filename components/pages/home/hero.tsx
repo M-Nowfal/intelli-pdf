@@ -57,7 +57,7 @@ export function Hero() {
 
           <Badge variant="secondary" className="px-4 py-2 gap-2 text-sm backdrop-blur-md bg-secondary/80 border-secondary-foreground/10 shadow-sm">
             <Zap className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-            <span>Now running on Gemini 1.5 Flash</span>
+            <span>Now running on Gemini 2.5 Flash</span>
           </Badge>
 
           <h1 className="text-5xl font-extrabold leading-tight tracking-tighter md:text-7xl lg:leading-[1.1]">

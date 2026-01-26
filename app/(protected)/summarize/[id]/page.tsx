@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Alert as AlertDialog } from "@/components/common/alert";
 import { toast } from "sonner";
 import { useSummaryStore } from "@/store/useSummaryStore";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
 export default function SummarizePage() {
   const params = useParams();
@@ -23,13 +24,18 @@ export default function SummarizePage() {
     summary,
     isSummaryLoading,
     summaryError,
+    source,
     fetchSummary,
     deleteSummary
   } = useSummaryStore();
+  const { decrementCredits } = useDashboardStore();
 
   useEffect(() => {
     if (id) {
       fetchSummary(id);
+      if (source === "generated") {
+        decrementCredits(20);
+      }
     }
   }, [id, fetchSummary]);
 

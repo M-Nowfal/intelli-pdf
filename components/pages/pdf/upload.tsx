@@ -35,6 +35,7 @@ import { generateReactHelpers } from "@uploadthing/react";
 import type { OurFileRouter } from "@/app/api/uploadthing/core";
 import api from "@/lib/axios";
 import { usePdfStore } from "@/store/usePdfStore";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
 const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 
@@ -48,6 +49,7 @@ export function PDFUpload() {
   const [success, setSuccess] = useState(false);
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
   const { addPdf } = usePdfStore();
+  const { decrementCredits } = useDashboardStore();
 
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -85,6 +87,7 @@ export function PDFUpload() {
         setUploadProgress(100);
         addPdf(res.data.newPDF);
         setSuccess(true);
+        decrementCredits(20);
         toast.success("PDF uploaded & processed successfully!");
       } catch (err: any) {
         await api.delete(`/uploadthing/delete?publicId=${uploadedFile.key}`);

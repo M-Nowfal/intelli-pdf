@@ -6,6 +6,8 @@ import { PDF } from "@/models/pdf.model";
 import { generateAndStoreEmbeddings } from "@/lib/embeddings";
 import pdfParse from "pdf-parse";
 import { UTApi } from "uploadthing/server";
+import { User } from "@/models/user.model";
+import { calculateStreak } from "@/lib/study-streak";
 
 const utapi = new UTApi();
 
@@ -79,6 +81,19 @@ export async function POST(req: NextRequest) {
       publicId: fileKey,
       pages: pageCount,
       fileSize: fileSize,
+    });
+
+    const { newStreak, today } = await calculateStreak(session.user.id);
+
+    await User.findByIdAndUpdate(session.user.id, {
+      $inc: {
+        "stats.totalDocuments": 1,
+        "stats.aiCredits": -20
+      },
+      $set: {
+        "stats.studyStreak.streak": newStreak,
+        "stats.studyStreak.lastActive": today
+      }
     });
 
     await generateAndStoreEmbeddings(newPDF._id.toString(), session.user.id, pages);

@@ -8,6 +8,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GOOGLE_API_KEY } from "@/utils/constants";
 import mongoose from "mongoose";
 import { GENERATE_FLASHCARD_PROMPT } from "@/lib/prompts";
+import { User } from "@/models/user.model";
+import { calculateStreak } from "@/lib/study-streak";
 
 const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY || "");
 
@@ -47,11 +49,30 @@ export async function POST(req: NextRequest) {
     if (flashcardDoc) {
       flashcardDoc.cards.push(...newCardsData);
       await flashcardDoc.save();
+
+      await User.findByIdAndUpdate(session.user.id, {
+        $inc: {
+          "stats.flashcardsMastered": 1,
+          "stats.aiCredits": -20
+        }
+      });
     } else {
       flashcardDoc = await Flashcard.create({
         userId: session.user.id,
         pdfId,
         cards: newCardsData,
+      });
+
+      const { newStreak, today } = await calculateStreak(session.user.id);
+
+      await User.findByIdAndUpdate(session.user.id, {
+        $inc: {
+          "stats.aiCredits": -20
+        },
+        $set: {
+          "stats.studyStreak.streak": newStreak,
+          "stats.studyStreak.lastActive": today
+        }
       });
     }
 
