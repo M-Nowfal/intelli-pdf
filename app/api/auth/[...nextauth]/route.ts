@@ -6,6 +6,7 @@ import { User } from "@/models/user.model";
 import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, NEXTAUTH_SECRET } from "@/utils/constants";
 import { compare } from "@/lib/password";
 import { cookies } from "next/headers";
+import { generateReferralCode, sendCreditAwardedMail } from "@/helpers/referral.helper";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -102,7 +103,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
-        
+
         if (token.name) {
           session.user.name = token.name;
         }
@@ -119,10 +120,11 @@ export const authOptions: NextAuthOptions = {
           const cookieStore = await cookies();
           const intent = cookieStore.get("auth_intent")?.value;
 
+          const referralCode = cookieStore.get("referral_code")?.value;
           await connectDB();
 
           const existingUser = await User.findOne({ email: user.email });
-          
+
           if (intent === "login" && !existingUser) {
             return `/login?error=AccountNotFound`;
           }
@@ -132,11 +134,26 @@ export const authOptions: NextAuthOptions = {
           }
 
           if (intent === "signup" && !existingUser) {
+            const newUserReferralCode = generateReferralCode();
+
+            if (referralCode) {
+              const referrer = await User.findOne({ referralCode });
+              
+              if (referrer) {
+                await User.findByIdAndUpdate(referrer._id, {
+                  $inc: { "stats.aiCredits": 500 }
+                });
+                await sendCreditAwardedMail(referrer.email, referrer.name);
+              }
+            }
+
             await User.create({
               name: user.name,
               email: user.email,
               avatar: user.image,
               isVerified: true,
+              referralCode: newUserReferralCode,
+              referredBy: referralCode || null,
               stats: {
                 totalDocuments: 0,
                 flashcardsMastered: 0,

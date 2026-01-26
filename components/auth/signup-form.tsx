@@ -11,14 +11,14 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Eye, EyeClosed } from "lucide-react"
 import { useForm } from "react-hook-form"
 import api from "@/lib/axios"
 import { toast } from "sonner"
 import { signIn } from "next-auth/react"
 import { Loader } from "../ui/loader"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { AxiosError } from "axios"
 import { useAuthIntent } from "@/providers/authintent-provider"
 
@@ -39,15 +39,21 @@ export function SignupForm({
   const [loading, setLoading] = useState<AuthLoading>(null);
   const router = useRouter();
   const { setIntent } = useAuthIntent();
-
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<SignupFormData>()
+  } = useForm<SignupFormData>();
+  const searchParams = useSearchParams();
+  const refCode = searchParams.get("ref");
+  const password = watch("password");
 
-  const password = watch("password")
+  useEffect(() => {
+    if (refCode) {
+      document.cookie = `referral_code=${refCode}; path=/; max-age=86400`;
+    }
+  }, [refCode]);
 
   const onSubmit = async (data: SignupFormData) => {
     setLoading("credentials");

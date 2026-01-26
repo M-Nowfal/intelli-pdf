@@ -8,6 +8,7 @@ import pdfParse from "pdf-parse";
 import { UTApi } from "uploadthing/server";
 import { User } from "@/models/user.model";
 import { calculateStreak } from "@/lib/study-streak";
+import { COST } from "@/utils/constants";
 
 const utapi = new UTApi();
 
@@ -22,6 +23,15 @@ export async function POST(req: NextRequest) {
     if (!fileUrl) return NextResponse.json({ message: "Missing file URL" }, { status: 400 });
 
     await connectDB();
+
+    const user = await User.findById(session.user.id);
+
+    if (user.stats.aiCredits < COST) {
+      return NextResponse.json(
+        { message: "Insufficient credits. Please upgrade your plan." },
+        { status: 402 }
+      );
+    }
 
     const existingPDF = await PDF.findOne({
       userId: session.user.id,

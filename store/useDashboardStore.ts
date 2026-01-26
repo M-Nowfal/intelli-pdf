@@ -5,8 +5,10 @@ interface DashboardStore {
   stats: DashboardStats | null;
   isLoading: boolean;
   error: string | null;
-  fetchStats: () => Promise<void>;
+
+  fetchStats: (refetch?: boolean) => Promise<void>;
   decrementCredits: (amount: number) => void;
+  refetchStats: () => Promise<void>;
 }
 
 export const useDashboardStore = create<DashboardStore>((set, get) => ({
@@ -14,8 +16,8 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
   isLoading: false,
   error: null,
 
-  fetchStats: async () => {
-    if (get().stats) return;
+  fetchStats: async (refetch = false) => {
+    if (get().stats && !refetch) return;
 
     set({ isLoading: true, error: null });
 
@@ -35,11 +37,11 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
       set({ isLoading: false });
     }
   },
-
   decrementCredits: (amount = 20) => set((state) => ({
     stats: state.stats ? {
       ...state.stats,
       aiCredits: Math.max(0, state.stats.aiCredits - amount)
     } : null
-  }))
+  })),
+  refetchStats: () => get().fetchStats(true)
 }));

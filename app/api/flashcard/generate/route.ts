@@ -5,7 +5,7 @@ import { connectDB } from "@/lib/db";
 import { Flashcard } from "@/models/flashcard.model";
 import { Embedding } from "@/models/embedding.model";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { GOOGLE_API_KEY } from "@/utils/constants";
+import { COST, GOOGLE_API_KEY } from "@/utils/constants";
 import mongoose from "mongoose";
 import { GENERATE_FLASHCARD_PROMPT } from "@/lib/prompts";
 import { User } from "@/models/user.model";
@@ -29,6 +29,15 @@ export async function POST(req: NextRequest) {
     }
 
     await connectDB();
+
+    const user = await User.findById(session.user.id);
+
+    if (user.stats.aiCredits < COST) {
+      return NextResponse.json(
+        { message: "Insufficient credits. Please upgrade your plan." },
+        { status: 402 }
+      );
+    }
 
     const contextDocs = await Embedding.find({ pdfId: new mongoose.Types.ObjectId(pdfId) }).select("content");
 

@@ -1,4 +1,4 @@
-import { emailTemplate } from "@/utils/template";
+import { otpMailTemplate } from "@/utils/template";
 import { transporter } from "./mailer";
 import { redis } from "./redis";
 
@@ -20,7 +20,7 @@ export const sendOTP = async (email: string, otp: string) => {
     from: `"Intelli-PDF" <${process.env.SMTP_USER}>`,
     to: email,
     subject: "Your Verification Code | Intelli-PDF",
-    html: emailTemplate(otp),
+    html: otpMailTemplate(otp),
     text: `Your verification code is ${otp}. It is valid for 10 minutes. If you did not request this, please ignore this email.`,
   });
 };

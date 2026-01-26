@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { Flashcard } from "@/models/flashcard.model";
+import { User } from "@/models/user.model";
 
 export async function GET() {
   try {
@@ -43,6 +44,12 @@ export async function DELETE(req: NextRequest) {
     if (!deletedCard) {
       return NextResponse.json({ message: "FlashCard not found" }, { status: 404 });
     }
+
+    await User.findByIdAndDelete(session.user.id, {
+      $inc: {
+        "stats.flashcardsMastered": -1,
+      }
+    });
 
     return NextResponse.json({ success: true });
 

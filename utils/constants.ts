@@ -1,3 +1,5 @@
+const APP_URL: string = process.env.NEXT_PUBLIC_APP_URL!;
+
 const DB_URI: string = process.env.MONGO_URI!;
 const DB_NAME: string = process.env.DB_NAME!;
 
@@ -20,7 +22,10 @@ const NODE_ENV: "production" | "development" | "test" = process.env.NODE_ENV!;
 
 const GOOGLE_API_KEY: string = process.env.GOOGLE_API_KEY!;
 
+const COST: number = 20;
+
 export {
+  APP_URL,
   DB_URI, DB_NAME,
   ICON, APP_NAME,
   BOT,
@@ -29,4 +34,5 @@ export {
   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS,
   NODE_ENV,
   GOOGLE_API_KEY,
+  COST
 };

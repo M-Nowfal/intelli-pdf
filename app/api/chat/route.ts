@@ -5,7 +5,7 @@ import { Embedding } from "@/models/embedding.model";
 import { Chat } from "@/models/chat.model";
 import { getEmbeddings } from "@/lib/gemini";
 import mongoose from "mongoose";
-import { GOOGLE_API_KEY } from "@/utils/constants";
+import { COST, GOOGLE_API_KEY } from "@/utils/constants";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { GENERATE_CHAT_PROMPT } from "@/lib/prompts";
@@ -27,6 +27,15 @@ export async function POST(req: NextRequest) {
     const userQuestion = lastMessage.content;
 
     await connectDB();
+
+    const user = await User.findById(session.user.id);
+
+    if (user.stats.aiCredits < COST - 10) {
+      return NextResponse.json(
+        { message: "Insufficient credits. Please upgrade your plan." },
+        { status: 402 }
+      );
+    }
 
     let chat = await Chat.findOne({ userId: session.user?.id, pdfId });
 

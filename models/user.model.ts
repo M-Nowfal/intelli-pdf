@@ -37,6 +37,10 @@ const UserSchema = new Schema<IUser>({
     aiCredits: {
       type: Number,
       default: 1000
+    },
+    lastClaimedAt: {
+      type: Date,
+      default: Date.now
     }
   },
   password: {
@@ -50,6 +54,15 @@ const UserSchema = new Schema<IUser>({
   isVerified: {
     type: Boolean,
     default: false
+  },
+  referralCode: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
+  referredBy: {
+    type: String,
+    default: null
   }
 }, { timestamps: true });
 

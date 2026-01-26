@@ -7,6 +7,7 @@ interface DashboardStats {
     lastStudyDate: Date | null;
   };
   aiCredits: number;
+  lastClaimedAt: Date;
 }
 
 interface IUser {
@@ -18,6 +19,8 @@ interface IUser {
   password?: string;
   provider: "credentials" | "google";
   isVerified: boolean;
+  referralCode: string;
+  referredBy: string;
   createdAt: Date;
   updatedAt: Date;
 }

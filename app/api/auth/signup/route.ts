@@ -5,21 +5,19 @@ import { checkDailyLimit, generateOTP, sendOTP, storeOTP } from "@/lib/otp";
 import { hash } from "@/lib/password";
 import crypto from "crypto";
 import { otpFlowOptions } from "@/utils/options";
+import { generateReferralCode } from "@/helpers/referral.helper";
 
 async function sendOtpAndPrepareFlow(email: string, res: NextResponse) {
   const otp = generateOTP();
-
   await storeOTP(email, otp);
   await sendOTP(email, otp);
-
   const otpFlowToken = crypto.randomUUID();
-
   res.cookies.set("otp_flow", otpFlowToken, otpFlowOptions);
 }
 
-export async function POST(req: NextRequest): Promise<NextResponse> {
+export async function POST(req: NextRequest) {
   try {
-    const { name, email, password } = await req.json();
+    const { name, email, password, referralCode } = await req.json();
 
     await connectDB();
 
@@ -49,12 +47,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     const hashedPassword = await hash(password);
+    const newUserReferralCode = generateReferralCode();
 
     await User.create({
       name,
       email,
       password: hashedPassword,
       isVerified: false,
+      referralCode: newUserReferralCode,
+      referredBy: referralCode || null,
       stats: {
         totalDocuments: 0,
         flashcardsMastered: 0,

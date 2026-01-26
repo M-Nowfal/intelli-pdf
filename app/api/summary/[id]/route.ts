@@ -4,7 +4,7 @@ import { Summary } from "@/models/summary.model";
 import { PDF } from "@/models/pdf.model";
 import { Embedding } from "@/models/embedding.model";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { GOOGLE_API_KEY } from "@/utils/constants";
+import { COST, GOOGLE_API_KEY } from "@/utils/constants";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { GENERATE_SUMMARY_PROMPT } from "@/lib/prompts";
@@ -29,6 +29,15 @@ export async function POST(_req: NextRequest, { params }: Params) {
     }
 
     await connectDB();
+
+    const user = await User.findById(session.user.id);
+
+    if (user.stats.aiCredits < COST) {
+      return NextResponse.json(
+        { message: "Insufficient credits. Please upgrade your plan." },
+        { status: 402 }
+      );
+    }
 
     const existingSummary = await Summary.findOne(
       { pdfId, userId: session.user?.id }

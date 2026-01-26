@@ -6,7 +6,6 @@ import { signOut, useSession } from "next-auth/react";
 import { Trash2, Lock } from "lucide-react";
 import { toast } from "sonner";
 import api from "@/lib/axios";
-
 import { Alert } from "@/components/common/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -97,7 +96,7 @@ export function DeleteAccount() {
                 </Button>
               }
               title="Are you absolutely sure?"
-              description= {`This action cannot be undone. All the data stored will be permanently deleted from our server. ${verifyType === "OTP" ? "" : "We will send a OTP to your E-Mail id."}`}
+              description= "This action cannot be undone. All the data stored will be permanently deleted from our server."
               onContinue={handleInitiateDelete}
             />
           </div>
@@ -110,7 +109,7 @@ export function DeleteAccount() {
           onInteractOutside={(e) => e.preventDefault()}
           showCloseButton={false}
         >
-          <DialogHeader>
+          <DialogHeader className="text-start">
             <DialogTitle>Security Verification</DialogTitle>
             <DialogDescription className="text-xs">
               {verifyType === "OTP"

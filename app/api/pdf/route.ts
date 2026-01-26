@@ -9,6 +9,7 @@ import { Chat } from "@/models/chat.model";
 import { Summary } from "@/models/summary.model";
 import { Quiz } from "@/models/quiz.model";
 import { UTApi } from "uploadthing/server";
+import { User } from "@/models/user.model";
 
 const utapi = new UTApi();
 
@@ -68,6 +69,13 @@ export async function DELETE(req: NextRequest) {
       Summary.deleteMany({ pdfId }),
       Quiz.deleteMany({ pdfId }),
     ]);
+
+    await User.findByIdAndUpdate(session.user.id, {
+      $inc: {
+        "stats.totalDocuments": -1,
+        "stats.flashcardsMastered": -1
+      }
+    });
 
     return NextResponse.json({ success: true, message: `PDF "${pdf.title}" deleted successfully` });
 
