@@ -30,6 +30,10 @@ export async function POST(req: NextRequest) {
 
     const user = await User.findById(session.user.id);
 
+    if (!user) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
     if (user.stats.aiCredits < COST - 10) {
       return NextResponse.json(
         { message: "Insufficient credits. Please upgrade your plan." },

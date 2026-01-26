@@ -17,6 +17,7 @@ import { useDashboardStore } from "@/store/useDashboardStore";
 import { useEffect } from "react";
 import { Loader } from "@/components/ui/loader";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export function DashboardStats() {
   const { stats, fetchStats, isLoading, error } = useDashboardStore();
@@ -29,9 +30,14 @@ export function DashboardStats() {
     if (error) toast.error(error);
   }, [error]);
 
+  const maxCredits = 1000;
+  const currentCredits = stats?.aiCredits || 0;
+  const isOverLimit = currentCredits > maxCredits;
+  const progressPercentage = Math.min(100, (currentCredits / maxCredits) * 100);
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      
+
       <Card className="gap-3 bg-linear-to-br from-blue-50 to-blue-100/30 dark:from-blue-950/20 dark:to-blue-900/10 shadow hover:shadow-xl transition-all">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">Total Documents</CardTitle>
@@ -78,15 +84,37 @@ export function DashboardStats() {
       <Card className="gap-3 bg-linear-to-br from-amber-50 to-amber-100/30 dark:from-amber-950/20 dark:to-amber-900/10 shadow hover:shadow-xl transition-all">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">AI Credits</CardTitle>
-          <Brain className="h-4 w-4 text-muted-foreground" />
+          <Brain className={cn(
+            "h-4 w-4",
+            isOverLimit ? "text-amber-600 dark:text-amber-500" : "text-muted-foreground"
+          )} />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
-            {isLoading ? <Loader size={15} /> : stats?.aiCredits || 0}
+          <div className="flex items-center justify-between">
+            <div className={cn(
+              "text-2xl font-bold",
+              isOverLimit && "text-amber-600 dark:text-amber-500"
+            )}>
+              {isLoading ? <Loader size={15} /> : currentCredits}
+            </div>
+
+            {isOverLimit && (
+              <p className="text-xs text-amber-600 dark:text-amber-500 font-medium mt-1">
+                Bonus credits active!
+              </p>
+            )}
           </div>
-          <Progress value={((stats?.aiCredits || 0) / 1000) * 100} className="mt-2 h-2" />
+
+          <Progress
+            value={progressPercentage}
+            className={cn(
+              "mt-2 h-2",
+              isOverLimit && "[&>div]:bg-amber-500"
+            )}
+          />
         </CardContent>
       </Card>
+
     </div>
   );
 }

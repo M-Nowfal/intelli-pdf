@@ -13,6 +13,7 @@ import api from "@/lib/axios";
 import { differenceInCalendarDays } from "date-fns";
 import { Loader } from "@/components/ui/loader";
 import { APP_URL } from "@/utils/constants";
+import { cn } from "@/lib/utils";
 
 export function BillingTab() {
   const { stats, fetchStats, refetchStats } = useDashboardStore();
@@ -30,7 +31,7 @@ export function BillingTab() {
     try {
       const res = await api.get("/user/credits/referral");
       if (res.status === 200) {
-        shareUrl = `${APP_URL}?ref=${res.data.referralCode}`
+        shareUrl = `${APP_URL}/signup?ref=${res.data.referralCode}`
       }
     } catch (err: unknown) {
       console.error(err);
@@ -84,6 +85,11 @@ export function BillingTab() {
     }
   };
 
+  const maxCredits = 1000;
+  const currentCredits = stats?.aiCredits || 0;
+  const isOverLimit = currentCredits > maxCredits;
+  const progressPercentage = Math.min(100, (currentCredits / maxCredits) * 100);
+
   return (
     <Card className="pb-0 overflow-hidden">
       <CardHeader>
@@ -95,14 +101,21 @@ export function BillingTab() {
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium">Monthly Credits</span>
-            <span className="text-muted-foreground">
-              {stats?.aiCredits || 0} / 1000
+            <span className={cn(
+              "font-medium", 
+              isOverLimit ? "text-amber-600 dark:text-amber-500" : "text-muted-foreground"
+            )}>
+              {currentCredits} / {maxCredits}
+              {isOverLimit && <span className="text-xs ml-1.5 font-normal">(+Bonus)</span>}
             </span>
           </div>
-          <Progress value={((stats?.aiCredits || 0) / 1000) * 100} className="h-2" />
-          <p className="text-xs text-muted-foreground pt-1">
-            Resets on the 1st of every month.
-          </p>
+          <Progress 
+            value={progressPercentage} 
+            className={cn(
+              "h-2",
+              isOverLimit && "[&>div]:bg-amber-500"
+            )} 
+          />
         </div>
 
         <div className="rounded-lg border p-4 bg-background">

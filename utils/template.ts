@@ -14,7 +14,6 @@ export function otpMailTemplate(otp: string) {
     <tr>
       <td align="center" style="padding: 40px 20px;">
         <table width="100%" style="max-width: 600px;" cellpadding="0" cellspacing="0" border="0">
-          <!-- Logo/Header -->
           <tr>
             <td align="center" style="padding: 0 0 40px 0;">
               <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #000000; letter-spacing: -0.5px;">
@@ -22,8 +21,6 @@ export function otpMailTemplate(otp: string) {
               </h1>
             </td>
           </tr>
-          
-          <!-- Main Content -->
           <tr>
             <td style="padding: 0 0 32px 0;">
               <h2 style="margin: 0 0 16px 0; font-size: 28px; font-weight: 600; color: #000000; letter-spacing: -0.5px; line-height: 1.3;">
@@ -34,8 +31,6 @@ export function otpMailTemplate(otp: string) {
               </p>
             </td>
           </tr>
-          
-          <!-- OTP Code Box -->
           <tr>
             <td align="center" style="padding: 0 0 32px 0;">
               <table cellpadding="0" cellspacing="0" border="0" style="background-color: #f5f5f7; border-radius: 12px; padding: 32px 48px;">
@@ -49,8 +44,6 @@ export function otpMailTemplate(otp: string) {
               </table>
             </td>
           </tr>
-          
-          <!-- Expiry Info -->
           <tr>
             <td style="padding: 0 0 32px 0;">
               <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #666666; text-align: center;">
@@ -58,15 +51,11 @@ export function otpMailTemplate(otp: string) {
               </p>
             </td>
           </tr>
-          
-          <!-- Divider -->
           <tr>
             <td style="padding: 0 0 32px 0;">
               <div style="border-top: 1px solid #e5e5e5;"></div>
             </td>
           </tr>
-          
-          <!-- Security Notice -->
           <tr>
             <td style="padding: 0 0 32px 0;">
               <p style="margin: 0 0 12px 0; font-size: 14px; line-height: 1.5; color: #666666;">
@@ -77,8 +66,6 @@ export function otpMailTemplate(otp: string) {
               </p>
             </td>
           </tr>
-          
-          <!-- Footer -->
           <tr>
             <td style="padding: 32px 0 0 0; border-top: 1px solid #e5e5e5;">
               <p style="margin: 0 0 8px 0; font-size: 12px; line-height: 1.5; color: #999999;">
@@ -103,111 +90,56 @@ export function creditAwardMailTemplate(name: string) {
   return (`
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>You earned free credits!</title>
+  <title>Credits Received</title>
   <style>
-    /* Basic Resets for Email Clients */
-    body,
-    table,
-    td,
-    a {
-      -webkit-text-size-adjust: 100%;
-      -ms-text-size-adjust: 100%;
-    }
-
-    table,
-    td {
-      mso-table-lspace: 0pt;
-      mso-table-rspace: 0pt;
-    }
-
-    img {
-      -ms-interpolation-mode: bicubic;
-    }
-
-    img {
-      border: 0;
-      height: auto;
-      line-height: 100%;
-      outline: none;
-      text-decoration: none;
-    }
-
-    table {
-      border-collapse: collapse !important;
-    }
-
-    body {
-      height: 100% !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      width: 100% !important;
-    }
-
-    /* Button Hover Effect (Works in modern clients) */
-    .btn:hover {
-      background-color: #4338ca !important;
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #ffffff; margin: 0; padding: 0; color: #1a1a1a; }
+    .container { max-width: 480px; margin: 0 auto; padding: 40px 20px; }
+    .btn { background-color: #000000; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 500; display: inline-block; font-size: 14px; }
+    .btn:hover { background-color: #333333; }
+    .stat-box { border: 1px solid #e5e5e5; border-radius: 8px; padding: 24px; text-align: center; margin: 24px 0; }
+    .footer { font-size: 12px; color: #888888; margin-top: 40px; border-top: 1px solid #eaeaea; padding-top: 20px; }
+    .link { color: #888888; text-decoration: underline; }
   </style>
 </head>
-
-<body
-  style="margin: 0; padding: 0; background-color: #f9fafb; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-  <table border="0" cellpadding="0" cellspacing="0" width="100%">
-    <tr>
-      <td align="center" style="padding: 40px 0;">
-
-        <table border="0" cellpadding="0" cellspacing="0" width="600"
-          style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 600px; width: 100%;">
-          <tr>
-            <td align="center" style="padding: 40px 30px;">
-
-              <h2 style="color: #4f46e5; margin: 0 0 20px 0; font-size: 24px; font-weight: 700;">
-                High five, ${name}! ✋
-              </h2>
-
-              <p style="color: #333333; font-size: 16px; line-height: 24px; margin: 0 0 20px 0;">
-                Your friend just joined <strong>Intelli-PDF</strong> using your link.
-              </p>
-
-              <div
-                style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 8px; margin: 25px 0; text-align: center;">
-                <span style="font-size: 18px; font-weight: bold; color: #166534; display: block;">
-                  +500 Credits Added
-                </span>
-              </div>
-
-              <p style="color: #4b5563; font-size: 16px; line-height: 24px; margin: 0 0 30px 0;">
-                You can use these credits immediately to create more quizzes, summarize documents, and chat with your
-                PDFs.
-              </p>
-
-              <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                <tr>
-                  <td align="center">
-                    <a href="${APP_URL}/settings?tab=billing" class="btn"
-                      style="background-color: #4f46e5; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px;">
-                      Check My Balance
-                    </a>
-                  </td>
-                </tr>
-              </table>
-
-              <p style="margin-top: 30px; font-size: 12px; color: #9ca3af; text-align: center;">
-                Keep sharing to earn unlimited rewards! <br>
-                Intelli-PDF Team
-              </p>
-
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
+<body>
+  <div class="container">
+    <div style="margin-bottom: 32px;">
+      <span style="font-weight: 700; font-size: 16px; letter-spacing: -0.5px;">Intelli-PDF</span>
+    </div>
+    <h1 style="font-size: 24px; font-weight: 600; letter-spacing: -0.5px; margin-bottom: 16px; color: #000;">
+      Referral Bonus
+    </h1>
+    <p style="font-size: 15px; line-height: 1.6; color: #444; margin-bottom: 24px;">
+      Hi ${name},
+    </p>
+    <p style="font-size: 15px; line-height: 1.6; color: #444; margin-bottom: 24px;">
+      Your friend just created an account using your invite link. As a thank you, we have added bonus credits to your account.
+    </p>
+    <div class="stat-box">
+      <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 8px;">
+        Credit Balance Adjustment
+      </div>
+      <div style="font-size: 32px; font-weight: 700; color: #000; letter-spacing: -1px;">
+        +500
+      </div>
+    </div>
+    <p style="font-size: 15px; line-height: 1.6; color: #444; margin-bottom: 32px;">
+      These credits are available immediately for use on your next document summary or quiz generation.
+    </p>
+    <div style="text-align: center;">
+      <a href="${APP_URL}/settings?tab=billing" class="btn" style="width: 90%;">
+        View Account
+      </a>
+    </div>
+    <div class="footer">
+      <p>
+        Sent by Intelli-PDF • <a href="${APP_URL}" class="link">Generate more invites</a>
+      </p>
+    </div>
+  </div>
 </body>
 </html>
   `);

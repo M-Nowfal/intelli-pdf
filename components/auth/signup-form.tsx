@@ -63,10 +63,11 @@ export function SignupForm({
         name: data.name,
         email: data.email,
         password: data.password,
-      })
+        referralCode: refCode
+      });
 
       if (!res.data.success) {
-        throw new Error("Signup failed")
+        throw new Error("Signup failed");
       }
 
       router.push(`/otp?email=${encodeURIComponent(data.email)}`);
