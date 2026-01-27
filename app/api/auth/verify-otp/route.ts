@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
       if (referrer) {
         await User.findByIdAndUpdate(referrer._id, {
-          $inc: { "stats.aiCredits": 500 }
+          $inc: { "stats.aiCredits": 250 }
         });
         await sendCreditAwardedMail(referrer.email, referrer.name);
       }

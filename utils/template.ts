@@ -123,7 +123,7 @@ export function creditAwardMailTemplate(name: string) {
         Credit Balance Adjustment
       </div>
       <div style="font-size: 32px; font-weight: 700; color: #000; letter-spacing: -1px;">
-        +500
+        +250
       </div>
     </div>
     <p style="font-size: 15px; line-height: 1.6; color: #444; margin-bottom: 32px;">

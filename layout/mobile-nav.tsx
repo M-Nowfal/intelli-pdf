@@ -10,6 +10,7 @@ import {
   GalleryVerticalEnd, 
   Settings 
 } from "lucide-react";
+import { vibrate } from "@/lib/haptics";
 
 export function MobileNav() {
   const pathname = usePathname();
@@ -53,6 +54,7 @@ export function MobileNav() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => vibrate()}
               className={cn(
                 "inline-flex flex-col items-center justify-center px-5 hover:bg-muted/50 transition-colors group",
                 isActive && "bg-muted/30"

@@ -73,7 +73,7 @@ export function HomeLayout({
         )}>
           {children}
         </main>
-        {mobileNav && <MobileNav />}
+        {mobileNav && pathname !== "/" && <MobileNav />}
       </SidebarInset>
     </SidebarProvider>
   );

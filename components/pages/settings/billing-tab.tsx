@@ -171,7 +171,7 @@ export function BillingTab() {
                 <h4 className="font-semibold text-sm">Get Free Credits</h4>
               </div>
               <p className="text-sm text-muted-foreground max-w-75">
-                Running low? Invite friends to <strong>Intelli-PDF</strong> Help them study smarter and earn <strong>500 bonus credits</strong> for every friend who signs up.
+                Running low? Invite friends to <strong>Intelli-PDF</strong> Help them study smarter and earn <strong>250 bonus credits</strong> for every friend who signs up.
               </p>
             </div>
             <Button
