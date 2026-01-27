@@ -153,7 +153,7 @@ html {
   scroll-behavior: smooth;
 }
 
-@media screen and (max-height: 600px) {
+@media screen and (max-height: 750px) {
   .hide-on-keyboard {
     display: none !important;
   }
@@ -163,7 +163,7 @@ html {
   padding-bottom: 3.5rem; 
 }
 
-@media screen and (max-height: 600px) {
+@media screen and (max-height: 750px) {
   .mobile-nav-padding {
     padding-bottom: 0 !important;
   }
