@@ -69,11 +69,13 @@ export function HomeLayout({
         )}
         <main className={cn(
           "flex-1",
-          mobileNav && !pathname.startsWith("/chat/") && "pb-16 md:pb-0"
+          mobileNav && !pathname.startsWith("/chat/") && "pb-14"
         )}>
           {children}
         </main>
-        {mobileNav && pathname !== "/" && <MobileNav />}
+        {mobileNav && pathname !== "/" && <div className="hide-on-keyboard w-full">
+          <MobileNav />
+        </div>}
       </SidebarInset>
     </SidebarProvider>
   );

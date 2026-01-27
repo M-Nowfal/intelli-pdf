@@ -236,7 +236,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
       <div 
         className={cn(
           "px-4 pt-4 pb-2 bg-background shrink-0",
-          mobileNav && "pb-20 md:pb-2"
+          mobileNav && "mobile-nav-padding"
         )}
       >
         <form
@@ -277,9 +277,9 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
           <p className="not-md:hidden text-xs text-muted-foreground text-center">
             Press <kbd className="font-sans">Enter</kbd> to send, <kbd className="font-sans">Shift + Enter</kbd> for new line
           </p>
-          <p className="text-xs text-muted-foreground text-center">
+          {!mobileNav && <p className="text-xs text-muted-foreground text-center">
             Intelli-AI can make mistakes, so double-check it
-          </p>
+          </p>}
         </div>
       </div>
     </div>

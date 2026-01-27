@@ -152,3 +152,25 @@
 html {
   scroll-behavior: smooth;
 }
+
+@media screen and (max-height: 600px) {
+  .hide-on-keyboard {
+    display: none !important;
+  }
+}
+
+.mobile-nav-padding {
+  padding-bottom: 3.5rem; 
+}
+
+@media screen and (max-height: 600px) {
+  .mobile-nav-padding {
+    padding-bottom: 0 !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-nav-padding {
+    padding-bottom: 0;
+  }
+}
