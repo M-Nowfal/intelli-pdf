@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useChatStore, Message } from "@/store/useChatStore";
 import { MarkDown } from "@/components/common/react-markdown";
 import { useDashboardStore } from "@/store/useDashboardStore";
+import { useSettingsStore } from "@/store/useSettingsStore";
 
 const SourceBadge = ({ sources }: { sources: number[] }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -63,10 +64,10 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
     setChatId
   } = useChatStore();
   const { decrementCredits } = useDashboardStore();
+  const { mobileNav } = useSettingsStore();
 
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
-
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -164,8 +165,8 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 w-full p-4 overflow-auto hide-scrollbar">
+    <div className="flex flex-col h-[calc(100vh-3.5rem)] overflow-hidden">
+      <div className="flex-1 w-full p-4 overflow-y-auto hide-scrollbar">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full mt-10 space-y-4 text-center opacity-50">
             <div className="p-4 rounded-full bg-muted">
@@ -232,7 +233,12 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
         )}
       </div>
 
-      <div className="px-4 pt-4 pb-2 bg-background shrink-0">
+      <div 
+        className={cn(
+          "px-4 pt-4 pb-2 bg-background shrink-0",
+          mobileNav && "pb-20 md:pb-2"
+        )}
+      >
         <form
           onSubmit={handleSend}
           className="relative flex items-end w-full p-2 bg-muted/50 border rounded-2xl shadow-sm focus-within:shadow-lg dark:focus-within:shadow-neutral-900 transition-all"

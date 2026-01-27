@@ -69,7 +69,7 @@ export function HomeLayout({
         )}
         <main className={cn(
           "flex-1",
-          mobileNav && "pb-16 md:pb-0"
+          mobileNav && !pathname.startsWith("/chat/") && "pb-16 md:pb-0"
         )}>
           {children}
         </main>
