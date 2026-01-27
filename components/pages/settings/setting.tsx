@@ -9,7 +9,7 @@ import { vibrate } from "@/lib/haptics";
 export function Settings({ tab }: { tab: string }) {
 
   return (
-    <div className="max-w-5xl m-auto py-8 space-y-8">
+    <div className="max-w-5xl m-auto pt-8 space-y-8">
       <Tabs
         defaultValue={tab}
         className="space-y-6"

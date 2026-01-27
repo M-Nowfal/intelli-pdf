@@ -16,6 +16,9 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { ChatActionMenu } from "@/components/pages/chat/chat-actions";
 import { usePdfStore } from "@/store/usePdfStore";
 import Link from "next/link";
+import { MobileNav } from "./mobile-nav";
+import { useSettingsStore } from "@/store/useSettingsStore";
+import { cn } from "@/lib/utils";
 
 export function HomeLayout({
   children,
@@ -26,6 +29,7 @@ export function HomeLayout({
   const pathname = usePathname();
   const { isLoading, isAuthenticated } = useCurrentUser();
   const { getActivePdf } = usePdfStore();
+  const { mobileNav } = useSettingsStore();
 
   const paths = ["/login", "/signup", "/otp", "/signout", "/forgot-password"];
   const isAuthPath = () => paths.some(path => path === pathname);
@@ -63,9 +67,13 @@ export function HomeLayout({
             </div>
           </header>
         )}
-        <main className="flex-1">
+        <main className={cn(
+          "flex-1",
+          mobileNav && "pb-16 md:pb-0"
+        )}>
           {children}
         </main>
+        {mobileNav && <MobileNav />}
       </SidebarInset>
     </SidebarProvider>
   );

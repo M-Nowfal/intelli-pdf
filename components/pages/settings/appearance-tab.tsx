@@ -15,7 +15,7 @@ import { vibrate } from "@/lib/haptics";
 export function AppearanceTab() {
   const { setTheme, theme } = useTheme();
 
-  const { haptics, setHaptics } = useSettingsStore();
+  const { haptics, setHaptics, mobileNav, setMobileNav } = useSettingsStore();
 
   const handleToggle = (checked: boolean) => {
     setHaptics(checked);
@@ -23,7 +23,7 @@ export function AppearanceTab() {
   };
 
   return (
-    <Card>
+    <Card className="mb-5">
       <CardHeader>
         <CardTitle>Appearance</CardTitle>
         <CardDescription>Customize the look and feel of the application.</CardDescription>
@@ -100,22 +100,39 @@ export function AppearanceTab() {
           </div>
         </div>
 
+      </CardContent>
+      <CardFooter className="flex flex-col gap-5 border-t px-6 py-4">
+        <div className="flex items-center justify-between w-full">
+          <div className="space-y-0.5">
+            <Label className="text-base">Haptic Feedback</Label>
+            <p className="text-xs text-muted-foreground">
+              {haptics
+                ? "Vibrations are currently enabled."
+                : "Vibrations are turned off for a simpler experience."}
+            </p>
+          </div>
+          <Switch
+            checked={haptics}
+            onCheckedChange={handleToggle}
+          />
+        </div>
+
         <Separator />
 
-      </CardContent>
-      <CardFooter className="flex items-center justify-between border-t px-6 py-4">
-        <div className="space-y-0.5">
-          <Label className="text-base">Haptic Feedback</Label>
-          <p className="text-xs text-muted-foreground">
-            {haptics
-              ? "Vibrations are currently enabled."
-              : "Vibrations are turned off for a simpler experience."}
-          </p>
+        <div className="flex items-center justify-between w-full">
+          <div className="space-y-0.5">
+            <Label className="text-base">Bottom Navigation Bar</Label>
+            <p className="text-xs text-muted-foreground">
+              {mobileNav
+                ? "The menu bar is visible at the bottom of mobile screens."
+                : "The menu bar is hidden on mobile screens."}
+            </p>
+          </div>
+          <Switch
+            checked={mobileNav}
+            onCheckedChange={() => setMobileNav(!mobileNav)}
+          />
         </div>
-        <Switch
-          checked={haptics}
-          onCheckedChange={handleToggle}
-        />
       </CardFooter>
     </Card>
   );

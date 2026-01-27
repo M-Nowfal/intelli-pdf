@@ -5,7 +5,9 @@ import { toast } from "sonner";
 
 interface SettingsStore {
   haptics: boolean;
+  mobileNav: boolean;
   setHaptics: (value: boolean) => void;
+  setMobileNav: (value: boolean) => void;
   deleteAccount: () => Promise<void>;
 }
 
@@ -13,8 +15,10 @@ export const useSettingsStore = create<SettingsStore>()(
   persist(
     (set) => ({
       haptics: true,
+      mobileNav: false,
 
       setHaptics: (value: boolean) => set({ haptics: value }),
+      setMobileNav: (value: boolean) => set({ mobileNav: value }),
 
       deleteAccount: async () => {
         try {
@@ -28,7 +32,10 @@ export const useSettingsStore = create<SettingsStore>()(
     }),
     {
       name: 'user-settings',
-      partialize: (state) => ({ haptics: state.haptics }), 
+      partialize: (state) => ({ 
+        haptics: state.haptics,
+        mobileNav: state.mobileNav
+      }), 
     }
   )
 );
