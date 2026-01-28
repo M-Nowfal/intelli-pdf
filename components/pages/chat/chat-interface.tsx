@@ -268,7 +268,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
             onBlur={() => {
               blurTimeoutRef.current = setTimeout(() => {
                 setIsKeyboardActive(false);
-              }, 400);
+              }, 250);
             }}
             onKeyDown={handleKeyDown}
             disabled={isStreaming}
