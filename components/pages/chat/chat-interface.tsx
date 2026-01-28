@@ -64,11 +64,11 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
     setChatId
   } = useChatStore();
   const { decrementCredits } = useDashboardStore();
-  const { mobileNav } = useSettingsStore();
-
+  const { mobileNav, isKeyboardActive, setIsKeyboardActive } = useSettingsStore();
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (pdfId) {
@@ -79,6 +79,12 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isMessagesLoading, isStreaming]);
+
+  useEffect(() => {
+    return () => {
+      setIsKeyboardActive(false);
+    };
+  }, [setIsKeyboardActive]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -233,10 +239,11 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
         )}
       </div>
 
-      <div 
+      <div
         className={cn(
-          "px-4 pt-4 pb-2 bg-background shrink-0",
-          mobileNav && "mobile-nav-padding"
+          "px-2 pt-4 pb-2 bg-background shrink-0",
+          mobileNav && "pb-14 md:pb-2",
+          isKeyboardActive && mobileNav && "pb-3"
         )}
       >
         <form
@@ -251,6 +258,18 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
             className="w-full resize-none bg-transparent px-3 py-2.5 text-sm outline-none border-none ring-0 shadow-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 hide-scrollbar placeholder:text-muted-foreground"
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            onFocus={() => {
+              if (blurTimeoutRef.current) {
+                clearTimeout(blurTimeoutRef.current);
+                blurTimeoutRef.current = null;
+              }
+              setIsKeyboardActive(true);
+            }}
+            onBlur={() => {
+              blurTimeoutRef.current = setTimeout(() => {
+                setIsKeyboardActive(false);
+              }, 400);
+            }}
             onKeyDown={handleKeyDown}
             disabled={isStreaming}
           />
@@ -273,13 +292,13 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
             </Button>
           </div>
         </form>
-        <div className="flex justify-center md:justify-between mt-2 px-5">
+        <div className={`flex justify-center md:justify-between mt-2 px-5 ${isKeyboardActive && mobileNav ? "hidden md:flex" : ""}`}>
           <p className="not-md:hidden text-xs text-muted-foreground text-center">
             Press <kbd className="font-sans">Enter</kbd> to send, <kbd className="font-sans">Shift + Enter</kbd> for new line
           </p>
-          {!mobileNav && <p className="text-xs text-muted-foreground text-center">
+          <p className={`text-xs text-muted-foreground text-center ${mobileNav ? "hidden md:block" : ""}`}>
             Intelli-AI can make mistakes, so double-check it
-          </p>}
+          </p>
         </div>
       </div>
     </div>

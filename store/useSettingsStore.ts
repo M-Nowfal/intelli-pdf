@@ -6,8 +6,11 @@ import { toast } from "sonner";
 interface SettingsStore {
   haptics: boolean;
   mobileNav: boolean;
+  isKeyboardActive: boolean;
+
   setHaptics: (value: boolean) => void;
   setMobileNav: (value: boolean) => void;
+  setIsKeyboardActive: (value: boolean) => void;
   deleteAccount: () => Promise<void>;
 }
 
@@ -16,9 +19,11 @@ export const useSettingsStore = create<SettingsStore>()(
     (set) => ({
       haptics: true,
       mobileNav: false,
+      isKeyboardActive: false,
 
       setHaptics: (value: boolean) => set({ haptics: value }),
       setMobileNav: (value: boolean) => set({ mobileNav: value }),
+      setIsKeyboardActive: (value: boolean) => set({ isKeyboardActive: value }),
 
       deleteAccount: async () => {
         try {

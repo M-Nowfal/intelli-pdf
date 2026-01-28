@@ -29,7 +29,7 @@ export function HomeLayout({
   const pathname = usePathname();
   const { isLoading, isAuthenticated } = useCurrentUser();
   const { getActivePdf } = usePdfStore();
-  const { mobileNav } = useSettingsStore();
+  const { mobileNav, isKeyboardActive } = useSettingsStore();
 
   const paths = ["/login", "/signup", "/otp", "/signout", "/forgot-password"];
   const isAuthPath = () => paths.some(path => path === pathname);
@@ -69,13 +69,11 @@ export function HomeLayout({
         )}
         <main className={cn(
           "flex-1",
-          mobileNav && !pathname.startsWith("/chat/") && "pb-14"
+          mobileNav && pathname !== "/" && !pathname.startsWith("/chat/") && "pb-14"
         )}>
           {children}
         </main>
-        {mobileNav && pathname !== "/" && <div className="hide-on-keyboard w-full">
-          <MobileNav />
-        </div>}
+        {mobileNav && pathname !== "/" && !isKeyboardActive && <MobileNav />}
       </SidebarInset>
     </SidebarProvider>
   );
