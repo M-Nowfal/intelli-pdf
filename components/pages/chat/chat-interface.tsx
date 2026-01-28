@@ -241,7 +241,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
 
       <div
         className={cn(
-          "px-2 pt-4 pb-2 bg-background shrink-0",
+          "px-2 pt-2.5 pb-2 bg-background shrink-0",
           mobileNav && "pb-14 md:pb-2",
           isKeyboardActive && mobileNav && "pb-3"
         )}

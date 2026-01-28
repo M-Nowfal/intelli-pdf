@@ -55,7 +55,7 @@ export function FlashCardList() {
             Review your study decks generated from your PDFs. Click a deck to start practicing.
           </p>
         </div>
-        <Button onClick={handleCreateNew} size="lg" className="shadow-md hover:shadow-lg transition-shadow">
+        <Button onClick={handleCreateNew} size="lg" className="shadow-md hover:shadow-lg transition-shadow" disabled={isLoading}>
           New Deck
           <Plus className="ml-2 h-4 w-4" />
         </Button>
