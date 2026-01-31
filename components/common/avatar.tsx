@@ -1,6 +1,7 @@
 import { getColorFromName, getFirstLetter } from "@/helpers/name.helper";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { getOptimizedAvatar } from "@/helpers/cloudinary.helper";
 
 interface UserAvatarProps {
   size?: "sm" | "md" | "lg" | "xl";
@@ -20,8 +21,11 @@ export function UserAvatar({ size = "sm" }: UserAvatarProps) {
 
   return (
     <Avatar className={`${sizes[size]} text-white font-semibold border cursor-pointer`}>
-      <AvatarImage src={avatar || ""} alt={name || ""} />
-
+      <AvatarImage
+        className="object-cover object-center"
+        src={getOptimizedAvatar(avatar)}
+        alt={name || ""}
+      />
       <AvatarFallback
         className={fallbackBgColors[getColorFromName(name || "")]}
       >

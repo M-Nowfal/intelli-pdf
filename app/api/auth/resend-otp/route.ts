@@ -3,7 +3,7 @@ import { generateOTP, storeOTP, canResendOTP, checkDailyLimit } from "@/lib/otp"
 import { sendOTP } from "@/lib/otp";
 import { otpFlowOptions } from "@/utils/options";
 
-export async function POST(req: NextRequest): Promise<NextResponse> {
+export async function POST(req: NextRequest) {
   const { email } = await req.json();
 
   const allowed = await canResendOTP(email);

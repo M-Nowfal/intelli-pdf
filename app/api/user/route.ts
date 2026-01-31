@@ -2,6 +2,15 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { User } from "@/models/user.model";
+import { connectDB } from "@/lib/db";
+import { v2 as cloudinary } from "cloudinary";
+import { getPublicIdFromUrl } from "@/helpers/cloudinary.helper";
+
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function GET() {
   try {
@@ -30,17 +39,55 @@ export async function PUT(req: NextRequest) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { name } = await req.json();
+    const { name, avatar } = await req.json();
 
     if (!name || name.trim().length < 3) {
       return NextResponse.json({ message: "Name is Required" }, { status: 400 });
     }
 
-    await User.findByIdAndUpdate(session.user?.id, {
-      $set: { name }
-    });
+    await connectDB();
 
-    return NextResponse.json({ success: true });
+    const currentUser = await User.findById(session.user.id);
+    if (!currentUser) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    const shouldDeleteOldImage = 
+      (avatar === null && currentUser.avatar) || 
+      (avatar && currentUser.avatar && currentUser.avatar !== avatar);
+
+    if (shouldDeleteOldImage) {
+      if (currentUser.avatar.includes("cloudinary.com")) {
+        const publicId = getPublicIdFromUrl(currentUser.avatar);
+        if (publicId) {
+          try {
+            await cloudinary.uploader.destroy(publicId);
+            console.log("Deleted old Cloudinary image:", publicId);
+          } catch (error) {
+            console.error("Failed to delete old image:", error);
+          }
+        }
+      }
+    }
+
+    const updateData: any = { name };
+    if (avatar === null) {
+      updateData.$unset = { avatar: 1 };
+    } else if (avatar) {
+      updateData.avatar = avatar;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      session.user.id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    return NextResponse.json({
+      success: true,
+      message: "Profile updated successfully",
+      user: updatedUser
+    });
 
   } catch (err: unknown) {
     console.error("User Updation Error", err);

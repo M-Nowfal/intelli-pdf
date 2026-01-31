@@ -1,4 +1,6 @@
-import { Save } from "lucide-react";
+"use client";
+
+import { Save, UploadCloud, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,34 +8,99 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from "@/components/ui/separator";
 import { UserAvatar } from "@/components/common/avatar";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
-import { Loader } from "@/components/ui/loader";
 import api from "@/lib/axios";
 import { DeleteAccount } from "./danger-zone";
+import { Loader } from "@/components/ui/loader";
+import axios from "axios";
+import { Alert } from "@/components/common/alert";
 
 export function GeneralTab() {
   const { data: session, update } = useSession();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [name, setName] = useState<string>("");
 
   useEffect(() => {
     setName(session?.user?.name || "");
   }, [session]);
 
-  const handleUpdateProfile = async () => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+
+    try {
+      const signRes = await api.post("/cloudinary/sign");
+      const { signature, timestamp, apiKey, folder, cloudName } = signRes.data;
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("api_key", apiKey);
+      formData.append("timestamp", timestamp.toString());
+      formData.append("signature", signature);
+      formData.append("folder", folder);
+
+      const uploadRes = await axios.post(
+        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+        formData
+      );
+
+      if (uploadRes.data.secure_url) {
+        await handleSaveChanges(name, uploadRes.data.secure_url);
+      }
+    } catch (err: any) {
+      console.error("Cloudinary Error:", err.response?.data);
+      toast.error("Upload failed. Check console for details.");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleRemoveImage = async () => {
     setIsLoading(true);
     try {
-      const res = await api.put("/user", { name });
+      const res = await api.put("/user", { name, avatar: null });
 
       if (res.data.success) {
-        await update({ name });
-        toast.success("Profile Updated.");
+        await update({ name, image: null });
+        toast.success("Profile picture removed.");
       }
     } catch (err: unknown) {
       console.error(err);
-      toast.error("Update failed, try again later.");
+      toast.error("Failed to remove image.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSaveChanges = async (newName: string, newAvatarUrl?: string) => {
+    setIsLoading(true);
+    try {
+      const dbPayload = {
+        name: newName,
+        ...(newAvatarUrl && { avatar: newAvatarUrl })
+      };
+
+      const sessionPayload = {
+        name: newName,
+        ...(newAvatarUrl && { image: newAvatarUrl })
+      };
+
+      const res = await api.put("/user", dbPayload);
+
+      if (res.data.success) {
+        await update(sessionPayload);
+        toast.success("Profile updated successfully.");
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Failed to save profile changes.");
     } finally {
       setIsLoading(false);
     }
@@ -44,17 +111,57 @@ export function GeneralTab() {
       <Card>
         <CardHeader>
           <CardTitle>Profile Information</CardTitle>
-          <CardDescription>Update your public profile details.</CardDescription>
+          <CardDescription>Update your profile details and public avatar.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="flex items-center gap-6">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
             <UserAvatar size="xl" />
-            <div className="space-y-1">
+
+            <div className="space-y-2 text-center sm:text-left">
               <h4 className="font-medium">Profile Picture</h4>
-              <p className="text-xs text-muted-foreground">
-                Supported formats: JPG, PNG. Max size: 2MB.
+              <p className="text-xs text-muted-foreground max-w-50">
+                JPG, PNG or GIF. Max size of 3MB.
               </p>
-              <Button variant="outline" size="sm" className="mt-2" disabled>Upload New</Button>
+
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
+
+              <div className="flex gap-2 justify-center sm:justify-start">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  disabled={isUploading || isLoading}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {isUploading ? <Loader /> : <UploadCloud />}
+                  {isUploading ? "Uploading..." : "Upload New"}
+                </Button>
+
+                {session?.user?.image && (
+                  <Alert
+                    trigger={
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                        disabled={isUploading || isLoading}
+                      >
+                        <Trash2 />
+                        Remove
+                      </Button>
+                    }
+                    title="Remove profile picture?"
+                    description="Are you sure you want to remove your profile picture? This action cannot be undone."
+                    onContinue={handleRemoveImage}
+                  />
+                )}
+              </div>
             </div>
           </div>
 
@@ -67,31 +174,37 @@ export function GeneralTab() {
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your name"
+                placeholder="Enter your full name"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email Address</Label>
               <Input
                 id="email"
                 value={session?.user?.email || ""}
                 disabled
-                className="bg-muted"
+                className="bg-muted text-muted-foreground"
               />
-              <p className="text-[10px] text-muted-foreground">Email cannot be changed.</p>
+              <p className="text-[10px] text-muted-foreground">
+                Email is managed by your provider ({session?.user?.email ? "Google" : "credentials"}).
+              </p>
             </div>
           </div>
         </CardContent>
         <CardFooter className="flex justify-end border-t px-6 py-4">
-          <Button onClick={handleUpdateProfile} disabled={isLoading || session?.user?.name?.trim() === name.trim()}>
-            {isLoading ? <>
-              Saving Changes <Loader />
-            </> : <>
-              <Save /> Save Changes
-            </>}
+          <Button
+            onClick={() => handleSaveChanges(name)}
+            disabled={isLoading || isUploading || session?.user?.name?.trim() === name.trim()}
+          >
+            {isLoading ? (
+              <>Saving <Loader /></>
+            ) : (
+              <><Save /> Save Changes</>
+            )}
           </Button>
         </CardFooter>
       </Card>
+
       <DeleteAccount />
     </>
   );

@@ -79,11 +79,12 @@ export const authOptions: NextAuthOptions = {
 
           if (dbUser) {
             token.id = dbUser._id.toString();
+            token.picture = dbUser.avatar;
+          } else {
+            token.picture = user.image;
           }
         } else {
           token.id = user.id;
-        }
-        if (user.image) {
           token.picture = user.image;
         }
       }
@@ -92,7 +93,7 @@ export const authOptions: NextAuthOptions = {
         if (session.name) {
           token.name = session.name;
         }
-        if (session.image) {
+        if (session.image !== undefined) {
           token.picture = session.image;
         }
       }
@@ -138,7 +139,7 @@ export const authOptions: NextAuthOptions = {
 
             if (referralCode) {
               const referrer = await User.findOne({ referralCode });
-              
+
               if (referrer) {
                 await User.findByIdAndUpdate(referrer._id, {
                   $inc: { "stats.aiCredits": 250 }
