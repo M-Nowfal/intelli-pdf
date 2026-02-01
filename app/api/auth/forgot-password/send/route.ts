@@ -27,6 +27,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (user.provider === "google") {
+      return NextResponse.json(
+        { message: "This account uses google signin." },
+        { status: 400 }
+      );
+    }
+
     const canResend = await canResendOTP(email);
     if (!canResend) {
       return NextResponse.json(
