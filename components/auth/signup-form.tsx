@@ -21,6 +21,7 @@ import { Loader } from "../ui/loader"
 import { useRouter, useSearchParams } from "next/navigation"
 import { AxiosError } from "axios"
 import { useAuthIntent } from "@/providers/authintent-provider"
+import { vibrate } from "@/lib/haptics"
 
 type SignupFormData = {
   name: string
@@ -103,6 +104,7 @@ export function SignupForm({
               Already have an account?{" "}
               <Link
                 href="/login"
+                onClick={() => vibrate()}
                 className={cn(
                   "underline",
                   loading && "pointer-events-none opacity-50"

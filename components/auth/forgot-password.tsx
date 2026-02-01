@@ -17,6 +17,7 @@ import { useState } from "react";
 import { Loader } from "@/components/ui/loader";
 import { ArrowLeft, KeyRound, Mail } from "lucide-react";
 import api from "@/lib/axios";
+import { vibrate } from "@/lib/haptics";
 
 export function ForgotPassword({
   className,
@@ -225,6 +226,7 @@ export function ForgotPassword({
 
       <div className="flex justify-center">
         <Link
+          onClick={() => vibrate()}
           href="/login"
           className={cn(
             "flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors",

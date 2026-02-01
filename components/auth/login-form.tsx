@@ -18,6 +18,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Loader } from "@/components/ui/loader"
 import { useAuthIntent } from "@/providers/authintent-provider"
+import { vibrate } from "@/lib/haptics"
 
 type LoginFormData = {
   email: string
@@ -129,6 +130,7 @@ export function LoginForm({
               Don&apos;t have an account?{" "}
               <Link
                 href="/signup"
+                onClick={() => vibrate()}
                 className={cn(
                   "underline",
                   loading && "pointer-events-none opacity-50"
@@ -166,6 +168,7 @@ export function LoginForm({
               <FieldLabel htmlFor="password">Password</FieldLabel>
               <Link
                 href="/forgot-password"
+                onClick={() => vibrate()}
                 className={cn(
                   "ml-auto text-sm underline-offset-4 hover:underline",
                   loading && "pointer-events-none opacity-50"
