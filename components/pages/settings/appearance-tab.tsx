@@ -130,7 +130,10 @@ export function AppearanceTab() {
           </div>
           <Switch
             checked={mobileNav}
-            onCheckedChange={() => setMobileNav(!mobileNav)}
+            onCheckedChange={() => {
+              vibrate();
+              setMobileNav(!mobileNav);
+            }}
           />
         </div>
       </CardFooter>
