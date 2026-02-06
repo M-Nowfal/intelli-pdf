@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { connectDB } from "@/lib/db";
 import { Quiz } from "@/models/quiz.model";
+import "@/models/pdf.model";
 
 export async function GET() {
   try {

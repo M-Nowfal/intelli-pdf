@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { Flashcard } from "@/models/flashcard.model";
 import { User } from "@/models/user.model";
+import "@/models/pdf.model";
 
 export async function GET() {
   try {

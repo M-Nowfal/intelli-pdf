@@ -6,7 +6,7 @@ export function getFirstLetter(name: string | undefined | null): string {
 
 export function getTwoLetters(name: string): string {
   return name
-    .split(" ")
+    .split(/\s+/)
     .slice(0, 2)
     .map(n => n[0])
     .join("")

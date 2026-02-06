@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Calendar, Layers, ExternalLink, Trash2, Plus, Library } from "lucide-react";
+import { FileText, Calendar, Layers, ExternalLink, Trash2, Plus, Library, Sparkles, MessageSquare, BrainCircuit } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { IPDF } from "@/types/pdf";
 import { useRouter } from "next/navigation";
@@ -18,11 +18,19 @@ import { formatFileSize } from "@/helpers/file.helper";
 import { useChatStore } from "@/store/useChatStore";
 import { useSummaryStore } from "@/store/useSummaryStore";
 import { CardSkeloton } from "@/components/common/card-skeloton";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function PDFList() {
-  const { 
-    pdfs, fetchPdfs, isPdfLoading, 
-    pdfError, removePdf 
+  const {
+    pdfs, fetchPdfs, isPdfLoading,
+    pdfError, removePdf
   } = usePdfStore();
   const { removeSummary } = useSummaryStore();
   const { removeChatFromList } = useChatStore();
@@ -141,23 +149,59 @@ export default function PDFList() {
                 </CardContent>
 
                 <CardFooter className="bg-muted/5 flex gap-2">
-                  <Button className="flex-1 gap-2 shadow-sm" variant="default" asChild>
-                    <Link
-                      href={removePDF.loading ? "" : pdf.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={removePDF.loading ? "pointer-events-none opacity-50" : ""}
-                    >
-                      {removePDF.loading ? (
-                        <>Removing...</>
-                      ) : (
-                        <>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button className="flex-1 gap-2 shadow-sm" variant="default">
+                        <Sparkles className="h-4 w-4" />
+                        Start Learning
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="top" align="center" className="w-48 mb-2">
+                      <DropdownMenuLabel>Study Modes</DropdownMenuLabel>
+                      
+                      <DropdownMenuItem asChild>
+                        <Link href={`/chat/${pdf._id}`} className="cursor-pointer flex items-center gap-2">
+                          <MessageSquare className="h-4 w-4 text-blue-500" />
+                          <span>AI Chat</span>
+                        </Link>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem asChild>
+                        <Link href={`/flashcards/${pdf._id}`} className="cursor-pointer flex items-center gap-2">
+                          <Layers className="h-4 w-4 text-amber-500" />
+                          <span>Flashcards</span>
+                        </Link>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem asChild>
+                        <Link href={`/quiz/${pdf._id}`} className="cursor-pointer flex items-center gap-2">
+                          <BrainCircuit className="h-4 w-4 text-purple-500" />
+                          <span>Take Quiz</span>
+                        </Link>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem asChild>
+                        <Link href={`/summarize/${pdf._id}`} className="cursor-pointer flex items-center gap-2">
+                          <FileText className="h-4 w-4 text-green-500" />
+                          <span>Summary</span>
+                        </Link>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuSeparator />
+
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href={pdf.fileUrl}
+                          target="_blank"
+                          className="cursor-pointer flex items-center gap-2 text-muted-foreground"
+                        >
                           <ExternalLink className="h-4 w-4" />
-                          View
-                        </>
-                      )}
-                    </Link>
-                  </Button>
+                          <span>View Original PDF</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
                   <Alert
                     trigger={
                       <Button

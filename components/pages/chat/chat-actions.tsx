@@ -13,6 +13,7 @@ import { Alert } from "@/components/common/alert";
 import Link from "next/link";
 import { formatChatListTitle } from "@/helpers/name.helper";
 import { formatFileSize } from "@/helpers/file.helper";
+import { Switch } from "@/components/ui/switch";
 
 interface ChatActionProps {
   activePdf: {
@@ -62,8 +63,12 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
             </h1>
             <ExternalLink size={15} />
           </Link>
-          <div className="text-xs text-muted-foreground text-end mt-2">
+          <div className="text-xs text-muted-foreground mt-2">
             {activePdf?.pages} Pages • {formatFileSize(activePdf?.fileSize || 0)}
+          </div>
+          <div className="flex items-center justify-between mt-2">
+            Strict with PDF
+            <Switch checked />
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
