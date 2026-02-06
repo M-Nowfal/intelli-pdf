@@ -18,7 +18,7 @@ import { useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { formatFileSize } from "@/helpers/file.helper";
 import { useRouter } from "next/navigation";
-import { Loader } from "@/components/ui/loader";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function DashboardRecentActivity() {
   const { pdfs, isPdfLoading, fetchPdfs } = usePdfStore();
@@ -47,8 +47,19 @@ export function DashboardRecentActivity() {
         </Button>}
       </CardHeader>
       {isPdfLoading && <CardContent>
-        <div className="flex justify-center">
-          <Loader size={30} />
+        <div className="grid lg:grid-cols-2 gap-3">
+          {[1, 2, 3].map((_, i) => (
+            <Skeleton key={i} className="w-full h-18 flex items-center justify-between px-5">
+              <div className="flex items-center gap-5 w-full">
+                <Skeleton className="bg-primary/10 w-12 h-12 rounded-full" />
+                <div className="flex flex-col gap-3 w-full">
+                  <Skeleton className="bg-primary/10 w-4/6 h-4 rounded-full" />
+                  <Skeleton className="bg-primary/10 w-3/6 h-4 rounded-full" />
+                </div>
+              </div>
+              <Skeleton className="bg-primary/10 w-18 h-8 rounded-lg" />
+            </Skeleton>
+          ))}
         </div>
       </CardContent>}
       {hasPdf && <CardContent>

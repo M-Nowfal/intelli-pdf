@@ -41,6 +41,7 @@ import { useChatStore } from "@/store/useChatStore";
 import { useEffect } from "react";
 import { formatChatListTitle } from "@/helpers/name.helper";
 import { vibrate } from "@/lib/haptics";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type SubMenuItem = {
   title: string;
@@ -52,7 +53,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { name, email } = useCurrentUser();
   const { isMobile, toggleSidebar } = useSidebar();
   const pathname = usePathname();
-  const { chatList, fetchChatList } = useChatStore();
+  const { chatList, fetchChatList, isLoading } = useChatStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -156,6 +157,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                   {isActive(subItem.url) && <div className="w-2 h-2 bg-accent-foreground rounded-full" />}
                                 </Link>
                               </SidebarMenuSubButton>
+                              {isLoading && item.title === "AI Chat" && <Skeleton className="w-full h-5 mt-2 bg-primary/10" />}
                             </SidebarMenuSubItem>
                           ))}
                         </SidebarMenuSub>

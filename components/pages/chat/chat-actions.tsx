@@ -5,7 +5,7 @@ import {
   DropdownMenu, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { EllipsisVertical, Eraser, ExternalLink, MessageCircleDashedIcon, Pencil, Pin, Trash2, Upload } from "lucide-react";
+import { EllipsisVertical, Eraser, ExternalLink, MessageCircleDashedIcon, Pin, Trash2, Upload } from "lucide-react";
 import { useChatStore } from "@/store/useChatStore";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -56,31 +56,23 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
           <Link
             href={activePdf?.fileUrl}
             target="_blank"
-            className="w-fit flex items-center gap-2 bg-accent px-3 py-1 rounded-full shadow hover:shadow-md"
+            className="w-fit flex items-center gap-2 bg-accent px-2 py-1 rounded-full shadow hover:shadow-md"
           >
-            <h1 className="text-sm font-medium truncate max-w-40 md:max-w-md">
+            <h1 className="text-sm font-medium truncate max-w-32 md:max-w-md">
               {formatChatListTitle(activePdf?.title || "")}
             </h1>
             <ExternalLink size={15} />
           </Link>
-          <div className="text-xs text-muted-foreground mt-2">
+          <div className="text-xs text-muted-foreground mt-2 me-2 text-end">
             {activePdf?.pages} Pages • {formatFileSize(activePdf?.fileSize || 0)}
           </div>
-          <div className="flex items-center justify-between mt-2">
-            Strict with PDF
-            <Switch checked />
-          </div>
         </DropdownMenuLabel>
+
         <DropdownMenuSeparator />
 
         <DropdownMenuItem className="cursor-pointer p-2" disabled>
           <Pin className="mr-2 h-4 w-4" />
           Pin
-        </DropdownMenuItem>
-
-        <DropdownMenuItem className="cursor-pointer p-2" disabled>
-          <Pencil className="mr-2 h-4 w-4" />
-          Rename
         </DropdownMenuItem>
 
         <DropdownMenuItem className="cursor-pointer p-2" onClick={() => router.push("/chat")}>
@@ -101,10 +93,10 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
         <Alert
           trigger={
             <DropdownMenuItem
-              className="text-red-600 focus:text-red-600 cursor-pointer p-2"
+              className="text-red-400 focus:text-red-400 cursor-pointer p-2"
               onSelect={(e) => e.preventDefault()}
             >
-              <Trash2 className="mr-2 h-4 w-4" />
+              <Trash2 className="text-red-400 mr-2" />
               Delete
             </DropdownMenuItem>
           }
@@ -112,6 +104,13 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
           description="All the chats related this document will be deleted permanently, this can't be undone."
           onContinue={handleDelete}
         />
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem className="flex items-center justify-between" onSelect={(e) => e.preventDefault()}>
+          Strict with PDF
+          <Switch checked />
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
