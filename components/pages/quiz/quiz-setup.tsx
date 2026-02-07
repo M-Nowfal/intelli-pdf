@@ -22,8 +22,8 @@ export function QuizSetup({ pdfId, onQuizReady }: QuizSetupProps) {
   const { decrementCredits } = useDashboardStore();
 
   const handleGenerate = async () => {
-    if (amount < 1 || amount > 20) {
-      toast.error("Questions must be between 1 and 20");
+    if (amount < 3 || amount > 50) {
+      toast.error("Questions must be between 3 and 50");
       return;
     }
 
@@ -53,13 +53,13 @@ export function QuizSetup({ pdfId, onQuizReady }: QuizSetupProps) {
             <Label>How many questions?</Label>
             <Input
               type="number"
-              min={1}
-              max={20}
+              min={3}
+              max={50}
               value={amount}
               onChange={(e) => setAmount(parseInt(e.target.value) || 0)}
               className="text-center text-lg"
             />
-            <p className="text-xs text-muted-foreground text-center">Max: 20</p>
+            <p className="text-xs text-muted-foreground text-center">Max: 50</p>
           </div>
         </CardContent>
         <CardFooter>

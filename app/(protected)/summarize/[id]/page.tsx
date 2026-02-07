@@ -97,16 +97,16 @@ export default function SummarizePage() {
           ) : isSummaryLoading ? (
             <div className="space-y-6">
               <div className="space-y-2">
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-5/6" />
+                <Skeleton className="h-4 w-3/4 bg-primary/10" />
+                <Skeleton className="h-4 w-full bg-primary/10" />
+                <Skeleton className="h-4 w-5/6 bg-primary/10" />
               </div>
               <div className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-4/5" />
-                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full bg-primary/10" />
+                <Skeleton className="h-4 w-4/5 bg-primary/10" />
+                <Skeleton className="h-4 w-full bg-primary/10" />
               </div>
-              <div className="h-32 w-full bg-muted/20 rounded-md animate-pulse" />
+              <Skeleton className="bg-primary/10 h-32 w-full rounded-md animate-pulse" />
             </div>
           ) : (
             <div className="prose prose-slate dark:prose-invert max-w-none 

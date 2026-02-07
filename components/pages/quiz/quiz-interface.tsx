@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuizStore, QuizItem } from "@/store/useQuizStore";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,35 @@ export function QuizInterface({ quiz }: { quiz: QuizItem }) {
   const questions = quiz.questions;
   const currentQuestion = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
+
+  useEffect(() => {
+    if (isFinished) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const options = currentQuestion.options;
+      const currentSelectionIndex = options.indexOf(selectedAnswer);
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        const nextIndex = (currentSelectionIndex + 1) % options.length;
+        setSelectedAnswer(options[nextIndex]);
+      }
+
+      else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        const prevIndex = (currentSelectionIndex - 1 + options.length) % options.length;
+        setSelectedAnswer(options[prevIndex]);
+      }
+
+      else if (e.key === "Enter" && selectedAnswer) {
+        e.preventDefault();
+        handleNext();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedAnswer, currentIndex, isFinished]);
 
   const handleNext = () => {
     if (!selectedAnswer) return;
@@ -133,7 +162,7 @@ export function QuizInterface({ quiz }: { quiz: QuizItem }) {
         </CardContent>
         <CardFooter className="flex justify-end pt-4">
           <Button onClick={handleNext} disabled={!selectedAnswer} size="lg" className="px-8">
-            {currentIndex === questions.length - 1 ? "Finish" : "Next"} <ArrowRight className="pt-0.5" />
+            {currentIndex === questions.length - 1 ? "Finish" : "Next"} <ArrowRight className="pt-0.5 ml-2 h-4 w-4" />
           </Button>
         </CardFooter>
       </Card>

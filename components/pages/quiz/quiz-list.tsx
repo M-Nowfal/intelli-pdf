@@ -29,7 +29,7 @@ export function QuizList() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
-        <div className="space-y-2">
+        <div className="space-y-2 me-auto">
           <div className="flex items-center gap-2">
             <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 shadow-sm">
               <ListChecks className="h-4 w-4 sm:h-6 sm:w-6 text-primary" />

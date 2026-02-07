@@ -17,16 +17,21 @@ import { useFlashCardStore } from "@/store/useFlashCardStore";
 import { toast } from "sonner";
 import { useDashboardStore } from "@/store/useDashboardStore";
 
-export function FlashCardCount({ pdfId }: { pdfId: string }) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+interface FlashCardCountProps {
+  pdfId: string;
+  isDialogOpen: boolean; 
+  setIsDialogOpen: (val: boolean) => void;
+}
+
+export function FlashCardCount({ pdfId, isDialogOpen, setIsDialogOpen }: FlashCardCountProps) {
   const [numCardsToGenerate, setNumCardsToGenerate] = useState(0);
   const { generateFlashCards, isGenerating, isLoading } = useFlashCardStore();
   const { decrementCredits } = useDashboardStore();
 
   const handleGenerate = async () => {
     setIsDialogOpen(false);
-    if (numCardsToGenerate > 20 || numCardsToGenerate < 1) {
-      toast.warning("Enter a count between 1 - 20");
+    if (numCardsToGenerate > 50 || numCardsToGenerate < 3) {
+      toast.warning("Enter a count between 3 - 50");
       return;
     }
     await generateFlashCards(pdfId, numCardsToGenerate);
@@ -64,8 +69,8 @@ export function FlashCardCount({ pdfId }: { pdfId: string }) {
             <Input
               id="numCards"
               type="string"
-              min={1}
-              max={20}
+              min={3}
+              max={50}
               value={numCardsToGenerate}
               onChange={(e) => setNumCardsToGenerate(parseInt(e.target.value) || 0)}
               className="col-span-4"

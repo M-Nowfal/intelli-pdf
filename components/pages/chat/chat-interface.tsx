@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send, Bot, StopCircle, FileText, Copy } from "lucide-react";
+import { Send, Bot, StopCircle, FileText, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import TextareaAutosize from "react-textarea-autosize";
 import { BOT } from "@/utils/constants";
@@ -70,6 +70,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (pdfId) {
@@ -163,6 +164,12 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
     }
   };
 
+  const handleCopy = (id: string, content: string) => {
+    copy(content);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
   if (isMessagesLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -188,6 +195,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
           <div className="flex flex-col space-y-8 pb-4">
             {messages.map((message) => {
               const isUser = message.role === "user";
+              const isCopied = copiedId === message.id;
 
               return (
                 <div
@@ -208,12 +216,10 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
                     "flex flex-col gap-2 max-w-[85%] sm:max-w-[80%]",
                     isUser ? "items-end text-right" : "items-start text-left"
                   )}>
-
                     <div className={cn(
                       "relative flex gap-2 items-center group/bubble",
-                      isUser ? "flex-row-reverse" : "flex-row"
+                      isUser ? "flex-row-reverse" : "flex-col items-start"
                     )}>
-
                       <div
                         className={cn(
                           "text-sm leading-7 transition-all duration-200",
@@ -226,17 +232,30 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
                       </div>
 
                       <div className={cn(
-                        "opacity-0 scale-95 translate-y-2 group-hover/bubble:opacity-100 group-hover/bubble:scale-100 group-hover/bubble:translate-y-0 transition-all duration-200 ease-out shrink-0",
-                        "order-last sm:order-0",
-                        isUser ? "mr-1" : "ml-1"
+                        "transition-all duration-200 ease-out shrink-0",
+                        "opacity-100 sm:opacity-0 sm:scale-95 sm:translate-y-2 group-hover/bubble:opacity-100 group-hover/bubble:scale-100 group-hover/bubble:translate-y-0",
+                        isUser ? "order-last sm:order-0 mr-1" : "mt-1 ml-0"
                       )}>
                         <Button
                           variant="secondary"
                           size="icon-sm"
-                          className="h-8 w-8 rounded-full shadow-sm hover:bg-secondary/80"
-                          onClick={() => copy(message?.content)}
+                          className={cn(
+                            "shadow-sm hover:bg-secondary/80",
+                            isUser ? "rounded-full h-8 sm:w-8" : "w-20"
+                          )}
+                          onClick={() => handleCopy(message.id, message.content)}
                         >
-                          <Copy className="h-3.5 w-3.5" />
+                          {isCopied ? (
+                            <>
+                              <Check className="h-3.5 w-3.5 animate-in zoom-in duration-300" />
+                              {!isUser && "Copied"}
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-3.5 w-3.5" />
+                              {!isUser && "Copy"}
+                            </>
+                          )}
                         </Button>
                       </div>
                     </div>
@@ -255,7 +274,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
               <div className="flex items-start gap-4">
                 <Avatar className="h-8 w-8 border shrink-0 mt-1">
                   <AvatarImage src={BOT} />
-                  <AvatarFallback className="bg-primary/10 text-primary">AI</AvatarFallback>
+                  <AvatarFallback>AI</AvatarFallback>
                 </Avatar>
                 <div className="flex items-center gap-1 mt-3">
                   <span className="w-1.5 h-1.5 bg-foreground/60 rounded-full animate-bounce [animation-delay:-0.3s]"></span>

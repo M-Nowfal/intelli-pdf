@@ -26,6 +26,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Missing fields" }, { status: 400 });
     }
 
+    if (parseInt(amount) < 3 || parseInt(amount) > 50) {
+      return NextResponse.json({ message: "Amount must be between 3 - 50" }, { status: 400 });
+    }
+
     await connectDB();
 
     const user = await User.findById(session.user.id);

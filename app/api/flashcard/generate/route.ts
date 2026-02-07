@@ -24,8 +24,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "PDF ID is required" }, { status: 400 });
     }
 
-    if (parseInt(count) < 1 || parseInt(count) > 20) {
-      return NextResponse.json({ message: "Count must be between 1 - 20" }, { status: 400 });
+    if (parseInt(count) < 3 || parseInt(count) > 50) {
+      return NextResponse.json({ message: "Count must be between 3 - 50" }, { status: 400 });
     }
 
     await connectDB();

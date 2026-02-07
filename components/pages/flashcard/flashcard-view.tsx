@@ -29,6 +29,7 @@ export function FlashcardView({ pdfId }: { pdfId: string }) {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     if (pdfId) fetchFlashCards(pdfId);
@@ -39,6 +40,11 @@ export function FlashcardView({ pdfId }: { pdfId: string }) {
       setCurrentIndex(flashCards.length - 1);
     }
   }, [flashCards.length, currentIndex]);
+
+  useEffect(() => {
+    if (flashCards.length === 0 && !isLoading)
+      setIsDialogOpen(true);
+  }, [flashCards.length]);
 
   const handleNavigate = (direction: "next" | "prev") => {
     setIsFlipped(false);
@@ -75,7 +81,7 @@ export function FlashcardView({ pdfId }: { pdfId: string }) {
             Learn smarter, not harder. Build your knowledge one flashcard at a time and keep leveling up effortlessly.
           </p>
         </div>
-        <FlashCardCount pdfId={pdfId} />
+        <FlashCardCount {...{ pdfId, isDialogOpen, setIsDialogOpen }} />
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center min-h-100">
