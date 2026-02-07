@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     if (existingPDF) {
       try {
         await utapi.deleteFiles(fileKey);
-      } catch (deleteError) {
+      } catch (deleteError: unknown) {
         console.error("Failed to delete duplicate file from UploadThing:", deleteError);
       }
 

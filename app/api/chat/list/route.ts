@@ -16,8 +16,7 @@ export async function GET() {
 
     const chatLists = await Chat.find({ userId: session.user?.id })
       .select("pdfId -_id")
-      .populate("pdfId", "title _id")
-      .limit(10);
+      .populate("pdfId", "title _id");
       
     return NextResponse.json(chatLists || []);
 

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send, Bot, StopCircle, FileText } from "lucide-react";
+import { Send, Bot, StopCircle, FileText, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import TextareaAutosize from "react-textarea-autosize";
 import { BOT } from "@/utils/constants";
@@ -15,6 +15,7 @@ import { useChatStore, Message } from "@/store/useChatStore";
 import { MarkDown } from "@/components/common/react-markdown";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { copy } from "@/helpers/copy-chat.helper";
 
 const SourceBadge = ({ sources }: { sources: number[] }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -184,42 +185,71 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
             </div>
           </div>
         ) : (
-          <div className="space-y-8 pb-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={cn(
-                  "flex w-full items-start gap-4",
-                  message.role === "user" ? "justify-end" : "justify-start"
-                )}
-              >
-                {message.role === "assistant" && (
-                  <Avatar className="h-8 w-8 border shrink-0 mt-1">
-                    <AvatarImage src={BOT} />
-                    <AvatarFallback className="bg-primary/10 text-primary">AI</AvatarFallback>
-                  </Avatar>
-                )}
+          <div className="flex flex-col space-y-8 pb-4">
+            {messages.map((message) => {
+              const isUser = message.role === "user";
 
-                <div className={cn("flex flex-col gap-2 max-w-[85%] sm:max-w-[80%]", message.role === "user" && "items-end")}>
-                  <div
-                    className={cn(
-                      "text-sm leading-7",
-                      message.role === "user"
-                        ? "bg-secondary text-secondary-foreground px-5 py-3 rounded-2xl rounded-tr-sm"
-                        : "bg-transparent text-foreground px-0 py-0"
-                    )}
-                  >
-                    <MarkDown content={message?.content} />
-                  </div>
-
-                  {message.role === "assistant" && message.sources && message.sources.length > 0 && (
-                    <div className="mt-2 px-1">
-                      <SourceBadge sources={message.sources} />
-                    </div>
+              return (
+                <div
+                  key={message.id}
+                  className={cn(
+                    "flex w-full items-start gap-3 group px-2",
+                    isUser ? "flex-row-reverse" : "flex-row"
                   )}
+                >
+                  {!isUser && (
+                    <Avatar className="h-8 w-8 border shrink-0 mt-1">
+                      <AvatarImage src={BOT} />
+                      <AvatarFallback className="bg-primary/10 text-primary">AI</AvatarFallback>
+                    </Avatar>
+                  )}
+
+                  <div className={cn(
+                    "flex flex-col gap-2 max-w-[85%] sm:max-w-[80%]",
+                    isUser ? "items-end text-right" : "items-start text-left"
+                  )}>
+
+                    <div className={cn(
+                      "relative flex gap-2 items-center group/bubble",
+                      isUser ? "flex-row-reverse" : "flex-row"
+                    )}>
+
+                      <div
+                        className={cn(
+                          "text-sm leading-7 transition-all duration-200",
+                          isUser
+                            ? "bg-secondary text-secondary-foreground px-5 py-3 rounded-2xl rounded-tr-sm"
+                            : "bg-transparent text-foreground px-0 py-0"
+                        )}
+                      >
+                        <MarkDown content={message?.content} />
+                      </div>
+
+                      <div className={cn(
+                        "opacity-0 scale-95 translate-y-2 group-hover/bubble:opacity-100 group-hover/bubble:scale-100 group-hover/bubble:translate-y-0 transition-all duration-200 ease-out shrink-0",
+                        "order-last sm:order-0",
+                        isUser ? "mr-1" : "ml-1"
+                      )}>
+                        <Button
+                          variant="secondary"
+                          size="icon-sm"
+                          className="h-8 w-8 rounded-full shadow-sm hover:bg-secondary/80"
+                          onClick={() => copy(message?.content)}
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {!isUser && message.sources && message.sources.length > 0 && (
+                      <div className="mt-2 px-1">
+                        <SourceBadge sources={message.sources} />
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             {isStreaming && messages[messages.length - 1]?.role === "user" && (
               <div className="flex items-start gap-4">

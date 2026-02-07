@@ -18,9 +18,12 @@ import { useEffect } from "react";
 import { Loader } from "@/components/ui/loader";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { vibrate } from "@/lib/haptics";
 
 export function DashboardStats() {
   const { stats, fetchStats, isLoading, error } = useDashboardStore();
+  const router = useRouter();
 
   useEffect(() => {
     fetchStats();
@@ -35,10 +38,15 @@ export function DashboardStats() {
   const isOverLimit = currentCredits > maxCredits;
   const progressPercentage = Math.min(100, (currentCredits / maxCredits) * 100);
 
+  function navigate(url: string) {
+    vibrate();
+    router.push(url);
+  }
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 
-      <Card className="gap-3 bg-linear-to-br from-blue-50 to-blue-100/30 dark:from-blue-950/20 dark:to-blue-900/10 shadow hover:shadow-xl transition-all">
+      <Card onClick={() => navigate("/pdf")} className="gap-3 bg-linear-to-br from-blue-50 to-blue-100/30 dark:from-blue-950/20 dark:to-blue-900/10 shadow hover:shadow-xl transition-all">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">Total Documents</CardTitle>
           <FileText className="h-4 w-4 text-muted-foreground" />
@@ -53,7 +61,7 @@ export function DashboardStats() {
         </CardContent>
       </Card>
 
-      <Card className="gap-3 bg-linear-to-br from-green-50 to-green-100/30 dark:from-green-950/20 dark:to-green-900/10 shadow hover:shadow-xl transition-all">
+      <Card onClick={() => navigate("/flashcards")} className="gap-3 bg-linear-to-br from-green-50 to-green-100/30 dark:from-green-950/20 dark:to-green-900/10 shadow hover:shadow-xl transition-all">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">FlashCards Created</CardTitle>
           <GalleryVerticalEnd className="h-4 w-4 text-muted-foreground" />
@@ -81,7 +89,7 @@ export function DashboardStats() {
         </CardContent>
       </Card>
 
-      <Card className="gap-3 bg-linear-to-br from-amber-50 to-amber-100/30 dark:from-amber-950/20 dark:to-amber-900/10 shadow hover:shadow-xl transition-all">
+      <Card onClick={() => navigate("/settings?tab=billing")} className="gap-3 bg-linear-to-br from-amber-50 to-amber-100/30 dark:from-amber-950/20 dark:to-amber-900/10 shadow hover:shadow-xl transition-all">
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-sm font-medium">AI Credits</CardTitle>
           <Brain className={cn(

@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { UTApi } from "uploadthing/server";
+import { PDF } from "@/models/pdf.model";
 
 const utapi = new UTApi();
 
@@ -24,6 +25,8 @@ export async function DELETE(req: NextRequest) {
     } catch (deleteError) {
       console.error("Failed to delete file from UploadThing:", deleteError);
     }
+
+    await PDF.findOneAndDelete({ publicId });
 
     return NextResponse.json({ success: true });
 

@@ -47,9 +47,8 @@ export async function DELETE(req: NextRequest) {
     }
 
     await User.findByIdAndDelete(session.user.id, {
-      $inc: {
-        "stats.flashcardsMastered": -1,
-      }
+      $inc: { "stats.flashcardsMastered": -1 },
+      $max: { "stats.flashcardsMastered": 0 }
     });
 
     return NextResponse.json({ success: true });

@@ -22,6 +22,14 @@ export function AppearanceTab() {
     if (checked) vibrate();
   };
 
+  function isMobile() {
+    if (typeof navigator === "undefined") return false;
+
+    const ua = navigator.userAgent.toLowerCase();
+
+    return /android|iphone|ipad|ipod|mobile/i.test(ua);
+  }
+
   return (
     <Card className="mb-5">
       <CardHeader>
@@ -101,7 +109,7 @@ export function AppearanceTab() {
         </div>
 
       </CardContent>
-      <CardFooter className="flex flex-col gap-5 border-t px-6 py-4">
+      {isMobile() && <CardFooter className="flex flex-col gap-5 border-t px-6 py-4">
         <div className="flex items-center justify-between w-full">
           <div className="space-y-0.5">
             <Label className="text-base">Haptic Feedback</Label>
@@ -136,7 +144,7 @@ export function AppearanceTab() {
             }}
           />
         </div>
-      </CardFooter>
+      </CardFooter>}
     </Card>
   );
 }

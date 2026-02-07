@@ -70,12 +70,20 @@ export async function DELETE(req: NextRequest) {
       Quiz.deleteMany({ pdfId }),
     ]);
 
-    await User.findByIdAndUpdate(session.user.id, {
-      $inc: {
-        "stats.totalDocuments": -1,
-        "stats.flashcardsMastered": -1
-      }
-    });
+    await User.findByIdAndUpdate(
+      session.user.id,
+      {
+        $inc: {
+          "stats.totalDocuments": -1,
+          "stats.flashcardsMastered": -1
+        },
+        $max: {
+          "stats.totalDocuments": 0,
+          "stats.flashcardsMastered": 0
+        }
+      },
+      { new: true }
+    );
 
     return NextResponse.json({ success: true, message: `PDF "${pdf.title}" deleted successfully` });
 

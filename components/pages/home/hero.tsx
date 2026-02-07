@@ -11,10 +11,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { usePathname } from "next/navigation";
 
 export function Hero() {
+  const pathname = usePathname();
+
   return (
-    <section className="relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-background">
+    <section className={`${pathname === "/" ? "pt-10" : ""} relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-background`}>
       <div className="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-primary/5 via-background to-background pointer-events-none" />
       <div className="absolute -top-24 -left-24 w-72 h-72 md:w-96 md:h-96 bg-primary/10 rounded-full blur-3xl opacity-70 animate-pulse pointer-events-none" />
       <div className="absolute -bottom-24 -right-24 w-72 h-72 md:w-96 md:h-96 bg-blue-500/10 rounded-full blur-3xl opacity-70 animate-pulse delay-1000 pointer-events-none" />
