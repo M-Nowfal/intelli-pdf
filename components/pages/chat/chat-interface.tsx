@@ -207,7 +207,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
 
   if (isMessagesLoading) {
     return (
-      <div className="flex justify-center items-center h-[85vh]">
+      <div className="flex justify-center items-center h-[90vh]">
         <Loader size={50} />
       </div>
     );
@@ -218,17 +218,15 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
       <div className="flex-1 w-full p-4 overflow-y-auto hide-scrollbar">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full mt-10 space-y-4 text-center opacity-50">
-            <div className="p-4 rounded-full bg-muted">
-              <Bot className="w-8 h-8" />
-            </div>
+            <div className="p-4 rounded-full bg-muted"><Bot className="w-8 h-8" /></div>
             <div>
               <h3 className="text-lg font-semibold">Ready to chat!</h3>
               <p className="text-sm">Ask me anything about this document.</p>
             </div>
           </div>
         ) : (
-          <div className="flex flex-col space-y-8 pb-4">
-            {messages.map((message) => {
+          <div className="flex flex-col space-y-6 pb-4">
+            {messages.map((message, i) => {
               const isUser = message.role === "user";
               const isCopied = copiedId === message.id;
               const isSpeaking = speakingMessageId === message.id;
@@ -238,7 +236,8 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
                   key={message.id}
                   className={cn(
                     "flex w-full items-start gap-3 group px-2",
-                    isUser ? "flex-row-reverse" : "flex-row"
+                    isUser ? "flex-row-reverse" : "flex-row",
+                    !isUser && i !== messages.length - 1 && "mb-20"
                   )}
                 >
                   {!isUser && (
@@ -249,79 +248,77 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
                   )}
 
                   <div className={cn(
-                    "flex flex-col gap-2 max-w-[85%] sm:max-w-[80%]",
-                    isUser ? "items-end text-right" : "items-start text-left"
+                    "flex flex-col gap-1 max-w-[85%] sm:max-w-[80%]",
+                    isUser ? "items-end" : "items-start"
                   )}>
-                    <div className={cn(
-                      "relative flex gap-2 items-center group/bubble",
-                      isUser ? "flex-row-reverse" : "flex-col items-start"
-                    )}>
-                      <div
-                        className={cn(
-                          "text-sm leading-7 transition-all duration-200",
-                          isUser
-                            ? "bg-secondary text-secondary-foreground px-5 py-3 rounded-2xl rounded-tr-sm"
-                            : "bg-transparent text-foreground px-0 py-0"
-                        )}
-                      >
-                        <MarkDown content={message?.content} />
-                      </div>
 
-                      <div className={cn(
-                        "transition-all duration-200 ease-out shrink-0",
-                        "opacity-100 sm:opacity-0 sm:translate-y-2 group-hover/bubble:opacity-100 group-hover/bubble:scale-100 group-hover/bubble:translate-y-0",
-                        isUser ? "order-last sm:order-0 mr-1" : "flex items-center not-md:justify-between w-full gap-3"
-                      )}>
-                        <Button
-                          variant="secondary"
-                          size={isUser ? "icon-sm" : "sm"}
-                          className="shadow-sm hover:bg-secondary/80"
-                          onClick={() => handleCopy(message.id, message.content)}
-                        >
-                          {isCopied ? (
-                            <>
-                              <Check className="h-3.5 w-3.5 animate-in zoom-in duration-300" />
-                              {!isUser && <span className="text-xs">Copied</span>}
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="h-3.5 w-3.5" />
-                              {!isUser && <span className="text-xs">Copy</span>}
-                            </>
-                          )}
-                        </Button>
-                        {!isUser && (
+                    <div
+                      className={cn(
+                        "text-sm leading-7 transition-all duration-200 relative",
+                        isUser
+                          ? "bg-secondary text-secondary-foreground px-5 py-3 rounded-2xl rounded-tr-sm"
+                          : "bg-transparent text-foreground px-0 py-0"
+                      )}
+                    >
+                      <MarkDown content={message?.content} />
+
+                      {isUser && (
+                        <div className="absolute -left-10 top-1 opacity-0 not-sm:opacity-100 group-hover:opacity-100 transition-opacity">
                           <Button
-                            variant={isSpeaking ? "default" : "secondary"}
-                            size="sm"
-                            className={cn(
-                              "shadow-sm transition-all duration-300",
-                              isSpeaking ? "bg-primary text-primary-foreground" : "hover:bg-secondary/80"
-                            )}
-                            onClick={() => handleSpeech(message.id, message.content)}
+                            variant="ghost"
+                            size="icon-sm"
+                            className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                            onClick={() => handleCopy(message.id, message.content)}
+                            title="Copy to clipboard"
                           >
-                            {isSpeaking ? (
-                              <>
-                                <span className="relative flex h-2 w-2 mr-1.5">
-                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white dark:bg-black opacity-75"></span>
-                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-white dark:bg-black"></span>
-                                </span>
-                                Stop
-                              </>
-                            ) : (
-                              <>
-                                <Volume2 />
-                                Read
-                              </>
-                            )}
+                            {isCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                           </Button>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
 
-                    {!isUser && message.sources && message.sources.length > 0 && (
-                      <div className="mt-2 px-1">
-                        <SourceBadge sources={message.sources} />
+                    {!isUser && (
+                      <div className="flex items-center gap-3 mt-1 ml-1 select-none">
+
+                        {message.sources && message.sources.length > 0 && (
+                          <SourceBadge sources={message.sources} />
+                        )}
+
+                        <div className={cn(
+                          "flex items-center gap-1 transition-opacity duration-200",
+                          isSpeaking ? "opacity-100" : "opacity-0 not-sm:opacity-100 group-hover:opacity-100"
+                        )}>
+
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                            onClick={() => handleCopy(message.id, message.content)}
+                            title="Copy to clipboard"
+                          >
+                            {isCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                          </Button>
+
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            className={cn(
+                              "h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted",
+                              isSpeaking && "text-primary bg-primary/10 hover:bg-primary/20"
+                            )}
+                            onClick={() => handleSpeech(message.id, message.content)}
+                            title={isSpeaking ? "Stop reading" : "Read aloud"}
+                          >
+                            {isSpeaking ? (
+                              <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                              </span>
+                            ) : (
+                              <Volume2 className="h-3.5 w-3.5" />
+                            )}
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -336,9 +333,9 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
                   <AvatarFallback>AI</AvatarFallback>
                 </Avatar>
                 <div className="flex items-center gap-1 mt-3">
-                  <span className="w-1.5 h-1.5 bg-foreground/60 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                  <span className="w-1.5 h-1.5 bg-foreground/60 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                  <span className="w-1.5 h-1.5 bg-foreground/60 rounded-full animate-bounce"></span>
+                  <span className="w-1.5 h-1.5 bg-foreground/60 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                  <span className="w-1.5 h-1.5 bg-foreground/60 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                  <span className="w-1.5 h-1.5 bg-foreground/60 rounded-full animate-bounce" />
                 </div>
               </div>
             )}
@@ -347,12 +344,11 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
         )}
       </div>
 
-      <div
-        className={cn(
-          "px-2 pt-2.5 pb-2 bg-background shrink-0",
-          mobileNav && "pb-14 md:pb-2",
-          isKeyboardActive && mobileNav && "pb-3"
-        )}
+      <div className={cn(
+        "px-2 pt-2.5 pb-2 bg-background shrink-0",
+        mobileNav && "pb-14 md:pb-2",
+        isKeyboardActive && mobileNav && "pb-3"
+      )}
       >
         <form
           onSubmit={handleSend}
@@ -360,8 +356,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
         >
           <TextareaAutosize
             ref={textareaRef}
-            minRows={1}
-            maxRows={8}
+            minRows={1} maxRows={8}
             placeholder="Ask a question..."
             className="w-full resize-none bg-transparent px-3 py-2.5 text-sm outline-none border-none ring-0 shadow-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 hide-scrollbar placeholder:text-muted-foreground"
             value={input}
@@ -381,7 +376,6 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
             onKeyDown={handleKeyDown}
             disabled={isStreaming}
           />
-
           <div className="pb-1 pr-1">
             <Button
               type="submit"
@@ -392,11 +386,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
                 (!input.trim() || isStreaming) ? "opacity-50 cursor-not-allowed" : "hover:bg-primary/90"
               )}
             >
-              {isStreaming ? (
-                <StopCircle className="h-4 w-4" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
+              {isStreaming ? <StopCircle className="h-4 w-4" /> : <Send className="h-4 w-4" />}
             </Button>
           </div>
         </form>
