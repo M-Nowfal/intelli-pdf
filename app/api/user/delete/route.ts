@@ -12,8 +12,16 @@ import { Flashcard } from "@/models/flashcard.model";
 import { Quiz } from "@/models/quiz.model";
 import { Summary } from "@/models/summary.model";
 import { UTApi } from "uploadthing/server";
+import { getPublicIdFromUrl } from "@/helpers/cloudinary.helper";
+import { v2 as cloudinary } from "cloudinary";
 
 const utapi = new UTApi();
+
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST() {
   try {
@@ -84,6 +92,17 @@ export async function DELETE(req: NextRequest) {
       User.findByIdAndDelete(user._id)
     ];
 
+    if (user.avatar.includes("cloudinary.com")) {
+      const publicId = getPublicIdFromUrl(user.avatar);
+      if (publicId) {
+        try {
+          await cloudinary.uploader.destroy(publicId);
+        } catch (err: unknown) {
+          console.error("Error deleting image from cloudinary.");
+        }
+      }
+    }
+
     if (fileKeys.length > 0) {
       deletePromises.push(utapi.deleteFiles(fileKeys));
     }
@@ -92,8 +111,8 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ success: true });
 
-  } catch (error) {
-    console.error("Delete Confirmation Error:", error);
+  } catch (err: unknown) {
+    console.error("Delete Confirmation Error:", err);
     return NextResponse.json({ message: "Error deleting account" }, { status: 500 });
   }
 }
