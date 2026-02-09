@@ -12,11 +12,12 @@ export async function getEmbeddings(text: string) {
         parts: [{ text }],
         role: "user"
       },
+      taskType: "retrieval_query",
       outputDimensionality: 768,
     } as any);
 
     return result.embedding.values;
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Embedding generation failed:", err);
     throw err;
   }

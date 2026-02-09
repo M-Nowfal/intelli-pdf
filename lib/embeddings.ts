@@ -31,13 +31,18 @@ export async function generateAndStoreEmbeddings(
 
     for (const page of pages) {
       const cleanedText = page.text.replace(/\s+/g, " ").trim();
-      
+
       if (cleanedText.length < 10) continue;
 
       const chunks = await splitter.createDocuments([cleanedText]);
 
       for (const chunk of chunks) {
-        const result = await model.embedContent(chunk.pageContent);
+        const result = await model.embedContent({
+          content: { parts: [{ text: chunk.pageContent }] },
+          outputDimensionality: 768,
+          taskType: "retrieval_document",
+        } as any);
+
         const vector = result.embedding.values;
 
         embeddingData.push({
