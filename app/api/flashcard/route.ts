@@ -46,7 +46,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ message: "FlashCard not found" }, { status: 404 });
     }
 
-    await User.findByIdAndDelete(session.user.id, {
+    await User.findByIdAndUpdate(session.user.id, {
       $inc: { "stats.flashcardsMastered": -1 },
       $max: { "stats.flashcardsMastered": 0 }
     });
