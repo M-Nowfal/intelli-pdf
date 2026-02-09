@@ -24,10 +24,13 @@ interface ChatState {
   isLoading: boolean;
   isMessagesLoading: boolean;
   isStreaming: boolean;
+  isStrict: boolean;
 
   setMessages: (messages: Message[]) => void;
   setStreaming: (status: boolean) => void;
   setChatId: (id: string) => void;
+
+  setIsStrict: (isStrict: boolean) => void;
 
   fetchChatList: () => Promise<void>;
   fetchMessages: (pdfId: string) => Promise<void>;
@@ -49,10 +52,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
   isLoading: false,
   isMessagesLoading: false,
   isStreaming: false,
+  isStrict: true,
 
   setMessages: (messages) => set({ messages }),
   setStreaming: (status) => set({ isStreaming: status }),
   setChatId: (id) => set({ chatId: id }),
+
+  setIsStrict: (isStrict) => set({ isStrict }),
 
   fetchChatList: async () => {
     set({ isLoading: true });

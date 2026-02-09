@@ -3,48 +3,19 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send, Bot, StopCircle, FileText, Copy, Check } from "lucide-react";
+import { Send, Bot, StopCircle, Copy, Check, Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import TextareaAutosize from "react-textarea-autosize";
 import { BOT } from "@/utils/constants";
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
 import api from "@/lib/axios";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useChatStore, Message } from "@/store/useChatStore";
 import { MarkDown } from "@/components/common/react-markdown";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
-import { copy } from "@/helpers/copy-chat.helper";
-
-const SourceBadge = ({ sources }: { sources: number[] }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <TooltipProvider delayDuration={0}>
-      <Tooltip open={isOpen} onOpenChange={setIsOpen}>
-        <TooltipTrigger asChild>
-          <div
-            onClick={() => setIsOpen((prev) => !prev)}
-            className="inline-flex items-center gap-1.5 text-xs bg-primary/10 text-primary px-3 py-1.5 rounded-full font-medium cursor-pointer hover:bg-primary/20 transition-colors border border-primary/20 select-none"
-          >
-            <FileText className="w-3.5 h-3.5" />
-            <span>
-              Sources: Page {sources.slice(0, 2).join(", ")}
-              {sources.length > 2 ? "..." : ""}
-            </span>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent side="bottom" className="max-w-62.5 wrap-break-word">
-          <p className="text-sm">
-            <span className="font-semibold">Found on Pages:</span>{" "}
-            {sources.join(", ")}
-          </p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-};
+import { cleanMarkdown, copy } from "@/helpers/chat.helper";
+import { SourceBadge } from "./source-badge";
 
 interface ChatInterfaceProps {
   pdfId: string;
@@ -62,7 +33,8 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
     isStreaming,
     addChat,
     fetchChatList,
-    setChatId
+    setChatId,
+    isStrict
   } = useChatStore();
   const { decrementCredits } = useDashboardStore();
   const { mobileNav, isKeyboardActive, setIsKeyboardActive } = useSettingsStore();
@@ -71,6 +43,8 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
 
   useEffect(() => {
     if (pdfId) {
@@ -83,7 +57,20 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
   }, [messages, isMessagesLoading, isStreaming]);
 
   useEffect(() => {
+    const loadVoices = () => {
+      const availableVoices = window.speechSynthesis.getVoices();
+      setVoices(availableVoices);
+    };
+
+    loadVoices();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+  }, []);
+
+  useEffect(() => {
     return () => {
+      window.speechSynthesis.cancel();
       setIsKeyboardActive(false);
     };
   }, [setIsKeyboardActive]);
@@ -98,6 +85,9 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
   const handleSend = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!input.trim() || isStreaming) return;
+
+    window.speechSynthesis.cancel();
+    setSpeakingMessageId(null);
 
     const isNewConversation = messages.length === 0;
 
@@ -114,7 +104,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
     try {
       const response = await api.post(
         "/chat",
-        { messages: [...messages, userMessage], pdfId },
+        { messages: [...messages, userMessage], pdfId, isStrict },
         { adapter: "fetch", responseType: "stream" }
       );
 
@@ -170,9 +160,54 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleSpeech = (id: string, content: string) => {
+    if (!("speechSynthesis" in window)) {
+      toast.warning("Text-to-speech is not supported in this browser.");
+      return;
+    }
+
+    if (speakingMessageId === id) {
+      window.speechSynthesis.cancel();
+      setSpeakingMessageId(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    const cleanText = cleanMarkdown(content);
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+
+    const englishVoices = voices.filter((v) => v.lang.startsWith("en"));
+
+    const preferredVoice = englishVoices.find(
+      (v) =>
+        v.name.includes("Microsoft David") ||
+        v.name.includes("Daniel") ||
+        (v.name.includes("Google") && v.name.includes("Male")) ||
+        v.name.includes("Male")
+    );
+
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+    } else if (englishVoices.length > 0) {
+      utterance.voice = englishVoices[0];
+    }
+
+    utterance.lang = "en-US";
+    utterance.pitch = 0.9;
+    utterance.rate = 1.0;
+
+    utterance.onend = () => {
+      setSpeakingMessageId(null);
+    };
+
+    setSpeakingMessageId(id);
+    window.speechSynthesis.speak(utterance);
+  };
+
   if (isMessagesLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-[85vh]">
         <Loader size={50} />
       </div>
     );
@@ -196,6 +231,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
             {messages.map((message) => {
               const isUser = message.role === "user";
               const isCopied = copiedId === message.id;
+              const isSpeaking = speakingMessageId === message.id;
 
               return (
                 <div
@@ -233,30 +269,53 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
 
                       <div className={cn(
                         "transition-all duration-200 ease-out shrink-0",
-                        "opacity-100 sm:opacity-0 sm:scale-95 sm:translate-y-2 group-hover/bubble:opacity-100 group-hover/bubble:scale-100 group-hover/bubble:translate-y-0",
-                        isUser ? "order-last sm:order-0 mr-1" : "mt-1 ml-0"
+                        "opacity-100 sm:opacity-0 sm:translate-y-2 group-hover/bubble:opacity-100 group-hover/bubble:scale-100 group-hover/bubble:translate-y-0",
+                        isUser ? "order-last sm:order-0 mr-1" : "flex items-center not-md:justify-between w-full gap-3"
                       )}>
                         <Button
                           variant="secondary"
-                          size="icon-sm"
-                          className={cn(
-                            "shadow-sm hover:bg-secondary/80",
-                            isUser ? "rounded-full h-8 sm:w-8" : "w-20"
-                          )}
+                          size={isUser ? "icon-sm" : "sm"}
+                          className="shadow-sm hover:bg-secondary/80"
                           onClick={() => handleCopy(message.id, message.content)}
                         >
                           {isCopied ? (
                             <>
                               <Check className="h-3.5 w-3.5 animate-in zoom-in duration-300" />
-                              {!isUser && "Copied"}
+                              {!isUser && <span className="text-xs">Copied</span>}
                             </>
                           ) : (
                             <>
                               <Copy className="h-3.5 w-3.5" />
-                              {!isUser && "Copy"}
+                              {!isUser && <span className="text-xs">Copy</span>}
                             </>
                           )}
                         </Button>
+                        {!isUser && (
+                          <Button
+                            variant={isSpeaking ? "default" : "secondary"}
+                            size="sm"
+                            className={cn(
+                              "shadow-sm transition-all duration-300",
+                              isSpeaking ? "bg-primary text-primary-foreground" : "hover:bg-secondary/80"
+                            )}
+                            onClick={() => handleSpeech(message.id, message.content)}
+                          >
+                            {isSpeaking ? (
+                              <>
+                                <span className="relative flex h-2 w-2 mr-1.5">
+                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white dark:bg-black opacity-75"></span>
+                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-white dark:bg-black"></span>
+                                </span>
+                                Stop
+                              </>
+                            ) : (
+                              <>
+                                <Volume2 />
+                                Read
+                              </>
+                            )}
+                          </Button>
+                        )}
                       </div>
                     </div>
 

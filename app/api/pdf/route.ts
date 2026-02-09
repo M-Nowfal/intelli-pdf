@@ -72,17 +72,17 @@ export async function DELETE(req: NextRequest) {
 
     await User.findByIdAndUpdate(
       session.user.id,
-      {
-        $inc: {
-          "stats.totalDocuments": -1,
-          "stats.flashcardsMastered": -1
-        },
-        $max: {
-          "stats.totalDocuments": 0,
-          "stats.flashcardsMastered": 0
+      [{
+        $set: {
+          "stats.totalDocuments": { 
+            $max: [{ $subtract: ["$stats.totalDocuments", 1] }, 0] 
+          },
+          "stats.flashcardsMastered": { 
+            $max: [{ $subtract: ["$stats.flashcardsMastered", 1] }, 0] 
+          }
         }
-      },
-      { new: true }
+      }],
+      { new: true, updatePipeline: true }
     );
 
     return NextResponse.json({ success: true, message: `PDF "${pdf.title}" deleted successfully` });

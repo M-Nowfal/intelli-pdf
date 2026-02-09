@@ -26,6 +26,6 @@ export function capitalize(str: string): string {
 }
 
 export function formatChatListTitle(title: string): string {
-  const cleanTitle = title.replace(/\(\d+\)|\d+|\.pdf/gi, "").trim();
+  const cleanTitle = title.replace(/\(\d+\)|\.pdf/gi, "").trim();
   return capitalize(cleanTitle);
 }

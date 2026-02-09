@@ -25,7 +25,7 @@ interface ChatActionProps {
 }
 
 export function ChatActionMenu({ activePdf }: ChatActionProps) {
-  const { clearChat, deleteChat, chatId } = useChatStore();
+  const { clearChat, deleteChat, chatId, isStrict, setIsStrict } = useChatStore();
   const router = useRouter();
 
   const handleClear = async () => {
@@ -85,10 +85,20 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
           Export Chat
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={handleClear} className="cursor-pointer p-2">
-          <Eraser className="mr-2 h-4 w-4" />
-          Clear Chat
-        </DropdownMenuItem>
+        <Alert
+          trigger={
+            <DropdownMenuItem
+            className="cursor-pointer p-2"
+              onSelect={(e) => e.preventDefault()}
+            >
+              <Eraser className="mr-2 h-4 w-4" />
+              Clear Chat
+            </DropdownMenuItem>
+          }
+          title="Are you sure to Clear?"
+          description="All the messages in this chat will be deleted permanently, this can't be undone."
+          onContinue={handleClear}
+        />
 
         <Alert
           trigger={
@@ -109,7 +119,7 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
 
         <DropdownMenuItem className="flex items-center justify-between" onSelect={(e) => e.preventDefault()}>
           Strict with PDF
-          <Switch checked />
+          <Switch checked={isStrict} onCheckedChange={setIsStrict} />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

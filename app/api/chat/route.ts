@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { messages, pdfId } = await req.json();
+    const { messages, pdfId, isStrict } = await req.json();
     const lastMessage = messages[messages.length - 1];
     const userQuestion = lastMessage.content;
 
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
 
     const contextText = similarDocs.map((doc) => doc.content).join("\n\n");
 
-    const prompt = GENERATE_CHAT_PROMPT(contextText, userQuestion);
+    const prompt = GENERATE_CHAT_PROMPT(contextText, userQuestion, isStrict);
 
     const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
     const streamingResponse = await model.generateContentStream(prompt);
