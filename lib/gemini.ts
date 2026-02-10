@@ -1,24 +1,30 @@
-import { GOOGLE_API_KEY } from "@/utils/constants";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { pipeline } from "@huggingface/transformers";
 
-const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
+let embedder: any = null;
+
+const getEmbedder = async () => {
+  if (!embedder) {
+    embedder = await pipeline(
+      "feature-extraction",
+      "Xenova/all-MiniLM-L6-v2",
+      { dtype: "fp32" }
+    );
+  }
+  return embedder;
+};
 
 export async function getEmbeddings(text: string) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
+    const generateEmbedding = await getEmbedder();
 
-    const result = await model.embedContent({
-      content: {
-        parts: [{ text }],
-        role: "user"
-      },
-      taskType: "retrieval_query",
-      outputDimensionality: 768,
-    } as any);
+    const output = await generateEmbedding(text, {
+      pooling: "mean",
+      normalize: true,
+    });
 
-    return result.embedding.values;
+    return Array.from(output.data);
   } catch (err: unknown) {
-    console.error("Embedding generation failed:", err);
+    console.error("Local query embedding failed:", err);
     throw err;
   }
 }

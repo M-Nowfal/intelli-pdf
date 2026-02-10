@@ -1,24 +1,25 @@
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { Embedding } from "@/models/embedding.model";
 import { connectDB } from "@/lib/db";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { GOOGLE_API_KEY } from "@/utils/constants";
+import { pipeline } from "@huggingface/transformers";
 
-const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
+let embedder: any = null;
 
-type PageData = {
-  text: string;
-  pageNumber: number;
+const getEmbedder = async () => {
+  if (!embedder) {
+    embedder = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
+  }
+  return embedder;
 };
 
 export async function generateAndStoreEmbeddings(
   pdfId: string,
   userId: string,
-  pages: PageData[]
+  pages: { text: string; pageNumber: number }[]
 ) {
   try {
     await connectDB();
+    const generateEmbedding = await getEmbedder();
 
     const splitter = new RecursiveCharacterTextSplitter({
       chunkSize: 1000,
@@ -26,33 +27,26 @@ export async function generateAndStoreEmbeddings(
     });
 
     const embeddingData = [];
-
-    console.log(`Processing ${pages.length} pages for PDF ${pdfId}...`);
+    console.log(`Processing PDF ${pdfId} with @huggingface/transformers...`);
 
     for (const page of pages) {
       const cleanedText = page.text.replace(/\s+/g, " ").trim();
-
       if (cleanedText.length < 10) continue;
 
       const chunks = await splitter.createDocuments([cleanedText]);
 
       for (const chunk of chunks) {
-        const result = await model.embedContent({
-          content: { parts: [{ text: chunk.pageContent }] },
-          outputDimensionality: 768,
-          taskType: "retrieval_document",
-        } as any);
-
-        const vector = result.embedding.values;
+        const output = await generateEmbedding(chunk.pageContent, {
+          pooling: "mean",
+          normalize: true,
+        });
 
         embeddingData.push({
-          pdfId: pdfId,
+          pdfId,
           userId,
           content: chunk.pageContent,
-          embedding: vector,
-          metadata: {
-            pageNumber: page.pageNumber,
-          },
+          embedding: Array.from(output.data),
+          metadata: { pageNumber: page.pageNumber },
         });
       }
     }
@@ -61,11 +55,10 @@ export async function generateAndStoreEmbeddings(
       await Embedding.insertMany(embeddingData);
     }
 
-    console.log(`Stored ${embeddingData.length} chunks for PDF ${pdfId}`);
+    console.log(`Successfully stored ${embeddingData.length} local embeddings.`);
     return { success: true };
-
   } catch (err: unknown) {
-    console.error("Error generating embeddings:", err);
+    console.error("Local document embedding failed:", err);
     throw err;
   }
 }
