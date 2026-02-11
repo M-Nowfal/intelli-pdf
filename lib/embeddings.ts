@@ -1,7 +1,12 @@
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { Embedding } from "@/models/embedding.model";
 import { connectDB } from "@/lib/db";
-import { pipeline } from "@huggingface/transformers";
+import { pipeline, env } from "@huggingface/transformers";
+
+env.cacheDir = "/tmp"; 
+
+env.allowLocalModels = false;
+env.useBrowserCache = false;
 
 let embedder: any = null;
 
@@ -10,7 +15,7 @@ const getEmbedder = async () => {
     embedder = await pipeline(
       "feature-extraction",
       "Xenova/all-MiniLM-L6-v2",
-      { dtype: "fp32", device: "wasm" }
+      { dtype: "fp32" }
     );
   }
   return embedder;
