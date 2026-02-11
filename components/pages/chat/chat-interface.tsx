@@ -38,18 +38,19 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
     isStrict
   } = useChatStore();
   const { decrementCredits } = useDashboardStore();
-  const { mobileNav, isKeyboardActive, setIsKeyboardActive } = useSettingsStore();
+  const { mobileNav, isKeyboardActive, setIsKeyboardActive, isMobile } = useSettingsStore();
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
-  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [pausedId, setPausedId] = useState<string | null>(null);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
 
   const currentUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const isCancelledRef = useRef<boolean>(false);
+  const mobile = isMobile();
 
   useEffect(() => {
     if (pdfId) {
@@ -77,7 +78,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
     window.speechSynthesis.cancel();
     isCancelledRef.current = true;
     setSpeakingMessageId(null);
-    setIsPaused(false);
+    setPausedId(null);
     currentUtteranceRef.current = null;
   };
 
@@ -172,12 +173,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const restartSpeech = (id: string, content: string) => {
-    stopSpeech();
-    setTimeout(() => {
-      handleSpeech(id, content);
-    }, 100);
-  };
+  const restartSpeech = () => stopSpeech();
 
   const handleSpeech = (id: string, content: string) => {
     if (!("speechSynthesis" in window)) {
@@ -185,15 +181,20 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
       return;
     }
 
-    if (speakingMessageId === id && !isPaused) {
-      window.speechSynthesis.pause();
-      setIsPaused(true);
+    if (speakingMessageId === id && mobile) {
+      stopSpeech();
       return;
     }
 
-    if (speakingMessageId === id && isPaused) {
+    if (speakingMessageId === id && !pausedId) {
+      window.speechSynthesis.pause();
+      setPausedId(id);
+      return;
+    }
+
+    if (speakingMessageId === id && pausedId === id) {
       window.speechSynthesis.resume();
-      setIsPaused(false);
+      setPausedId(null);
       return;
     }
 
@@ -220,7 +221,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
     const speakNextChunk = () => {
       if (isCancelledRef.current || currentIndex >= chunks.length) {
         setSpeakingMessageId(null);
-        setIsPaused(false);
+        setPausedId(null);
         return;
       }
 
@@ -284,6 +285,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
               const isUser = message.role === "user";
               const isCopied = copiedId === message.id;
               const isSpeaking = speakingMessageId === message.id;
+              const isPaused = pausedId === message.id;
 
               return (
                 <div
@@ -365,14 +367,14 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
                             </TooltipContent>
                           </Tooltip>
 
-                          {(isSpeaking) && (
+                          {isSpeaking && !mobile && (
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
                                   variant="ghost"
                                   size="icon-sm"
                                   className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
-                                  onClick={() => restartSpeech(message.id, message.content)}
+                                  onClick={restartSpeech}
                                 >
                                   <RotateCcw className="h-3.5 w-3.5" />
                                 </Button>
@@ -389,12 +391,21 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
                                 onClick={() => handleSpeech(message.id, message.content)}
                                 className="text-muted-foreground"
                               >
-                                {isSpeaking && !isPaused ? (
-                                  <Pause className="h-3.5 w-3.5 fill-current" />
-                                ) : isPaused && isSpeaking ? (
-                                  <Play className="h-3.5 w-3.5 fill-current" />
+                                {mobile ? (
+                                  isSpeaking ? (
+                                    <span className="relative flex h-2 w-2">
+                                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                                      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                                    </span>
+                                  ) : <Volume2 className="size-4" />
                                 ) : (
-                                  <Volume2 className="h-3.5 w-3.5" />
+                                  isSpeaking && !isPaused ? (
+                                    <Pause className="size-4 fill-current" />
+                                  ) : isPaused ? (
+                                    <Play className="size-4 fill-current" />
+                                  ) : (
+                                    <Volume2 className="size-4" />
+                                  )
                                 )}
                               </Button>
                             </TooltipTrigger>

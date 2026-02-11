@@ -15,11 +15,13 @@ import { useSummaryStore } from "@/store/useSummaryStore";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { cleanMarkdown, copy } from "@/helpers/chat.helper";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useSettingsStore } from "@/store/useSettingsStore";
 
 export default function SummarizePage() {
   const params = useParams();
   const id = params?.id as string;
   const router = useRouter();
+  const { isMobile } = useSettingsStore();
 
   const {
     summary,
@@ -39,6 +41,7 @@ export default function SummarizePage() {
   const isCancelledRef = useRef<boolean>(false);
   const currentUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const mobile = isMobile();
 
   useEffect(() => {
     if (id) {
@@ -142,11 +145,17 @@ export default function SummarizePage() {
       return;
     }
 
+    if (isSpeaking && mobile) {
+      stopSpeech();
+      return;
+    }
+
     if (isSpeaking && !isPaused) {
       window.speechSynthesis.pause();
       setIsPaused(true);
       return;
     }
+
     if (isSpeaking && isPaused) {
       window.speechSynthesis.resume();
       setIsPaused(false);
@@ -206,7 +215,7 @@ export default function SummarizePage() {
           </CardDescription>
 
           {summary?.content && <CardDescription className="flex items-center justify-end gap-1 md:gap-2">
-            {(isSpeaking || isPaused) && (
+            {(isSpeaking || isPaused) && !mobile && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
@@ -228,12 +237,21 @@ export default function SummarizePage() {
                   size="icon-sm"
                   onClick={() => handleSpeech(summary?.content || "")}
                 >
-                  {isSpeaking && !isPaused ? (
-                    <Pause className="size-4 fill-current" />
-                  ) : isPaused ? (
-                    <Play className="size-4 fill-current" />
+                  {mobile ? (
+                    isSpeaking ? (
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                      </span>
+                    ) : <Volume2 className="size-4" />
                   ) : (
-                    <Volume2 className="size-4" />
+                    isSpeaking && !isPaused ? (
+                      <Pause className="size-4 fill-current" />
+                    ) : isPaused ? (
+                      <Play className="size-4 fill-current" />
+                    ) : (
+                      <Volume2 className="size-4" />
+                    )
                   )}
                 </Button>
               </TooltipTrigger>

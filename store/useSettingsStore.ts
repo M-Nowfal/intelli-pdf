@@ -7,6 +7,7 @@ interface SettingsStore {
   haptics: boolean;
   mobileNav: boolean;
   isKeyboardActive: boolean;
+  isMobile: () => boolean;
 
   setHaptics: (value: boolean) => void;
   setMobileNav: (value: boolean) => void;
@@ -20,6 +21,14 @@ export const useSettingsStore = create<SettingsStore>()(
       haptics: true,
       mobileNav: false,
       isKeyboardActive: false,
+
+      isMobile: () => {
+        if (typeof navigator === "undefined") return false;
+
+        const ua = navigator.userAgent.toLowerCase();
+
+        return /android|iphone|ipad|ipod|mobile/i.test(ua);
+      },
 
       setHaptics: (value: boolean) => set({ haptics: value }),
       setMobileNav: (value: boolean) => set({ mobileNav: value }),
@@ -37,10 +46,10 @@ export const useSettingsStore = create<SettingsStore>()(
     }),
     {
       name: 'user-settings',
-      partialize: (state) => ({ 
+      partialize: (state) => ({
         haptics: state.haptics,
         mobileNav: state.mobileNav
-      }), 
+      }),
     }
   )
 );

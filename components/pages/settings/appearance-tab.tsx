@@ -15,20 +15,12 @@ import { vibrate } from "@/lib/haptics";
 export function AppearanceTab() {
   const { setTheme, theme } = useTheme();
 
-  const { haptics, setHaptics, mobileNav, setMobileNav } = useSettingsStore();
+  const { haptics, setHaptics, mobileNav, setMobileNav, isMobile } = useSettingsStore();
 
   const handleToggle = (checked: boolean) => {
     setHaptics(checked);
     if (checked) vibrate();
   };
-
-  function isMobile() {
-    if (typeof navigator === "undefined") return false;
-
-    const ua = navigator.userAgent.toLowerCase();
-
-    return /android|iphone|ipad|ipod|mobile/i.test(ua);
-  }
 
   return (
     <Card className="mb-5">
