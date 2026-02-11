@@ -40,7 +40,7 @@ export function HomeLayout({
       {isAuthenticated && !hideHeader && <AppSidebar />}
       <SidebarInset className="transition-[margin] duration-300 ease-in-out">
         {!hideHeader && (
-          <header className={`${pathname === "/" ? "fixed" : "sticky top-0"} z-20 flex items-center justify-between w-full p-2 bg-linear-to-t from-background/80 via-gray-100/90 dark:via-neutral-900/90 to-gray-200 dark:to-neutral-800`}>
+          <header className={`${pathname === "/" ? "sticky top-0 w-full z-20 -mb-14" : "sticky top-0"} z-20 flex items-center justify-between w-full p-2 bg-linear-to-t from-background/80 via-gray-100/90 dark:via-neutral-900/90 to-gray-200 dark:to-neutral-800`}>
             <div className="flex items-center gap-2">
               {isAuthenticated && <SidebarTrigger />}
               <h1 className="text-lg font-medium bg-card dark:bg-black shadow px-3 py-1 rounded-full border">{APP_NAME}</h1>
