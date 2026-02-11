@@ -58,6 +58,8 @@ export const useSummaryStore = create<SummaryState>((set, get) => ({
     try {
       if (get().summaryList.length > 0) return;
 
+      set({ isSummaryLoading: true, summaryError: null });
+
       const res = await api.get(`/summary`);
 
       if (res.status !== 200) {

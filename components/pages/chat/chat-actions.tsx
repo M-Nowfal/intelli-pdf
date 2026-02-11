@@ -14,6 +14,7 @@ import Link from "next/link";
 import { formatChatListTitle } from "@/helpers/name.helper";
 import { formatFileSize } from "@/helpers/file.helper";
 import { Switch } from "@/components/ui/switch";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ChatActionProps {
   activePdf: {
@@ -46,11 +47,18 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
 
   return (
     <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-          <EllipsisVertical className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+              <EllipsisVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">
+          Chat Actions
+        </TooltipContent>
+      </Tooltip>
       <DropdownMenuContent align="start" className="min-w-48 mt-3 me-5">
         <DropdownMenuLabel className="truncate max-w-50">
           <Link
@@ -88,7 +96,7 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
         <Alert
           trigger={
             <DropdownMenuItem
-            className="cursor-pointer p-2"
+              className="cursor-pointer p-2"
               onSelect={(e) => e.preventDefault()}
             >
               <Eraser className="mr-2 h-4 w-4" />

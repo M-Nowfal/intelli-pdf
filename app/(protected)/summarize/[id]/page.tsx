@@ -33,7 +33,6 @@ export default function SummarizePage() {
   const { decrementCredits } = useDashboardStore();
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
 
   useEffect(() => {
     if (id) {
@@ -42,19 +41,9 @@ export default function SummarizePage() {
         decrementCredits(20);
       }
     }
+
+    return () => window.speechSynthesis.cancel();
   }, [id, fetchSummary]);
-
-  useEffect(() => {
-    const loadVoices = () => {
-      const availableVoices = window.speechSynthesis.getVoices();
-      setVoices(availableVoices);
-    };
-
-    loadVoices();
-    if (window.speechSynthesis.onvoiceschanged !== undefined) {
-      window.speechSynthesis.onvoiceschanged = loadVoices;
-    }
-  }, []);
 
   const handleCopy = (content: string) => {
     copy(content);
@@ -73,31 +62,12 @@ export default function SummarizePage() {
       setIsSpeaking(false);
       return;
     }
-
+    
     window.speechSynthesis.cancel();
-
+    
     const cleanText = cleanMarkdown(content);
+    console.log(cleanText);
     const utterance = new SpeechSynthesisUtterance(cleanText);
-
-    const englishVoices = voices.filter((v) => v.lang.startsWith("en"));
-
-    const preferredVoice = englishVoices.find(
-      (v) =>
-        v.name.includes("Microsoft David") ||
-        v.name.includes("Daniel") ||
-        (v.name.includes("Google") && v.name.includes("Male")) ||
-        v.name.includes("Male")
-    );
-
-    if (preferredVoice) {
-      utterance.voice = preferredVoice;
-    } else if (englishVoices.length > 0) {
-      utterance.voice = englishVoices[0];
-    }
-
-    utterance.lang = "en-US";
-    utterance.pitch = 0.9;
-    utterance.rate = 1.0;
 
     utterance.onend = () => {
       setIsSpeaking(false);
@@ -105,7 +75,7 @@ export default function SummarizePage() {
 
     setIsSpeaking(true);
     window.speechSynthesis.speak(utterance);
-  };
+  }
 
   return (
     <div className="p-4">
@@ -152,9 +122,9 @@ export default function SummarizePage() {
             A detailed breakdown of the key concepts and arguments found in your PDF.
           </CardDescription>
 
-          <CardDescription className="flex items-center justify-end gap-2 md:gap-5">
+          {summary?.content && <CardDescription className="flex items-center justify-end gap-2 md:gap-5">
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon-sm"
@@ -162,7 +132,7 @@ export default function SummarizePage() {
                   onClick={() => handleCopy(summary?.content || "")}
                   title="Copy to clipboard"
                 >
-                  {isCopied ? <Check className="size-5 lg:size-6" /> : <Copy className="size-5 lg:size-6" />}
+                  {isCopied ? <Check className="size-5" /> : <Copy className="size-5" />}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -170,7 +140,7 @@ export default function SummarizePage() {
               </TooltipContent>
             </Tooltip>
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon-sm"
@@ -179,7 +149,6 @@ export default function SummarizePage() {
                     isSpeaking && "text-primary bg-primary/10 hover:bg-primary/20"
                   )}
                   onClick={() => handleSpeech(summary?.content || "")}
-                  disabled={!summary?.content || isSummaryLoading}
                 >
                   {isSpeaking ? (
                     <span className="relative flex h-2 w-2">
@@ -187,7 +156,7 @@ export default function SummarizePage() {
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                     </span>
                   ) : (
-                    <Volume2 className="size-5 lg:size-6" />
+                    <Volume2 className="size-5" />
                   )}
                 </Button>
               </TooltipTrigger>
@@ -195,17 +164,30 @@ export default function SummarizePage() {
                 {isSpeaking ? "Stop reading" : "Read summary aloud"}
               </TooltipContent>
             </Tooltip>
-          </CardDescription>
+          </CardDescription>}
         </CardHeader>
 
         <Separator />
 
         <CardContent>
           {summaryError ? (
-            <Alert variant="destructive">
+            <Alert variant="destructive" className="bg-destructive/5 border-destructive/20">
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{summaryError}</AlertDescription>
+              <AlertTitle className="font-semibold">Failed to load summary</AlertTitle>
+              <AlertDescription className="mt-2 flex flex-col gap-3">
+                <span className="text-sm opacity-90">
+                  {summaryError}
+                </span>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fetchSummary(id)}
+                  className="w-fit border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
+                >
+                  Retry Connection
+                </Button>
+              </AlertDescription>
             </Alert>
           ) : isSummaryLoading ? (
             <div className="space-y-6">

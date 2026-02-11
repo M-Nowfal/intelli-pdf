@@ -16,6 +16,7 @@ import { useDashboardStore } from "@/store/useDashboardStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { cleanMarkdown, copy } from "@/helpers/chat.helper";
 import { SourceBadge } from "./source-badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ChatInterfaceProps {
   pdfId: string;
@@ -264,15 +265,21 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
 
                       {isUser && (
                         <div className="absolute -left-10 top-1 opacity-0 not-sm:opacity-100 group-hover:opacity-100 transition-opacity">
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
-                            onClick={() => handleCopy(message.id, message.content)}
-                            title="Copy to clipboard"
-                          >
-                            {isCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                          </Button>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                                onClick={() => handleCopy(message.id, message.content)}
+                              >
+                                {isCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              {isCopied ? "Copied!" : "Copy to clipboard"}
+                            </TooltipContent>
+                          </Tooltip>
                         </div>
                       )}
                     </div>
@@ -289,35 +296,47 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
                           isSpeaking ? "opacity-100" : "opacity-0 not-sm:opacity-100 group-hover:opacity-100"
                         )}>
 
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
-                            onClick={() => handleCopy(message.id, message.content)}
-                            title="Copy to clipboard"
-                          >
-                            {isCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                          </Button>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                                onClick={() => handleCopy(message.id, message.content)}
+                              >
+                                {isCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              {isCopied ? "Copied!" : "Copy to clipboard"}
+                            </TooltipContent>
+                          </Tooltip>
 
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            className={cn(
-                              "h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted",
-                              isSpeaking && "text-primary bg-primary/10 hover:bg-primary/20"
-                            )}
-                            onClick={() => handleSpeech(message.id, message.content)}
-                            title={isSpeaking ? "Stop reading" : "Read aloud"}
-                          >
-                            {isSpeaking ? (
-                              <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                              </span>
-                            ) : (
-                              <Volume2 className="h-3.5 w-3.5" />
-                            )}
-                          </Button>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                className={cn(
+                                  "h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted",
+                                  isSpeaking && "text-primary bg-primary/10 hover:bg-primary/20"
+                                )}
+                                onClick={() => handleSpeech(message.id, message.content)}
+                              >
+                                {isSpeaking ? (
+                                  <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                                  </span>
+                                ) : (
+                                  <Volume2 className="h-3.5 w-3.5" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              {isSpeaking ? "Stop reading" : "Read aloud"}
+                            </TooltipContent>
+                          </Tooltip>
                         </div>
                       </div>
                     )}

@@ -13,5 +13,6 @@ export function cleanMarkdown(text: string): string {
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
     .replace(/^#+\s/gm, "")
     .replace(/[`_~>]/g, "")
-    .replace(/\n+/g, ". ");
+    .replace(/\n+/g, ". ")
+    .replace("*", "");
 };
