@@ -57,20 +57,31 @@ export function PDFUpload() {
 
   const { startUpload, isUploading } = useUploadThing("pdfUploader", {
     onUploadProgress: (p) => {
-      setUploadProgress(p * 0.8);
+      setUploadProgress(p * 0.5);
     },
     onClientUploadComplete: async (res) => {
       setIsProcessing(true);
-
-      setUploadProgress(80);
-      progressInterval.current = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 99) return prev;
-          return prev + 1;
-        });
-      }, 500);
-
+      setUploadProgress(50);
       const uploadedFile = res[0];
+
+      let currentProgress = 50;
+
+      const simulateProgress = () => {
+        const increment = Math.floor(Math.random() * 4) + 1;
+
+        if (currentProgress + increment < 95) {
+          currentProgress += increment;
+          setUploadProgress(currentProgress);
+
+          const randomDelay = currentProgress < 80
+            ? Math.floor(Math.random() * 300) + 200
+            : Math.floor(Math.random() * 500) + 500;
+
+          progressInterval.current = setTimeout(simulateProgress, randomDelay);
+        }
+      };
+
+      simulateProgress();
 
       try {
         const res = await api.post("/pdf/process", {

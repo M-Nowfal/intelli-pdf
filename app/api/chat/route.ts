@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { connectDB } from "@/lib/db";
 import { Embedding } from "@/models/embedding.model";
 import { Chat } from "@/models/chat.model";
-import { getEmbeddings } from "@/lib/gemini";
+import { getEmbeddings } from "@/lib/embeddings";
 import mongoose from "mongoose";
 import { COST, GOOGLE_API_KEY } from "@/utils/constants";
 import { getServerSession } from "next-auth";
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
         $vectorSearch: {
           index: "vector_search",
           path: "embedding",
-          queryVector: queryVector,
+          queryVector: queryVector as number[],
           numCandidates: 100,
           limit: 4,
           filter: {

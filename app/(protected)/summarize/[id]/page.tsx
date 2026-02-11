@@ -1,19 +1,21 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { Sparkles, FileText, AlertCircle, FileSearch, Trash2 } from "lucide-react";
+import { Sparkles, FileText, AlertCircle, FileSearch, Trash2, Volume2, Copy, Check } from "lucide-react";
 import { MarkDown } from "@/components/common/react-markdown";
 import { Button } from "@/components/ui/button";
 import { Alert as AlertDialog } from "@/components/common/alert";
 import { toast } from "sonner";
 import { useSummaryStore } from "@/store/useSummaryStore";
 import { useDashboardStore } from "@/store/useDashboardStore";
+import { cleanMarkdown, copy } from "@/helpers/chat.helper";
+import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function SummarizePage() {
   const params = useParams();
@@ -29,6 +31,9 @@ export default function SummarizePage() {
     deleteSummary
   } = useSummaryStore();
   const { decrementCredits } = useDashboardStore();
+  const [isCopied, setIsCopied] = useState<boolean>(false);
+  const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
 
   useEffect(() => {
     if (id) {
@@ -38,6 +43,69 @@ export default function SummarizePage() {
       }
     }
   }, [id, fetchSummary]);
+
+  useEffect(() => {
+    const loadVoices = () => {
+      const availableVoices = window.speechSynthesis.getVoices();
+      setVoices(availableVoices);
+    };
+
+    loadVoices();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+  }, []);
+
+  const handleCopy = (content: string) => {
+    copy(content);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
+
+  const handleSpeech = (content: string) => {
+    if (!("speechSynthesis" in window)) {
+      toast.warning("Text-to-speech is not supported in this browser.");
+      return;
+    }
+
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    const cleanText = cleanMarkdown(content);
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+
+    const englishVoices = voices.filter((v) => v.lang.startsWith("en"));
+
+    const preferredVoice = englishVoices.find(
+      (v) =>
+        v.name.includes("Microsoft David") ||
+        v.name.includes("Daniel") ||
+        (v.name.includes("Google") && v.name.includes("Male")) ||
+        v.name.includes("Male")
+    );
+
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+    } else if (englishVoices.length > 0) {
+      utterance.voice = englishVoices[0];
+    }
+
+    utterance.lang = "en-US";
+    utterance.pitch = 0.9;
+    utterance.rate = 1.0;
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+    };
+
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
 
   return (
     <div className="p-4">
@@ -56,7 +124,7 @@ export default function SummarizePage() {
           </div>
           <AlertDialog
             trigger={
-              <Button size="sm">
+              <Button size="sm" disabled={isSummaryLoading}>
                 <Trash2 />
                 <span className="hidden sm:inline">Delete Summary</span>
               </Button>
@@ -82,6 +150,51 @@ export default function SummarizePage() {
           <CardTitle className="text-2xl sm:text-3xl font-semibold">{summary?.title}</CardTitle>
           <CardDescription className="sm:text-lg">
             A detailed breakdown of the key concepts and arguments found in your PDF.
+          </CardDescription>
+
+          <CardDescription className="flex items-center justify-end gap-2 md:gap-5">
+            <Tooltip>
+              <TooltipTrigger>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                  onClick={() => handleCopy(summary?.content || "")}
+                  title="Copy to clipboard"
+                >
+                  {isCopied ? <Check className="size-5 lg:size-6" /> : <Copy className="size-5 lg:size-6" />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {isCopied ? "Copied!" : "Copy summary to clipboard"}
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className={cn(
+                    "h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted",
+                    isSpeaking && "text-primary bg-primary/10 hover:bg-primary/20"
+                  )}
+                  onClick={() => handleSpeech(summary?.content || "")}
+                  disabled={!summary?.content || isSummaryLoading}
+                >
+                  {isSpeaking ? (
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                    </span>
+                  ) : (
+                    <Volume2 className="size-5 lg:size-6" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {isSpeaking ? "Stop reading" : "Read summary aloud"}
+              </TooltipContent>
+            </Tooltip>
           </CardDescription>
         </CardHeader>
 
