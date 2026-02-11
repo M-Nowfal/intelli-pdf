@@ -7,7 +7,7 @@ import { getEmbeddings } from "@/lib/embeddings";
 import mongoose from "mongoose";
 import { COST, GOOGLE_API_KEY } from "@/utils/constants";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { GENERATE_CHAT_PROMPT } from "@/lib/prompts";
 import { User } from "@/models/user.model";
 

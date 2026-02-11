@@ -6,7 +6,7 @@ import { Embedding } from "@/models/embedding.model";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { COST, GOOGLE_API_KEY } from "@/utils/constants";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { GENERATE_SUMMARY_PROMPT } from "@/lib/prompts";
 import { User } from "@/models/user.model";
 import { calculateStreak } from "@/lib/study-streak";

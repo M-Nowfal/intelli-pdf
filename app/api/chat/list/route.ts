@@ -1,7 +1,7 @@
 import { Chat } from "@/models/chat.model";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import "@/models/pdf.model";
 
