@@ -54,8 +54,8 @@ export function SummaryList() {
           </p>
         </div>
 
-        <Button onClick={handleCreateNew} size="lg" className="shadow-md hover:shadow-lg transition-shadow">
-          <FilePlus className="mr-2 h-5 w-5" />
+        <Button onClick={handleCreateNew} disabled={isSummaryLoading} size="lg" className="shadow-md hover:shadow-lg transition-shadow">
+          <FilePlus />
           New Summary
         </Button>
       </div>

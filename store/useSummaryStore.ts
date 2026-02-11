@@ -70,6 +70,8 @@ export const useSummaryStore = create<SummaryState>((set, get) => ({
     } catch (err: unknown) {
       console.error(err);
       set({ summaryError: "Could not get summary list. Please try again later." });
+    } finally {
+      set({ isSummaryLoading: false });
     }
   },
   removeSummary: (id) => set(state => {

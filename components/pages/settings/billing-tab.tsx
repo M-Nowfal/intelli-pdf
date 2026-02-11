@@ -53,7 +53,7 @@ export function BillingTab() {
         toast.success("Link copied to clipboard!");
         setTimeout(() => setIsCopied(false), 2000);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Error sharing:", err);
       try {
         await navigator.clipboard.writeText(shareUrl);
@@ -105,11 +105,11 @@ export function BillingTab() {
               "font-medium", 
               isOverLimit ? "text-amber-600 dark:text-amber-500" : "text-muted-foreground"
             )}>
-              {currentCredits} / {maxCredits}
+              {isClaiming ? <Loader size={12} /> : currentCredits} / {maxCredits}
               {isOverLimit && <span className="text-xs ml-1.5 font-normal">(+Bonus)</span>}
             </span>
           </div>
-          <Progress 
+          <Progress
             value={progressPercentage} 
             className={cn(
               "h-2",

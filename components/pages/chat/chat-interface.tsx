@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send, Bot, StopCircle, Copy, Check, Volume2 } from "lucide-react";
+import { Send, Bot, StopCircle, Copy, Check, Volume2, Pause, Play, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import TextareaAutosize from "react-textarea-autosize";
 import { BOT } from "@/utils/constants";
@@ -45,7 +45,11 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
   const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+
+  const currentUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const isCancelledRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (pdfId) {
@@ -69,9 +73,17 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
     }
   }, []);
 
+  const stopSpeech = () => {
+    window.speechSynthesis.cancel();
+    isCancelledRef.current = true;
+    setSpeakingMessageId(null);
+    setIsPaused(false);
+    currentUtteranceRef.current = null;
+  };
+
   useEffect(() => {
     return () => {
-      window.speechSynthesis.cancel();
+      stopSpeech();
       setIsKeyboardActive(false);
     };
   }, [setIsKeyboardActive]);
@@ -87,8 +99,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
     e?.preventDefault();
     if (!input.trim() || isStreaming) return;
 
-    window.speechSynthesis.cancel();
-    setSpeakingMessageId(null);
+    stopSpeech();
 
     const isNewConversation = messages.length === 0;
 
@@ -161,49 +172,91 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const restartSpeech = (id: string, content: string) => {
+    stopSpeech();
+    setTimeout(() => {
+      handleSpeech(id, content);
+    }, 100);
+  };
+
   const handleSpeech = (id: string, content: string) => {
     if (!("speechSynthesis" in window)) {
       toast.warning("Text-to-speech is not supported in this browser.");
       return;
     }
 
-    if (speakingMessageId === id) {
-      window.speechSynthesis.cancel();
-      setSpeakingMessageId(null);
+    if (speakingMessageId === id && !isPaused) {
+      window.speechSynthesis.pause();
+      setIsPaused(true);
       return;
     }
 
-    window.speechSynthesis.cancel();
-
-    const cleanText = cleanMarkdown(content);
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-
-    const englishVoices = voices.filter((v) => v.lang.startsWith("en"));
-
-    const preferredVoice = englishVoices.find(
-      (v) =>
-        v.name.includes("Microsoft David") ||
-        v.name.includes("Daniel") ||
-        (v.name.includes("Google") && v.name.includes("Male")) ||
-        v.name.includes("Male")
-    );
-
-    if (preferredVoice) {
-      utterance.voice = preferredVoice;
-    } else if (englishVoices.length > 0) {
-      utterance.voice = englishVoices[0];
+    if (speakingMessageId === id && isPaused) {
+      window.speechSynthesis.resume();
+      setIsPaused(false);
+      return;
     }
 
-    utterance.lang = "en-US";
-    utterance.pitch = 0.9;
-    utterance.rate = 1.0;
+    stopSpeech();
+    isCancelledRef.current = false;
+    setSpeakingMessageId(id);
 
-    utterance.onend = () => {
-      setSpeakingMessageId(null);
+    const cleanText = cleanMarkdown(content);
+    const chunks = cleanText.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [cleanText];
+
+    let availableVoices = window.speechSynthesis.getVoices();
+    if (availableVoices.length === 0) availableVoices = voices;
+
+    const englishVoices = availableVoices.filter((v) => v.lang.startsWith("en"));
+    const preferredVoice =
+      englishVoices.find((v) => v.name.includes("Google US English")) ||
+      englishVoices.find((v) => v.name.includes("Microsoft David")) ||
+      englishVoices.find((v) => v.name.includes("Daniel")) ||
+      englishVoices.find((v) => v.name.toLowerCase().includes("male")) ||
+      englishVoices[0];
+
+    let currentIndex = 0;
+
+    const speakNextChunk = () => {
+      if (isCancelledRef.current || currentIndex >= chunks.length) {
+        setSpeakingMessageId(null);
+        setIsPaused(false);
+        return;
+      }
+
+      const chunkText = chunks[currentIndex].trim();
+      if (!chunkText) {
+        currentIndex++;
+        speakNextChunk();
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(chunkText);
+      if (preferredVoice) utterance.voice = preferredVoice;
+      utterance.lang = "en-US";
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+
+      currentUtteranceRef.current = utterance;
+
+      utterance.onend = () => {
+        currentIndex++;
+        speakNextChunk();
+      };
+
+      utterance.onerror = (e) => {
+        if (e.error === 'interrupted' || e.error === 'canceled') {
+          return;
+        }
+        console.error("Chunk Error:", e);
+        currentIndex++;
+        speakNextChunk();
+      };
+
+      window.speechSynthesis.speak(utterance);
     };
 
-    setSpeakingMessageId(id);
-    window.speechSynthesis.speak(utterance);
+    speakNextChunk();
   };
 
   if (isMessagesLoading) {
@@ -292,7 +345,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
                         )}
 
                         <div className={cn(
-                          "flex items-center gap-1 transition-opacity duration-200",
+                          "flex items-center transition-opacity duration-200",
                           isSpeaking ? "opacity-100" : "opacity-0 not-sm:opacity-100 group-hover:opacity-100"
                         )}>
 
@@ -312,29 +365,41 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
                             </TooltipContent>
                           </Tooltip>
 
+                          {(isSpeaking) && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon-sm"
+                                  className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
+                                  onClick={() => restartSpeech(message.id, message.content)}
+                                >
+                                  <RotateCcw className="h-3.5 w-3.5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom">Restart</TooltipContent>
+                            </Tooltip>
+                          )}
+
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
                                 variant="ghost"
                                 size="icon-sm"
-                                className={cn(
-                                  "h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted",
-                                  isSpeaking && "text-primary bg-primary/10 hover:bg-primary/20"
-                                )}
                                 onClick={() => handleSpeech(message.id, message.content)}
+                                className="text-muted-foreground"
                               >
-                                {isSpeaking ? (
-                                  <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                                  </span>
+                                {isSpeaking && !isPaused ? (
+                                  <Pause className="h-3.5 w-3.5 fill-current" />
+                                ) : isPaused && isSpeaking ? (
+                                  <Play className="h-3.5 w-3.5 fill-current" />
                                 ) : (
                                   <Volume2 className="h-3.5 w-3.5" />
                                 )}
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent side="bottom">
-                              {isSpeaking ? "Stop reading" : "Read aloud"}
+                              {isSpeaking && !isPaused ? "Pause" : isPaused && isSpeaking ? "Resume" : "Listen"}
                             </TooltipContent>
                           </Tooltip>
                         </div>
