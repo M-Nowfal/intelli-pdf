@@ -310,7 +310,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
 
                     <div
                       className={cn(
-                        "text-sm leading-7 transition-all duration-200 relative",
+                        "text-sm leading-7 transition-all duration-200 relative w-fit max-w-full wrap-break-word",
                         isUser
                           ? "bg-secondary text-secondary-foreground px-5 py-3 rounded-2xl rounded-tr-sm"
                           : "bg-transparent text-foreground px-0 py-0"

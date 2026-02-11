@@ -9,7 +9,7 @@ export function cleanMarkdown(text: string): string {
   if (!text) return "";
 
   return text
-    .replace(/```[\s\S]*?```/g, "")
+    .replace(/```[\w-]*\n?/g, "")
     .replace(/`([^`]+)`/g, "$1")
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
     .replace(/!\[.*?\]\(.*?\)/g, "")
