@@ -10,7 +10,7 @@ const getEmbedder = async () => {
     embedder = await pipeline(
       "feature-extraction",
       "Xenova/all-MiniLM-L6-v2",
-      { dtype: "fp32" }
+      { dtype: "fp32", device: "wasm" }
     );
   }
   return embedder;
