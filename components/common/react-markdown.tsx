@@ -1,6 +1,8 @@
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 export function MarkDown({ content }: { content: string | undefined }) {
   return (
@@ -10,7 +12,7 @@ export function MarkDown({ content }: { content: string | undefined }) {
         p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
         strong: ({ children }) => <span className="font-semibold text-foreground">{children}</span>,
         em: ({ children }) => <span className="italic">{children}</span>,
-        del: ({ children }) => <span className="line-through text-muted-foreground">{children}</span>, // Strikethrough
+        del: ({ children }) => <span className="line-through text-muted-foreground">{children}</span>,
 
         h1: ({ children }) => <h1 className="mt-8 mb-4 text-3xl font-bold tracking-tight text-foreground">{children}</h1>,
         h2: ({ children }) => <h2 className="mt-6 mb-3 text-2xl font-semibold tracking-tight text-foreground">{children}</h2>,
@@ -34,18 +36,13 @@ export function MarkDown({ content }: { content: string | undefined }) {
           </Link>
         ),
 
-        pre: ({ children }) => (
-          <div className="my-4 w-full overflow-hidden rounded-lg bg-muted border border-border">
-            <div className="overflow-x-auto p-4">
-              <pre className="font-mono text-sm">{children}</pre>
-            </div>
-          </div>
-        ),
-        code: ({ node, className, children, ...props }) => {
+        code({ node, inline, className, children, ...props }: any) {
+          const match = /language-(\w+)/.exec(className || "");
+          const language = match ? match[1] : null;
           const content = String(children).replace(/\n$/, "");
-          const isUrl = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/.test(content);
 
-          if (isUrl) {
+          const isUrl = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/.test(content);
+          if (isUrl && inline) {
             const href = content.startsWith("http") ? content : `https://${content}`;
             return (
               <Link
@@ -56,6 +53,32 @@ export function MarkDown({ content }: { content: string | undefined }) {
               >
                 {content}
               </Link>
+            );
+          }
+
+          if (!inline && language) {
+            return (
+              <div className="rounded-md overflow-hidden my-4 border bg-[#1e1e1e]">
+                <div className="flex items-center justify-between px-4 py-2 bg-[#2d2d2d] border-b border-gray-700">
+                  <span className="text-xs text-gray-400 lowercase">{language}</span>
+                </div>
+                <div className="overflow-x-auto">
+                  <SyntaxHighlighter
+                    style={vscDarkPlus}
+                    language={language}
+                    PreTag="div"
+                    customStyle={{
+                      margin: 0,
+                      padding: "1rem",
+                      background: "transparent",
+                      fontSize: "0.875rem",
+                    }}
+                    {...props}
+                  >
+                    {content}
+                  </SyntaxHighlighter>
+                </div>
+              </div>
             );
           }
 
