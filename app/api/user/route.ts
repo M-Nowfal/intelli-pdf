@@ -19,7 +19,7 @@ export async function GET() {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const user = await User.findById(session.user.id, "provider -_id");
+    const user = await User.findById(session.user.id, "provider avatar -_id");
 
     return NextResponse.json(user);
 

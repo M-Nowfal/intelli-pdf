@@ -73,8 +73,9 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user, account, trigger, session }) {
       if (user) {
+        await connectDB();
+
         if (account?.provider === "google") {
-          await connectDB();
           const dbUser = await User.findOne({ email: user.email });
 
           if (dbUser) {
@@ -95,6 +96,22 @@ export const authOptions: NextAuthOptions = {
         }
         if (session.image !== undefined) {
           token.picture = session.image;
+        }
+      }
+
+      if (!user && token.id) {
+        await connectDB();
+        const dbUser = await User.findById(token.id).select("avatar");
+        if (dbUser?.avatar) {
+          token.picture = dbUser.avatar;
+        }
+      }
+
+      if (token.id) {
+        await connectDB();
+        const dbUser = await User.findById(token.id).select("avatar");
+        if (dbUser?.avatar) {
+          token.picture = dbUser.avatar;
         }
       }
 
