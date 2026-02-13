@@ -58,7 +58,9 @@ export async function POST(req: NextRequest) {
 
     const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
-    const prompt = GENERATE_QUIZ_PROMPT(contextText, amount);
+    const previousQuestions = await Quiz.findOne({ userId: session.user.id, pdfId });
+
+    const prompt = GENERATE_QUIZ_PROMPT(contextText, amount, previousQuestions?.questions || []);
 
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();

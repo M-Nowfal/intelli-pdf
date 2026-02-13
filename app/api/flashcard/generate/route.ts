@@ -45,7 +45,9 @@ export async function POST(req: NextRequest) {
 
     const contextText = contextDocs.map((doc) => doc.content).join("\n\n");
 
-    const prompt = GENERATE_FLASHCARD_PROMPT(contextText, count);
+    const previousCards = await Flashcard.findOne({ userId: session.user.id, pdfId: new mongoose.Types.ObjectId(pdfId) });
+
+    const prompt = GENERATE_FLASHCARD_PROMPT(contextText, count, previousCards?.cards || []);
     const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();

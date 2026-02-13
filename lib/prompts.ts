@@ -33,44 +33,95 @@ export const GENERATE_CHAT_PROMPT = (contextText: string, userQuestion: string, 
 };
 
 export const GENERATE_SUMMARY_PROMPT = (text: string) => `
-  You are an expert academic summarizer. 
-  Please provide a comprehensive and detailed summary of the following document.
+  You are an expert academic and technical summarizer. 
   
-  Structure your response in Markdown format:
-  - Start with a **Main Argument** or **Core Thesis**.
-  - Use **H3 headers (###)** for key sections.
-  - Use **bullet points** for listing details.
-  - Highlight important terms in **bold**.
-  - End with a **Conclusion**.
+  Please provide a comprehensive, structured, and easy-to-understand summary of the following document.
+  
+  **Directives:**
+  1. **Structure**: 
+     - Start with a **Core Thesis** or **Executive Summary** (H2).
+     - Use **H3 headers (###)** to break down key sections.
+     - Use **bullet points** for readability.
+  
+  2. **Technical Content (CRITICAL)**:
+     - If the document contains programming concepts, **YOU MUST include code examples**.
+     - Extract or synthesize brief, illustrative code snippets to explain concepts (e.g., "Here is how a loop works in Python...").
+     - Format all code using markdown code blocks with the correct language tag (e.g., \`\`\`python ... \`\`\`).
+  
+  3. **Clarity**:
+     - Explain complex jargon in simple terms.
+     - Highlight important terms in **bold**.
+     - Ensure the flow is logical and educational.
+  
+  4. **Ending**:
+     - Conclude with a **Key Takeaways** section.
 
   Here is the document text:
-  ${text} 
+  "${text}"
 `;
 
-export const GENERATE_FLASHCARD_PROMPT = (text: string, count: number = 5) => `
-  You are a teacher creating study flashcards.
-  Based on the text below, generate ${count} distinct flashcards (Question and Answer).
-  
-  STRICT OUTPUT FORMAT: 
-  Return ONLY a raw JSON array of objects. Do not wrap in markdown code blocks.
-  Example: [{"question": "What is...", "answer": "It is..."}]
+export const GENERATE_FLASHCARD_PROMPT = (text: string, count: number = 5, previousCards: any[] = []) => {
+  const historyContext = previousCards?.length
+    ? previousCards.map((c: any) => c.question).join(" | ")
+    : "";
 
-  TEXT CONTENT:
-  ${text}
-`;
+  return `
+    You are an expert teacher creating distinct, high-quality study flashcards.
+    
+    OBJECTIVE: 
+    Generate exactly ${count} NEW flashcards (Question and Answer) based on the text below.
+    
+    ${historyContext ? `
+    CRITICAL INSTRUCTION - AVOID DUPLICATES:
+    The user has already generated cards for the following concepts. 
+    DO NOT repeat these questions or similar variations:
+    ---
+    PREVIOUS HISTORY: ${historyContext}
+    ---
+    Focus on different details, edge cases, or concepts not covered above.
+    ` : ''}
 
-export const GENERATE_QUIZ_PROMPT = (text: string, amount: number = 5) => `
-  You are an expert teacher creating quizzes. 
-  Based on the following text context, generate a quiz with exactly ${amount} multiple-choice questions.
-  
-  CONTEXT:
-  ${text.substring(0, 15000)} 
-  
-  STRICT OUTPUT FORMAT: 
-  Return ONLY a raw JSON array of objects. Do not include markdown formatting like \`\`\`json.
-  
-  EACH OBJECT MUST HAVE:
-  - "question": string
-  - "options": array of 4 strings
-  - "answer": string (must be exactly one of the options)
-`;
+    STRICT OUTPUT RULES:
+    1. Return ONLY a valid JSON array.
+    2. Do NOT use markdown code blocks (no \`\`\`json).
+    3. Do NOT include any intro or conversational text.
+    4. Format: [{"question": "Concise question...", "answer": "Clear, accurate answer..."}]
+
+    TEXT CONTENT:
+    ${text.substring(0, 20000)} 
+  `;
+};
+
+export const GENERATE_QUIZ_PROMPT = (text: string, amount: number = 5, previousQuestions: any[] = []) => {
+  const historyContext = previousQuestions?.length
+    ? previousQuestions.map((q: any) => q.question).join(" | ")
+    : "";
+
+  return `
+    You are an expert examiner creating a precise multiple-choice quiz.
+    
+    OBJECTIVE:
+    Generate exactly ${amount} distinct multiple-choice questions based on the text.
+
+    ${historyContext ? `
+    CRITICAL INSTRUCTION - AVOID DUPLICATES:
+    The following questions have already been asked. 
+    DO NOT generate them again:
+    ---
+    PREVIOUS QUIZ HISTORY: ${historyContext}
+    ---
+    Create completely new questions testing different sections or deeper understanding.
+    ` : ''}
+
+    STRICT JSON OUTPUT RULES:
+    1. Return ONLY a raw JSON array.
+    2. NO markdown formatting or code blocks.
+    3. Each object must have:
+       - "question": string
+       - "options": array of exactly 4 unique strings
+       - "answer": string (must be an exact match to one of the options)
+
+    CONTEXT:
+    ${text.substring(0, 15000)} 
+  `;
+};
