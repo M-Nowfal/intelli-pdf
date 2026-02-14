@@ -41,7 +41,7 @@ export function SelectPDF() {
 
   if (pdfs.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed rounded-xl bg-muted/10">
+      <div className="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed w-full max-w-5xl mt-10 mx-auto rounded-xl bg-muted/10">
         <div className="bg-background p-4 rounded-full mb-4 shadow-sm ring-1 ring-border">
           <FileText className="h-8 w-8 text-muted-foreground/50" />
         </div>
