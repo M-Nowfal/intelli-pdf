@@ -41,13 +41,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const existingQuiz = await Quiz.findOne({ userId: session.user.id, pdfId })
-      .populate("pdfId", "title");
-
-    if (existingQuiz) {
-      return NextResponse.json(existingQuiz);
-    }
-
     const embeddingDocs = await Embedding.find({ pdfId });
 
     if (!embeddingDocs || embeddingDocs.length === 0) {
@@ -58,39 +51,43 @@ export async function POST(req: NextRequest) {
 
     const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
-    const previousQuestions = await Quiz.findOne({ userId: session.user.id, pdfId });
+    let quizDoc = await Quiz.findOne({ userId: session.user.id, pdfId });
 
-    const prompt = GENERATE_QUIZ_PROMPT(contextText, amount, previousQuestions?.questions || []);
+    const prompt = GENERATE_QUIZ_PROMPT(contextText, amount, quizDoc?.questions || []);
 
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();
 
     const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
-    const questions = JSON.parse(cleanedText);
+    const newQuestions = JSON.parse(cleanedText);
 
-    const pdfIdAndTitle = await PDF.findById(pdfId).select("title");
+    if (quizDoc) {
+      quizDoc.questions.push(...newQuestions);
+      await quizDoc.save();
+    } else {
+      const pdfIdAndTitle = await PDF.findById(pdfId).select("title");
 
-    const newQuiz = await Quiz.create({
-      userId: session.user.id,
-      pdfId: pdfIdAndTitle,
-      questions: questions,
-      score: 0
-    });
+      quizDoc = await Quiz.create({
+        userId: session.user.id,
+        pdfId: pdfIdAndTitle,
+        questions: newQuestions,
+        score: 0
+      });
 
-    const { newStreak, today } = await calculateStreak(session.user.id);
+      const { newStreak, today } = await calculateStreak(session.user.id);
 
-    await User.findByIdAndUpdate(session.user.id, {
-      $inc: {
-        "stats.aiCredits": -20
-      },
-      $set: {
-        "stats.studyStreak.streak": newStreak,
-        "stats.studyStreak.lastActive": today
-      }
-    });
+      await User.findByIdAndUpdate(session.user.id, {
+        $inc: {
+          "stats.aiCredits": -20
+        },
+        $set: {
+          "stats.studyStreak.streak": newStreak,
+          "stats.studyStreak.lastActive": today
+        }
+      });
+    }
 
-    return NextResponse.json(newQuiz);
-
+    return NextResponse.json(quizDoc);
   } catch (err: unknown) {
     console.error("Quiz Generation Error:", err);
     return NextResponse.json(

@@ -27,7 +27,7 @@ interface QuizState {
 
   fetchQuizzes: () => Promise<void>;
   loadQuiz: (id: string) => Promise<void>;
-  generateQuiz: (pdfId: string, amount: number) => Promise<string | null>; // Returns quizId
+  generateQuiz: (pdfId: string, amount: number) => Promise<string | null>;
   submitScore: (quizId: string, score: number) => Promise<void>;
   deleteQuiz: (quizId: string) => Promise<void>;
   resetCurrentQuiz: () => void;
@@ -67,7 +67,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
       const res = await api.get(`/quiz/${id}`);
       set({ currentQuiz: res.data });
     } catch (err: unknown) {
-      toast.error("Failed to load quiz");
+      toast.error("No quiz found for this PDF.");
     } finally {
       set({ isLoading: false });
     }

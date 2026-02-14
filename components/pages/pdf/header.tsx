@@ -1,4 +1,4 @@
-import { BookOpen, Sparkles } from "lucide-react";
+import { File, Sparkles } from "lucide-react";
 import { Badge } from "../../ui/badge";
 import { Separator } from "../../ui/separator";
 
@@ -9,15 +9,12 @@ export function PDFHeader() {
         <div className="space-y-5">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 shadow-sm">
-              <BookOpen className="h-5 w-5 sm:h-6 sm:w-6 text-primary" strokeWidth={3} />
+              <File className="h-4 w-4 sm:h-6 sm:w-6 text-primary" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-              AI Study Assistant
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+              Upload Study Materials
             </h1>
           </div>
-          <p className="text-xl font-semibold">
-            Upload Study Materials
-          </p>
           <p className="text-muted-foreground text-lg max-w-2xl">
             Upload your PDF study materials and let our AI automatically create flashcards,
             summaries, and practice questions for you.

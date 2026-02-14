@@ -45,9 +45,9 @@ export async function POST(req: NextRequest) {
 
     const contextText = contextDocs.map((doc) => doc.content).join("\n\n");
 
-    const previousCards = await Flashcard.findOne({ userId: session.user.id, pdfId: new mongoose.Types.ObjectId(pdfId) });
+    let flashcardDoc = await Flashcard.findOne({ userId: session.user.id, pdfId });
 
-    const prompt = GENERATE_FLASHCARD_PROMPT(contextText, count, previousCards?.cards || []);
+    const prompt = GENERATE_FLASHCARD_PROMPT(contextText, count, flashcardDoc?.cards || []);
     const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();
@@ -55,18 +55,9 @@ export async function POST(req: NextRequest) {
     const cleanedJson = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
     const newCardsData = JSON.parse(cleanedJson);
 
-    let flashcardDoc = await Flashcard.findOne({ userId: session.user.id, pdfId });
-
     if (flashcardDoc) {
       flashcardDoc.cards.push(...newCardsData);
       await flashcardDoc.save();
-
-      await User.findByIdAndUpdate(session.user.id, {
-        $inc: {
-          "stats.flashcardsMastered": 1,
-          "stats.aiCredits": -20
-        }
-      });
     } else {
       flashcardDoc = await Flashcard.create({
         userId: session.user.id,
@@ -78,6 +69,7 @@ export async function POST(req: NextRequest) {
 
       await User.findByIdAndUpdate(session.user.id, {
         $inc: {
+          "stats.flashcardsMastered": 1,
           "stats.aiCredits": -20
         },
         $set: {

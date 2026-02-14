@@ -13,7 +13,7 @@ export default function UploadPDF() {
     isLoading ? (
       <PDFUploadSkeleton />
     ) : (
-      <div className="flex flex-1 flex-col gap-6 p-4 mx-auto w-full">
+      <div className="flex flex-1 flex-col p-4 gap-6 w-full max-w-7xl m-auto">
         <PDFHeader />
         <PDFFeatures />
         <PDFUpload />

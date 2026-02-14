@@ -47,7 +47,7 @@ export function QuizList() {
       </div>
 
       {quizzes.length === 0 ? (
-        <div className="text-center py-20 border-2 border-dashed rounded-xl space-y-4">
+        <div className="text-center py-20 border-2 border-dashed w-full max-w-5xl mt-10 mx-auto rounded-xl space-y-4">
           <div className="p-5 m-auto w-fit rounded-full bg-primary/5 mb-4 ring-1 ring-primary/10">
             <Wand2 className="h-10 w-10 text-primary/60" />
           </div>

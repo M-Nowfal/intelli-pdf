@@ -35,4 +35,6 @@ const ChatSchema = new Schema<IChat>(
   { timestamps: true }
 );
 
+ChatSchema.index({ pdfId: 1 });
+
 export const Chat = models.Chat || model<IChat>("Chat", ChatSchema);

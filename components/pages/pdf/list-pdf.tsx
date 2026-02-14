@@ -100,7 +100,7 @@ export default function PDFList() {
             </Button>
           </div>
         ) : !hasPdfs ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed rounded-xl bg-muted/10 hover:bg-muted/20 transition-colors">
+          <div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed w-full max-w-5xl mt-10 mx-auto rounded-xl bg-muted/10 hover:bg-muted/20 transition-colors">
             <div className="bg-background p-4 rounded-full mb-4 shadow-sm ring-1 ring-border">
               <FileText className="h-10 w-10 text-muted-foreground/50" />
             </div>

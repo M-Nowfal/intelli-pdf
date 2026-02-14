@@ -26,4 +26,6 @@ const EmbeddingSchema = new Schema<IEmbedding>({
   }
 });
 
+EmbeddingSchema.index({ pdfId: 1 });
+
 export const Embedding = models.Embedding || model<IEmbedding>("Embedding", EmbeddingSchema);

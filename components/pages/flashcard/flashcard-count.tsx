@@ -19,7 +19,7 @@ import { useDashboardStore } from "@/store/useDashboardStore";
 
 interface FlashCardCountProps {
   pdfId: string;
-  isDialogOpen: boolean; 
+  isDialogOpen: boolean;
   setIsDialogOpen: (val: boolean) => void;
 }
 
@@ -62,8 +62,8 @@ export function FlashCardCount({ pdfId, isDialogOpen, setIsDialogOpen }: FlashCa
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
-          <div className="grid grid-cols-5 items-center">
-            <Label htmlFor="numCards" className="text-right">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="numCards" className="text-right ms-2">
               Count
             </Label>
             <Input
@@ -78,7 +78,12 @@ export function FlashCardCount({ pdfId, isDialogOpen, setIsDialogOpen }: FlashCa
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit" onClick={handleGenerate} disabled={numCardsToGenerate === 0 || isGenerating}>
+          <Button
+            type="submit"
+            onClick={handleGenerate}
+            disabled={numCardsToGenerate === 0 || isGenerating}
+            className="w-full"
+          >
             {isGenerating ? "Creating" : "Generate"}
             {isGenerating && <Loader />}
           </Button>

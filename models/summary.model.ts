@@ -20,6 +20,6 @@ const SummarySchema = new Schema<ISummary>(
   }
 );
 
-SummarySchema.index({ pdfId: 1, userId: 1 }, { unique: true });
+SummarySchema.index({ pdfId: 1 });
 
 export const Summary = models.Summary || model<ISummary>("Summary", SummarySchema);

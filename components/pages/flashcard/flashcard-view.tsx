@@ -44,6 +44,8 @@ export function FlashcardView({ pdfId }: { pdfId: string }) {
   useEffect(() => {
     if (flashCards.length === 0 && !isLoading)
       setIsDialogOpen(true);
+    else 
+      setIsDialogOpen(false);
   }, [flashCards.length]);
 
   const handleNavigate = (direction: "next" | "prev") => {
@@ -133,7 +135,7 @@ export function FlashcardView({ pdfId }: { pdfId: string }) {
 
                   <div className="overflow-y-auto w-full text-center hide-scrollbar max-h-full flex items-center justify-center">
                     <h3 className="text-lg sm:text-2xl font-medium leading-relaxed text-card-foreground select-none px-2">
-                      {currentCard.question}
+                      {currentCard?.question}
                     </h3>
                   </div>
 
@@ -155,7 +157,7 @@ export function FlashcardView({ pdfId }: { pdfId: string }) {
 
                   <div className="overflow-y-auto w-full text-center hide-scrollbar max-h-full flex items-center justify-center">
                     <p className="text-base sm:text-xl font-medium leading-relaxed text-green-950/90 dark:text-green-50/90 select-none px-2">
-                      {currentCard.answer}
+                      {currentCard?.answer}
                     </p>
                   </div>
 

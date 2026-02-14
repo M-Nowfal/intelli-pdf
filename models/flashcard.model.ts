@@ -31,4 +31,6 @@ const FlashcardSchema = new Schema<IFlashcard>(
   { timestamps: true }
 );
 
+FlashcardSchema.index({ pdfId: 1 });
+
 export const Flashcard = models.Flashcard || model<IFlashcard>("Flashcard", FlashcardSchema);

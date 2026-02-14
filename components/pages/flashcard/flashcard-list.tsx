@@ -65,7 +65,7 @@ export function FlashCardList() {
         {isLoading && flashCardList.length === 0 ? (
           <CardSkeloton />
         ) : flashCardList.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-100 border-2 border-dashed rounded-3xl bg-muted/10 text-center px-4">
+          <div className="flex flex-col items-center justify-center h-100 border-2 border-dashed w-full max-w-5xl mt-10 mx-auto rounded-3xl bg-muted/10 text-center px-4">
             <div className="p-5 rounded-full bg-primary/5 mb-4 ring-1 ring-primary/10">
               <Layers className="h-10 w-10 text-primary/60" />
             </div>

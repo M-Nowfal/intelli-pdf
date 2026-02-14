@@ -5,18 +5,29 @@ import { useQuizStore } from "@/store/useQuizStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { BrainCircuit } from "lucide-react";
+import { BrainCircuit, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
 import { useDashboardStore } from "@/store/useDashboardStore";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 
 interface QuizSetupProps {
   pdfId: string;
+  isOpen: boolean;
+  setIsOpen: (val: boolean) => void;
   onQuizReady: () => void;
 }
 
-export function QuizSetup({ pdfId, onQuizReady }: QuizSetupProps) {
+export function QuizSetup({ pdfId, isOpen, setIsOpen, onQuizReady }: QuizSetupProps) {
   const { generateQuiz, isLoading } = useQuizStore();
   const [amount, setAmount] = useState(5);
   const { decrementCredits } = useDashboardStore();
@@ -31,27 +42,42 @@ export function QuizSetup({ pdfId, onQuizReady }: QuizSetupProps) {
 
     if (quizId) {
       toast.success("Quiz generated successfully!");
-      onQuizReady();
       decrementCredits(20);
+      setIsOpen(false);
+      onQuizReady();
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-[80vh]">
-      <Card className="w-full max-w-md border-2 shadow-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-xl">
-            <BrainCircuit className="w-6 h-6 text-primary" />
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button className="gap-2">
+          <Plus className="w-4 h-4" />
+          Generate Quizzes
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent 
+        className="sm:max-w-md" 
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        onInteractOutside={(e) => isLoading && e.preventDefault()}
+        showCloseButton={!isLoading}
+      >
+        <DialogHeader className="mb-5">
+          <DialogTitle className="flex items-center gap-2">
+            <BrainCircuit className="w-5 h-5 text-primary" />
             Quiz Setup
-          </CardTitle>
-          <CardDescription>
-            This document doesn't have a quiz yet. Create one now!
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label>How many questions?</Label>
+          </DialogTitle>
+          <DialogDescription className="text-start">
+            Generate a new quiz from your document.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="flex flex-col gap-2 mb-3">
+          <Label htmlFor="question-amount">Number of Questions</Label>
+          <div className="flex flex-col gap-1">
             <Input
+              id="question-amount"
               type="number"
               min={3}
               max={50}
@@ -59,10 +85,15 @@ export function QuizSetup({ pdfId, onQuizReady }: QuizSetupProps) {
               onChange={(e) => setAmount(parseInt(e.target.value) || 0)}
               className="text-center text-lg"
             />
-            <p className="text-xs text-muted-foreground text-center">Max: 50</p>
+            <span className="text-sm text-muted-foreground shrink-0">
+              (Min: 3 Questions) (Max: 50 Questions)
+            </span>
           </div>
-        </CardContent>
-        <CardFooter>
+        </div>
+
+        <Separator />
+
+        <DialogFooter>
           <Button
             onClick={handleGenerate}
             disabled={isLoading}
@@ -70,15 +101,15 @@ export function QuizSetup({ pdfId, onQuizReady }: QuizSetupProps) {
           >
             {isLoading ? (
               <>
-                <Loader /> 
-                Generating...
+                <Loader className="mr-2 h-4 w-4" />
+                Generating
               </>
             ) : (
               "Start Quiz"
             )}
           </Button>
-        </CardFooter>
-      </Card>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

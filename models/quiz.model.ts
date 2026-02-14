@@ -24,4 +24,6 @@ const QuizSchema = new Schema<IQuiz>(
   }
 );
 
+QuizSchema.index({ pdfId: 1 });
+
 export const Quiz = models.Quiz || model<IQuiz>("Quiz", QuizSchema);

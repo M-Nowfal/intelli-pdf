@@ -9,7 +9,7 @@ import {
 
 export function PDFUploadSkeleton() {
   return (
-    <div className="flex flex-1 flex-col gap-8 p-8 mx-auto w-full animate-in fade-in duration-500">
+    <div className="flex flex-1 flex-col gap-8 p-8 mx-auto w-full max-w-7xl animate-in fade-in duration-500">
       <div className="space-y-4 text-center md:text-left">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-5 w-full">
