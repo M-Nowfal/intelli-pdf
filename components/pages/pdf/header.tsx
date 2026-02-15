@@ -1,6 +1,5 @@
 import { File, Sparkles } from "lucide-react";
 import { Badge } from "../../ui/badge";
-import { Separator } from "../../ui/separator";
 
 export function PDFHeader() {
   return (
@@ -26,8 +25,6 @@ export function PDFHeader() {
           AI-Powered Learning
         </Badge>
       </div>
-
-      <Separator />
     </div>
   );
 }
