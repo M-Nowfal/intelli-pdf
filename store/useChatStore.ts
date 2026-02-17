@@ -106,11 +106,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
     return { chatList: [chat, ...state.chatList] };
   }),
-  clearChat: async (chatId) => {
-    set({ messages: [] });
 
+  clearChat: async (chatId) => {
     try {
       await api.put("/chat/action", { chatId });
+      set({ messages: [] });
     } catch (err: unknown) {
       console.error("Failed to clear chat", err);
     }

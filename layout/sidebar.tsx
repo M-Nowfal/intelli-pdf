@@ -149,6 +149,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                   href={subItem.url}
                                   className="flex justify-between"
                                   replace
+                                  prefetch
                                 >
                                   <div className="flex items-center gap-2">
                                     {subItem.icon && <subItem.icon className="h-4 w-4" />}
@@ -173,7 +174,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         }`}
                       onClick={() => isMobile && toggleSidebar()}
                     >
-                      <Link href={item.url} replace>
+                      <Link href={item.url} replace prefetch>
                         {item.icon && <item.icon className="h-4 w-4" />}
                         <span>{item.title}</span>
                       </Link>

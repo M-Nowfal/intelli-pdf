@@ -69,7 +69,7 @@ export function QuizList() {
                       {typeof quiz.pdfId === 'object' ? quiz.pdfId.title : 'Unknown Document'}
                     </CardTitle>
                     <span className="text-xs text-muted-foreground flex items-center gap-1">
-                      <BookOpen className="w-3 h-3" /> {quiz.questions.length} Questions
+                      <BookOpen className="w-3 h-3" /> {quiz.questions?.length || 0} Questions
                     </span>
                   </div>
                 </div>

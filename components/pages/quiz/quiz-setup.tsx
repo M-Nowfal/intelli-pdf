@@ -84,6 +84,7 @@ export function QuizSetup({ pdfId, isOpen, setIsOpen, onQuizReady }: QuizSetupPr
               value={amount}
               onChange={(e) => setAmount(parseInt(e.target.value) || 0)}
               className="text-center text-lg"
+              disabled={isLoading}
             />
             <span className="text-sm text-muted-foreground shrink-0">
               (Min: 3 Questions) (Max: 50 Questions)

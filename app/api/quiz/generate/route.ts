@@ -64,6 +64,7 @@ export async function POST(req: NextRequest) {
     if (quizDoc) {
       quizDoc.questions.push(...newQuestions);
       await quizDoc.save();
+      return NextResponse.json(newQuestions);
     } else {
       const pdfIdAndTitle = await PDF.findById(pdfId).select("title");
 

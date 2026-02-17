@@ -33,7 +33,7 @@ export default function ActiveQuizPage({ params }: { params: Promise<{ id: strin
       setIsOpen(false);
   }, [currentQuiz]);
 
-  if (isLoading || !initFinished) {
+  if (isLoading && !currentQuiz || !initFinished) {
     return <QuizSkeleton />;
   }
 

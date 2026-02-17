@@ -149,7 +149,7 @@ export function QuizInterface({ quiz }: { quiz: QuizItem }) {
         </CardHeader>
         <CardContent>
           <RadioGroup value={selectedAnswer} onValueChange={setSelectedAnswer} className="space-y-3">
-            {currentQuestion.options.map((option, idx) => (
+            {currentQuestion?.options?.map((option, idx) => (
               <div key={idx} className={cn(
                 "flex items-center space-x-2 border rounded-xl p-4 cursor-pointer transition-all hover:bg-accent",
                 selectedAnswer === option ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border"

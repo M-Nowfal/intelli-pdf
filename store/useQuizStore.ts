@@ -40,7 +40,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
 
   fetchQuizzes: async () => {
     if (get().quizzes.length > 0) return;
-    
+
     set({ isLoading: true });
     try {
       const res = await api.get("/quiz");
@@ -78,11 +78,29 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     try {
       const res = await api.post("/quiz/generate", { pdfId, amount });
 
-      set({ currentQuiz: res.data });
+      const quiz = get().currentQuiz;
+      if (quiz) {
+        set({
+          currentQuiz: {
+            ...quiz,
+            questions: [...quiz.questions, ...res.data]
+          }
+        });
+      } else {
+        set({ currentQuiz: res.data });
+      }
 
       const list = get().quizzes;
-      if (!list.find((q) => q._id === res.data._id)) {
-        set({ quizzes: [res.data, ...list] });
+      if (quiz) {
+        set({
+          quizzes: list.map(q => q._id === quiz._id ? (
+            { ...q, questions: [...quiz.questions, ...res.data] }
+          ) : q)
+        });
+      } else {
+        if (!list.find((q) => q._id === res.data._id)) {
+          set({ quizzes: [res.data, ...list] });
+        }
       }
 
       return res.data._id;
