@@ -174,6 +174,7 @@ export function LoginForm({
                   "ml-auto text-sm underline-offset-4 hover:underline",
                   loading && "pointer-events-none opacity-50"
                 )}
+                prefetch
               >
                 Forgot password?
               </Link>

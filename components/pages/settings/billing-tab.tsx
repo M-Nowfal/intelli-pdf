@@ -16,7 +16,7 @@ import { APP_URL } from "@/utils/constants";
 import { cn } from "@/lib/utils";
 
 export function BillingTab() {
-  const { stats, fetchStats, refetchStats } = useDashboardStore();
+  const { stats, isLoading, fetchStats, refetchStats } = useDashboardStore();
   const router = useRouter();
   const [isCopied, setIsCopied] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
@@ -105,7 +105,7 @@ export function BillingTab() {
               "font-medium", 
               isOverLimit ? "text-amber-600 dark:text-amber-500" : "text-muted-foreground"
             )}>
-              {isClaiming ? <Loader size={12} /> : currentCredits} / {maxCredits}
+              {(isClaiming || isLoading) ? <Loader size={12} /> : currentCredits} / {maxCredits}
               {isOverLimit && <span className="text-xs ml-1.5 font-normal">(+Bonus)</span>}
             </span>
           </div>

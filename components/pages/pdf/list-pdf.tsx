@@ -160,28 +160,28 @@ export default function PDFList() {
                       <DropdownMenuLabel>Study Modes</DropdownMenuLabel>
                       
                       <DropdownMenuItem asChild>
-                        <Link href={`/chat/${pdf._id}`} className="cursor-pointer flex items-center gap-2">
+                        <Link href={`/chat/${pdf._id}`} className="cursor-pointer flex items-center gap-2" prefetch>
                           <MessageSquare className="h-4 w-4 text-blue-500" />
                           <span>AI Chat</span>
                         </Link>
                       </DropdownMenuItem>
 
                       <DropdownMenuItem asChild>
-                        <Link href={`/flashcards/${pdf._id}`} className="cursor-pointer flex items-center gap-2">
+                        <Link href={`/flashcards/${pdf._id}`} className="cursor-pointer flex items-center gap-2" prefetch>
                           <Layers className="h-4 w-4 text-amber-500" />
                           <span>Flashcards</span>
                         </Link>
                       </DropdownMenuItem>
 
                       <DropdownMenuItem asChild>
-                        <Link href={`/quiz/${pdf._id}`} className="cursor-pointer flex items-center gap-2">
+                        <Link href={`/quiz/${pdf._id}`} className="cursor-pointer flex items-center gap-2" prefetch>
                           <BrainCircuit className="h-4 w-4 text-purple-500" />
                           <span>Take Quiz</span>
                         </Link>
                       </DropdownMenuItem>
 
                       <DropdownMenuItem asChild>
-                        <Link href={`/summarize/${pdf._id}`} className="cursor-pointer flex items-center gap-2">
+                        <Link href={`/summarize/${pdf._id}`} className="cursor-pointer flex items-center gap-2" prefetch>
                           <FileText className="h-4 w-4 text-green-500" />
                           <span>Summary</span>
                         </Link>

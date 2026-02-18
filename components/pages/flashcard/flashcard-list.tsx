@@ -110,6 +110,7 @@ function FlashcardDeckItem({
         href={`/flashcards/${item.pdfId._id}`} 
         onClick={() => vibrate()}
         className="absolute inset-0 z-10"
+        prefetch
       >
         <span className="sr-only">View Deck</span>
       </Link>

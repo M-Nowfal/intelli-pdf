@@ -78,7 +78,7 @@ export function Hero() {
 
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-6">
             <Button size="lg" className="h-14 px-10 text-lg gap-2 shadow-lg shadow-primary/20" asChild>
-              <Link href="/dashboard">
+              <Link href="/dashboard" prefetch>
                 Try for Free <ArrowRight className="h-5 w-5" />
               </Link>
             </Button>

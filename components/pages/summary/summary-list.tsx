@@ -102,6 +102,7 @@ function SummaryCard({ item }: { item: { id: string, title: string } }) {
         href={`/summarize/${item.id}`}
         onClick={() => vibrate()}
         className="absolute inset-0 z-20"
+        prefetch
       >
         <span className="sr-only">View Deck</span>
       </Link>

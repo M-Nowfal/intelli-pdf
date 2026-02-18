@@ -54,7 +54,7 @@ export function HomeLayout({
               ) : isAuthenticated ? (
                 <>
                   {pathname.startsWith("/chat/") && <ChatActionMenu activePdf={getActivePdf()!} />}
-                  <Link href="/settings">
+                  <Link href="/settings" prefetch>
                     <UserAvatar />
                   </Link>
                 </>

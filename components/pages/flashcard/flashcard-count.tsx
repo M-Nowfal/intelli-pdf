@@ -34,8 +34,9 @@ export function FlashCardCount({ pdfId, isDialogOpen, setIsDialogOpen }: FlashCa
       toast.warning("Enter a count between 3 - 50");
       return;
     }
-    await generateFlashCards(pdfId, numCardsToGenerate);
-    decrementCredits(20);
+    if (await generateFlashCards(pdfId, numCardsToGenerate)) {
+      decrementCredits(20);
+    }
   };
 
   return (

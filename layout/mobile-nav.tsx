@@ -59,6 +59,7 @@ export function MobileNav() {
                 "inline-flex flex-col items-center justify-center px-5 hover:bg-muted/50 transition-colors group",
                 isActive && "bg-muted/30"
               )}
+              prefetch
             >
               <Icon
                 className={cn(

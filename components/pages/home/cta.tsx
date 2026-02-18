@@ -40,7 +40,7 @@ export function CallToAction() {
               className="h-14 w-full sm:w-auto px-8 text-base shadow-lg shadow-primary/20"
               asChild
             >
-              <Link href="/signup">
+              <Link href="/signup" prefetch>
                 Get Started for Free
               </Link>
             </Button>
@@ -50,7 +50,7 @@ export function CallToAction() {
               className="h-14 w-full sm:w-auto px-8 text-base bg-transparent hover:bg-muted/50"
               asChild
             >
-              <Link href="#" className="gap-2">
+              <Link href="#" className="gap-2 hover:cursor-not-allowed opacity-75">
                 View Live Demo <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>

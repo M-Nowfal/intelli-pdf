@@ -159,7 +159,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
         updateMessageContent(aiMessageId, accumulatedText);
       }
 
-      decrementCredits(10);
+      decrementCredits(20);
     } catch (err) {
       toast.error("Error generating response");
     } finally {

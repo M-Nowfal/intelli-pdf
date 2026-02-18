@@ -62,11 +62,11 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
       <DropdownMenuContent align="start" className="min-w-48 mt-3 me-5">
         <DropdownMenuLabel className="truncate max-w-50">
           <Link
-            href={activePdf?.fileUrl}
+            href={activePdf?.fileUrl || ""}
             target="_blank"
             className="w-fit flex items-center gap-2 bg-accent px-2 py-1 rounded-full shadow hover:shadow-md"
           >
-            <h1 className="text-sm font-medium truncate max-w-32 md:max-w-md">
+            <h1 className="text-sm font-medium truncate max-w-32">
               {formatChatListTitle(activePdf?.title || "")}
             </h1>
             <ExternalLink size={15} />

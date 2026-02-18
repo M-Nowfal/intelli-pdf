@@ -11,7 +11,7 @@ interface FlashCardStore {
 
   fetchFlashCards: (pdfId: string) => Promise<void>;
   fetchFlashCardList: () => Promise<void>;
-  generateFlashCards: (pdfId: string, count: number) => Promise<void>;
+  generateFlashCards: (pdfId: string, count: number) => Promise<boolean>;
   deleteFlashCard: (pdfId: string, cardId: string) => Promise<void>;
   deleteFlashCards: (deckId: string) => Promise<void>;
 }
@@ -34,6 +34,7 @@ export const useFlashCardStore = create<FlashCardStore>((set, get) => ({
       set({ isLoading: false });
     }
   },
+
   fetchFlashCardList: async () => {
     set({ isLoading: true });
     try {
@@ -47,18 +48,21 @@ export const useFlashCardStore = create<FlashCardStore>((set, get) => ({
     }
   },
 
-  generateFlashCards: async (pdfId: string, count: number) => {
+  generateFlashCards: async (pdfId: string, count: number): Promise<boolean> => {
     set({ isGenerating: true });
+    let isSuccess = false;
     try {
       const res = await api.post("/flashcard/generate", { pdfId, count });
       set({ flashCards: res.data.reverse() });
       toast.success(`Generated ${count || 5} new flashcards!`);
+      isSuccess = true;
     } catch (err: unknown) {
       console.error(err);
       toast.error("Failed to generate flashcards");
     } finally {
       set({ isGenerating: false });
     }
+    return isSuccess;
   },
 
   deleteFlashCard: async (pdfId: string, cardId: string) => {
@@ -73,6 +77,7 @@ export const useFlashCardStore = create<FlashCardStore>((set, get) => ({
       toast.error("Could not delete flashcard");
     }
   },
+
   deleteFlashCards: async (deckId: string) => {
     const originalList = get().flashCardList;
 
