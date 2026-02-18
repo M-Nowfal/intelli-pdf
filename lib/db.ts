@@ -9,8 +9,6 @@ export async function connectDB() {
 
     await connect(DB_URI, { dbName: DB_NAME });
     isConnected = true;
-
-    console.log("DataBase connected successfully!");
   } catch (err: unknown) {
     console.log(err);
     throw err;

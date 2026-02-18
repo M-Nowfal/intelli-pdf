@@ -1,13 +1,13 @@
 "use client";
 
-import { Save, UploadCloud, Trash2 } from "lucide-react";
+import { Save, UploadCloud, Trash2, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { UserAvatar } from "@/components/common/avatar";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import api from "@/lib/axios";
@@ -39,6 +39,10 @@ export function GeneralTab() {
       console.error("Failed to check provider status");
     }
   };
+
+  async function handleLogout() {
+    await signOut({ callbackUrl: "/login" });
+  }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -109,10 +113,28 @@ export function GeneralTab() {
   return (
     <div className="space-y-6">
       <Card className="pb-0">
-        <CardHeader>
-          <CardTitle>Profile Information</CardTitle>
-          <CardDescription>Update your profile details and public avatar.</CardDescription>
-        </CardHeader>
+        <div className="flex items-start pe-3">
+          <CardHeader className="w-full">
+            <CardTitle>Profile Information</CardTitle>
+            <CardDescription>Update your profile details and public avatar.</CardDescription>
+          </CardHeader>
+          <Alert
+            trigger={
+              <Button
+                variant="secondary"
+                size="sm"
+                className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                disabled={isUploading || isLoading}
+              >
+                <LogOut className="text-red-500" />
+                <span className="text-red-500">Log out</span>
+              </Button>
+            }
+            title="Log out of your account?"
+            description="You're about to end your current session. Any unsaved changes will be lost, and you'll need to sign in again to continue."
+            onContinue={handleLogout}
+          />
+        </div>
         <CardContent className="space-y-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
             <UserAvatar size="xl" />
@@ -149,10 +171,9 @@ export function GeneralTab() {
                       <Button
                         variant="secondary"
                         size="sm"
-                        className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                         disabled={isUploading || isLoading}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4 text-red-500" />
                         Remove
                       </Button>
                     }

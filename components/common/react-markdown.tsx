@@ -1,8 +1,59 @@
+import { useState } from "react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { Check, Copy } from "lucide-react";
+
+const CodeBlock = ({ language, content }: { language: string; content: string }) => {
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(content);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
+
+  return (
+    <div className="rounded-md overflow-hidden my-4 border bg-[#1e1e1e]">
+      <div className="flex items-center justify-between px-4 py-2 bg-[#2d2d2d] border-b border-gray-700">
+        <span className="text-xs text-gray-400 lowercase">{language}</span>
+        <button
+          onClick={handleCopy}
+          className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition-colors"
+        >
+          {isCopied ? (
+            <>
+              <Check className="h-3.5 w-3.5" />
+              <span>Copied</span>
+            </>
+          ) : (
+            <>
+              <Copy className="h-3.5 w-3.5" />
+              Copy
+            </>
+          )}
+        </button>
+      </div>
+      <div className="overflow-x-auto">
+        <SyntaxHighlighter
+          style={vscDarkPlus}
+          language={language}
+          PreTag="div"
+          customStyle={{
+            margin: 0,
+            padding: "1rem",
+            background: "transparent",
+            fontSize: "0.875rem",
+          }}
+        >
+          {content}
+        </SyntaxHighlighter>
+      </div>
+    </div>
+  );
+};
 
 export function MarkDown({ content }: { content: string | undefined }) {
   return (
@@ -57,29 +108,7 @@ export function MarkDown({ content }: { content: string | undefined }) {
           }
 
           if (!inline && language) {
-            return (
-              <div className="rounded-md overflow-hidden my-4 border bg-[#1e1e1e]">
-                <div className="flex items-center justify-between px-4 py-2 bg-[#2d2d2d] border-b border-gray-700">
-                  <span className="text-xs text-gray-400 lowercase">{language}</span>
-                </div>
-                <div className="overflow-x-auto">
-                  <SyntaxHighlighter
-                    style={vscDarkPlus}
-                    language={language}
-                    PreTag="div"
-                    customStyle={{
-                      margin: 0,
-                      padding: "1rem",
-                      background: "transparent",
-                      fontSize: "0.875rem",
-                    }}
-                    {...props}
-                  >
-                    {content}
-                  </SyntaxHighlighter>
-                </div>
-              </div>
-            );
+            return <CodeBlock language={language} content={content} />;
           }
 
           return (
