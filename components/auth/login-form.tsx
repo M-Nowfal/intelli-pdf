@@ -135,6 +135,7 @@ export function LoginForm({
                   "underline",
                   loading && "pointer-events-none opacity-50"
                 )}
+                prefetch
               >
                 Sign up
               </Link>

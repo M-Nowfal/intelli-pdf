@@ -40,7 +40,7 @@ export function DashboardRecentActivity() {
           </CardDescription>
         </div>
         {hasPdf && <Button asChild size="sm" className="ml-auto gap-1">
-          <Link href={hasPdf ? "/pdf" : "/pdf/upload"}>
+          <Link href={hasPdf ? "/pdf" : "/pdf/upload"} prefetch>
             View All
             <TrendingUp className="h-4 w-4" />
           </Link>
