@@ -5,7 +5,7 @@ import { Embedding } from "@/models/embedding.model";
 import { Chat } from "@/models/chat.model";
 import { getEmbeddings } from "@/lib/embeddings";
 import mongoose from "mongoose";
-import { COST, GOOGLE_API_KEY } from "@/utils/constants";
+import { COST, GEMINI_MODEL, GOOGLE_API_KEY } from "@/utils/constants";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { GENERATE_CHAT_PROMPT } from "@/lib/prompts";
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
 
     const prompt = GENERATE_CHAT_PROMPT(contextText, userQuestion, isStrict);
 
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+    const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
     const streamingResponse = await model.generateContentStream(prompt);
 
     let fullAiResponse = "";
@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
 
           await User.findByIdAndUpdate(session.user.id, {
             $inc: {
-              "stats.aiCredits": -10
+              "stats.aiCredits": -20
             }
           });
 

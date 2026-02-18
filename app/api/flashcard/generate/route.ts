@@ -5,7 +5,7 @@ import { connectDB } from "@/lib/db";
 import { Flashcard } from "@/models/flashcard.model";
 import { Embedding } from "@/models/embedding.model";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { COST, GOOGLE_API_KEY } from "@/utils/constants";
+import { COST, GEMINI_MODEL, GOOGLE_API_KEY } from "@/utils/constants";
 import mongoose from "mongoose";
 import { GENERATE_FLASHCARD_PROMPT } from "@/lib/prompts";
 import { User } from "@/models/user.model";
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     let flashcardDoc = await Flashcard.findOne({ userId: session.user.id, pdfId });
 
     const prompt = GENERATE_FLASHCARD_PROMPT(contextText, count, flashcardDoc?.cards || []);
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+    const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();
 
@@ -64,20 +64,19 @@ export async function POST(req: NextRequest) {
         pdfId,
         cards: newCardsData,
       });
-
-      const { newStreak, today } = await calculateStreak(session.user.id);
-
-      await User.findByIdAndUpdate(session.user.id, {
-        $inc: {
-          "stats.flashcardsMastered": 1,
-          "stats.aiCredits": -20
-        },
-        $set: {
-          "stats.studyStreak.streak": newStreak,
-          "stats.studyStreak.lastActive": today
-        }
-      });
     }
+    
+    const { newStreak, today } = await calculateStreak(session.user.id);
+    await User.findByIdAndUpdate(session.user.id, {
+      $inc: {
+        "stats.flashcardsMastered": !flashcardDoc ? 1 : 0,
+        "stats.aiCredits": -20
+      },
+      $set: {
+        "stats.studyStreak.streak": newStreak,
+        "stats.studyStreak.lastActive": today
+      }
+    });
 
     return NextResponse.json(flashcardDoc.cards);
 

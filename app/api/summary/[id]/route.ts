@@ -4,7 +4,7 @@ import { Summary } from "@/models/summary.model";
 import { PDF } from "@/models/pdf.model";
 import { Embedding } from "@/models/embedding.model";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { COST, GOOGLE_API_KEY } from "@/utils/constants";
+import { COST, GEMINI_MODEL, GOOGLE_API_KEY } from "@/utils/constants";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { GENERATE_SUMMARY_PROMPT } from "@/lib/prompts";
@@ -70,7 +70,7 @@ export async function POST(_req: NextRequest, { params }: Params) {
       .join("\n")
       .substring(0, 30000);
 
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+    const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
 
     const prompt = GENERATE_SUMMARY_PROMPT(fullText);
 

@@ -21,6 +21,7 @@ const SMTP_PASS: string = process.env.SMTP_PASS!;
 const NODE_ENV: "production" | "development" | "test" = process.env.NODE_ENV!;
 
 const GOOGLE_API_KEY: string = process.env.GOOGLE_API_KEY!;
+const GEMINI_MODEL = "gemini-2.5-flash";
 
 const COST: number = 20;
 
@@ -37,7 +38,7 @@ export {
   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET,
   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS,
   NODE_ENV,
-  GOOGLE_API_KEY,
+  GOOGLE_API_KEY, GEMINI_MODEL,
   COST,
   CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET,
 };

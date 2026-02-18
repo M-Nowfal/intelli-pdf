@@ -5,7 +5,7 @@ import { connectDB } from "@/lib/db";
 import { Quiz } from "@/models/quiz.model";
 import { Embedding } from "@/models/embedding.model";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { COST, GOOGLE_API_KEY } from "@/utils/constants";
+import { COST, GEMINI_MODEL, GOOGLE_API_KEY } from "@/utils/constants";
 import { GENERATE_QUIZ_PROMPT } from "@/lib/prompts";
 import { PDF } from "@/models/pdf.model";
 import { User } from "@/models/user.model";
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
 
     const contextText = embeddingDocs.map((doc) => doc.content).join("\n\n");
 
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+    const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
 
     let quizDoc = await Quiz.findOne({ userId: session.user.id, pdfId });
 
@@ -74,19 +74,18 @@ export async function POST(req: NextRequest) {
         questions: newQuestions,
         score: 0
       });
-
-      const { newStreak, today } = await calculateStreak(session.user.id);
-
-      await User.findByIdAndUpdate(session.user.id, {
-        $inc: {
-          "stats.aiCredits": -20
-        },
-        $set: {
-          "stats.studyStreak.streak": newStreak,
-          "stats.studyStreak.lastActive": today
-        }
-      });
     }
+
+    const { newStreak, today } = await calculateStreak(session.user.id);
+    await User.findByIdAndUpdate(session.user.id, {
+      $inc: {
+        "stats.aiCredits": -20
+      },
+      $set: {
+        "stats.studyStreak.streak": newStreak,
+        "stats.studyStreak.lastActive": today
+      }
+    });
 
     return NextResponse.json(quizDoc);
   } catch (err: unknown) {
