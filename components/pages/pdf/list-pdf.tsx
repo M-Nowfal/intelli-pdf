@@ -198,6 +198,7 @@ export default function PDFList() {
                           href={pdf.fileUrl}
                           target="_blank"
                           className="cursor-pointer flex items-center gap-2 text-muted-foreground"
+                          prefetch
                         >
                           <ExternalLink className="h-4 w-4" />
                           <span>View Original PDF</span>

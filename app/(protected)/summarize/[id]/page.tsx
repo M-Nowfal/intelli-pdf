@@ -170,7 +170,7 @@ export default function SummarizePage() {
   }, []);
 
   return (
-    <div className="p-4">
+    <div className="p-4 w-full max-w-full overflow-x-hidden">
       <div className="space-y-4 pb-6">
         <div className="flex items-center justify-between gap-5">
           <div className="flex flex-col gap-2">
@@ -201,7 +201,7 @@ export default function SummarizePage() {
         </div>
       </div>
 
-      <Card className="max-w-4xl mx-auto mt-5 shadow-lg border-border bg-card">
+      <Card className="w-full max-w-4xl mx-auto mt-5 shadow-lg border-border bg-card overflow-hidden">
         <CardHeader className="space-y-1">
           <div className="flex items-center gap-2 text-primary">
             <div className="p-2 bg-primary/10 rounded-full">
@@ -209,10 +209,7 @@ export default function SummarizePage() {
             </div>
             <span className="font-semibold tracking-wide uppercase text-sm">AI Generated Analysis</span>
           </div>
-          <CardTitle className="text-2xl sm:text-3xl font-semibold">{summary?.title}</CardTitle>
-          <CardDescription className="sm:text-lg">
-            A detailed breakdown of the key concepts and arguments found in your PDF.
-          </CardDescription>
+          <CardTitle className="text-2xl sm:text-3xl font-semibold line-clamp-1">{summary?.title}</CardTitle>
 
           {summary?.content && <CardDescription className="flex items-center justify-end gap-1 md:gap-2">
             {(isSpeaking || isPaused) && !mobile && (
@@ -302,7 +299,7 @@ export default function SummarizePage() {
               <Skeleton className="bg-primary/10 h-32 w-full rounded-md animate-pulse" />
             </div>
           ) : (
-            <div className="prose prose-slate dark:prose-invert max-w-none 
+            <div className="prose prose-slate dark:prose-invert max-w-full w-full min-w-0 wrap-break-word
               prose-headings:font-bold prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3
               prose-p:leading-relaxed prose-p:text-muted-foreground prose-p:mb-4
               prose-strong:text-foreground prose-strong:font-semibold

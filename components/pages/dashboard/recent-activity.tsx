@@ -70,7 +70,7 @@ export function DashboardRecentActivity() {
                 <FileText className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1 space-y-1">
-                <p className="text-sm font-medium leading-none">
+                <p className="text-sm font-medium leading-tight line-clamp-1 max-w-52">
                   {pdf.title}
                 </p>
                 <p className="text-xs text-muted-foreground">

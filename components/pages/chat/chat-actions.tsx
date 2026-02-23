@@ -65,6 +65,7 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
             href={activePdf?.fileUrl || ""}
             target="_blank"
             className="w-fit flex items-center gap-2 bg-accent px-2 py-1 rounded-full shadow hover:shadow-md"
+            prefetch
           >
             <h1 className="text-sm font-medium truncate max-w-32">
               {formatChatListTitle(activePdf?.title || "")}

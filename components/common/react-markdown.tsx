@@ -60,6 +60,7 @@ export function MarkDown({ content }: { content: string | undefined }) {
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
       components={{
+        pre: ({ children }) => <>{children}</>,
         p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
         strong: ({ children }) => <span className="font-semibold text-foreground">{children}</span>,
         em: ({ children }) => <span className="italic">{children}</span>,
