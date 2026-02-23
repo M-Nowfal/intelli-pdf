@@ -121,8 +121,11 @@ export default function PDFList() {
             {pdfList.map((pdf) => (
               <Card key={pdf._id} className="group gap-2 hover:shadow-lg transition-all duration-300 border-border/60 flex flex-col">
                 <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
-                  <div className="flex-1 space-y-3 pr-4">
-                    <CardTitle className="text-base font-semibold line-clamp-1 leading-tight" title={pdf.title}>
+                  <div className="flex-1 min-w-0 space-y-3 pr-4">
+                    <CardTitle
+                      className="text-base font-semibold line-clamp-1 leading-tight"
+                      title={pdf.title}
+                    >
                       {pdf.title}
                     </CardTitle>
                     <div className="text-xs text-muted-foreground flex items-center gap-2">
@@ -132,6 +135,7 @@ export default function PDFList() {
                       </span>
                     </div>
                   </div>
+
                   <div className="bg-primary/10 p-2.5 rounded-xl text-primary shrink-0">
                     <FileText className="h-5 w-5" />
                   </div>
@@ -158,7 +162,7 @@ export default function PDFList() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="top" align="center" className="w-48 mb-2">
                       <DropdownMenuLabel>Study Modes</DropdownMenuLabel>
-                      
+
                       <DropdownMenuItem asChild>
                         <Link href={`/chat/${pdf._id}`} className="cursor-pointer flex items-center gap-2" prefetch>
                           <MessageSquare className="h-4 w-4 text-blue-500" />

@@ -70,18 +70,24 @@ export function SelectPDF() {
             className="gap-2 group relative flex flex-col overflow-hidden border-muted-foreground/20 transition-all duration-300 hover:shadow-lg hover:border-primary/20 cursor-pointer bg-card hover:bg-accent/30 active:scale-95"
           >
             <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
-              <div className="flex-1 space-y-2 pr-4">
-                <CardTitle className="text-base font-semibold line-clamp-1 leading-tight group-hover:text-primary transition-colors" title={pdf.title}>
+              <div className="flex-1 min-w-0 space-y-3 pr-4">
+
+                <CardTitle
+                  className="text-base font-semibold line-clamp-1 leading-tight"
+                  title={pdf.title}
+                >
                   {pdf.title}
                 </CardTitle>
+
                 <div className="text-xs text-muted-foreground flex items-center gap-2">
-                  <span className="flex items-center gap-1.5 bg-muted/50 px-2 py-1 rounded-md">
+                  <span className="flex items-center gap-1.5 bg-muted/50 px-2 py-0.5 rounded-md">
                     <Calendar className="h-3 w-3" />
                     {formatDistanceToNow(new Date(pdf.createdAt), { addSuffix: true })}
                   </span>
                 </div>
               </div>
-              <div className="bg-primary/10 p-2.5 rounded-xl text-primary shrink-0 group-hover:bg-primary group-hover:text-background transition-colors duration-300">
+
+              <div className="bg-primary/10 p-2.5 rounded-xl text-primary shrink-0">
                 <FileText className="h-5 w-5" />
               </div>
             </CardHeader>
