@@ -66,10 +66,10 @@ export function QuizList() {
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0 space-y-1">
                     <CardTitle
-                      className="line-clamp-1 text-lg leading-tight max-w-80"
+                      className="line-clamp-1 text-lg leading-tight"
                       title={typeof quiz.pdfId === 'object' ? quiz.pdfId.title : 'Unknown Document'}
                     >
-                      {typeof quiz.pdfId === 'object' ? quiz.pdfId.title : 'Unknown Document'}
+                      {typeof quiz.pdfId === 'object' ? quiz.pdfId.title.replaceAll("_", " ") : 'Unknown Document'}
                     </CardTitle>
                     <span className="text-xs text-muted-foreground flex items-center gap-1">
                       <BookOpen className="w-3 h-3 shrink-0" />

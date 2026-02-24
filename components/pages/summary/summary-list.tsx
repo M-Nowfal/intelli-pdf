@@ -136,8 +136,8 @@ function SummaryCard({ item }: { item: { id: string, title: string } }) {
           </Badge>
         </div>
         <div className="space-y-1">
-          <CardTitle className="line-clamp-1 max-w-60 text-lg font-bold leading-tight group-hover:text-primary transition-colors">
-            {item.title || "Untitled Document"}
+          <CardTitle className="line-clamp-1 text-lg font-bold leading-tight group-hover:text-primary transition-colors">
+            {item.title.replaceAll("_", " ") || "Untitled Document"}
           </CardTitle>
           <CardDescription className="flex items-center gap-2 text-xs font-mono pt-1">
             <span>ID:</span>

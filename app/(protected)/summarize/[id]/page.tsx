@@ -209,7 +209,7 @@ export default function SummarizePage() {
             </div>
             <span className="font-semibold tracking-wide uppercase text-sm">AI Generated Analysis</span>
           </div>
-          <CardTitle className="text-2xl sm:text-3xl font-semibold line-clamp-1">{summary?.title}</CardTitle>
+          <CardTitle className="text-2xl sm:text-3xl font-semibold">{summary?.title.replaceAll("_", " ")}</CardTitle>
 
           {summary?.content && <CardDescription className="flex items-center justify-end gap-1 md:gap-2">
             {(isSpeaking || isPaused) && !mobile && (
@@ -296,6 +296,7 @@ export default function SummarizePage() {
                 <Skeleton className="h-4 w-full bg-primary/10" />
                 <Skeleton className="h-4 w-5/6 bg-primary/10" />
               </div>
+              <Skeleton className="bg-primary/10 h-32 w-full rounded-md animate-pulse" />
               <Skeleton className="bg-primary/10 h-32 w-full rounded-md animate-pulse" />
             </div>
           ) : (

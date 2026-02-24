@@ -101,7 +101,7 @@ function FlashcardDeckItem({
   item: any;
   onDelete: () => void;
 }) {
-  const pdfTitle = item.pdfId?.title || "Untitled Document";
+  const pdfTitle = item.pdfId?.title.replaceAll("_", " ") || "Untitled Document";
   const cardCount = item.cards?.length || 0;
 
   return (
@@ -144,7 +144,7 @@ function FlashcardDeckItem({
         </div>
 
         <div className="space-y-1">
-          <CardTitle className="line-clamp-1 max-w-60 text-lg font-bold leading-tight group-hover:text-primary transition-colors pr-6">
+          <CardTitle className="line-clamp-1 text-lg font-bold leading-tight group-hover:text-primary transition-colors pr-6">
             {pdfTitle}
           </CardTitle>
           <CardDescription className="flex items-center gap-2 text-xs font-mono pt-1">
