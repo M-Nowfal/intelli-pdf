@@ -1,6 +1,7 @@
 import { otpMailTemplate } from "@/utils/template";
 import { transporter } from "./mailer";
 import { redis } from "./redis";
+import { SMTP_USER } from "@/utils/constants";
 
 export const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -17,7 +18,7 @@ export const checkDailyLimit = async (email: string): Promise<boolean> => {
 
 export const sendOTP = async (email: string, otp: string) => {
   await transporter.sendMail({
-    from: `"Intelli-PDF" <${process.env.SMTP_USER}>`,
+    from: `"Intelli-PDF" <${SMTP_USER}>`,
     to: email,
     subject: "Your Verification Code | Intelli-PDF",
     html: otpMailTemplate(otp),

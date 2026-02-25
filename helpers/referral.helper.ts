@@ -1,5 +1,5 @@
 import { transporter } from "@/lib/mailer";
-import { APP_URL } from "@/utils/constants";
+import { APP_URL, SMTP_USER } from "@/utils/constants";
 import { creditAwardMailTemplate } from "@/utils/template";
 import crypto from "crypto";
 
@@ -10,7 +10,7 @@ export function generateReferralCode() {
 export async function sendCreditAwardedMail(email: string, name: string) {
   try {
     await transporter.sendMail({
-      from: `"Intelli-PDF" <${process.env.SMTP_USER}>`,
+      from: `"Intelli-PDF" <${SMTP_USER}>`,
       to: email,
       subject: "You earned 500 Free Credits! 🎉",
       html: creditAwardMailTemplate(name),

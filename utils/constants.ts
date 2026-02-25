@@ -18,6 +18,9 @@ const SMTP_PORT: string = process.env.SMTP_PORT!;
 const SMTP_USER: string = process.env.SMTP_USER!;
 const SMTP_PASS: string = process.env.SMTP_PASS!;
 
+const REDIS_URL: string = process.env.UPSTASH_REDIS_REST_URL!;
+const REDIS_TOKEN: string = process.env.UPSTASH_REDIS_REST_TOKEN!;
+
 const NODE_ENV: "production" | "development" | "test" = process.env.NODE_ENV!;
 
 const GOOGLE_API_KEY: string = process.env.GOOGLE_API_KEY!;
@@ -37,6 +40,7 @@ export {
   NEXTAUTH_SECRET,
   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET,
   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS,
+  REDIS_URL, REDIS_TOKEN,
   NODE_ENV,
   GOOGLE_API_KEY, GEMINI_MODEL,
   COST,
