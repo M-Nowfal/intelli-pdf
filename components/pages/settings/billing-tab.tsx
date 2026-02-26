@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useDashboardStore } from "@/store/useDashboardStore";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
@@ -14,10 +13,10 @@ import { differenceInCalendarDays } from "date-fns";
 import { Loader } from "@/components/ui/loader";
 import { APP_URL } from "@/utils/constants";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 export function BillingTab() {
   const { stats, isLoading, fetchStats, refetchStats } = useDashboardStore();
-  const router = useRouter();
   const [isCopied, setIsCopied] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
 
@@ -27,7 +26,7 @@ export function BillingTab() {
 
   const handleShare = async () => {
     let shareUrl = APP_URL;
-    
+
     try {
       const res = await api.get("/user/credits/referral");
       if (res.status === 200) {
@@ -102,7 +101,7 @@ export function BillingTab() {
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium">Monthly Credits</span>
             <span className={cn(
-              "font-medium", 
+              "font-medium",
               isOverLimit ? "text-amber-600 dark:text-amber-500" : "text-muted-foreground"
             )}>
               {(isClaiming || isLoading) ? <Loader size={12} /> : currentCredits} / {maxCredits}
@@ -110,11 +109,11 @@ export function BillingTab() {
             </span>
           </div>
           <Progress
-            value={progressPercentage} 
+            value={progressPercentage}
             className={cn(
               "h-2",
               isOverLimit && "[&>div]:bg-amber-500"
-            )} 
+            )}
           />
         </div>
 
@@ -188,7 +187,11 @@ export function BillingTab() {
       </CardContent>
       <CardFooter className="flex justify-between border-t px-6 py-4 bg-muted/20">
         <p className="text-sm text-muted-foreground">Need more power?</p>
-        <Button variant="default" onClick={() => router.push("/upgrade")}>Upgrade to Pro</Button>
+        <Link href="/upgrade" prefetch>
+          <Button variant="default">
+            Upgrade to Pro
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   );

@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export function AuthHeader() {
   return (
-    <header className="absolute w-full z-10 top-0 flex items-center justify-between p-2 backdrop-blur-md bg-linear-to-t from-background to-gray-200 dark:to-neutral-900">
+    <header className="sticky top-0 z-20 flex items-center justify-between w-full p-2 bg-linear-to-t from-background/80 via-gray-100/90 dark:via-neutral-900/90 to-gray-200 dark:to-neutral-800">
       <div className="flex items-center gap-3">
         <Link href="/" replace className="bg-card dark:bg-black shadow p-1.5 rounded-full border">
           <ArrowLeft />
