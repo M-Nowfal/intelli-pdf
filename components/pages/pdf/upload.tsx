@@ -36,6 +36,7 @@ import type { OurFileRouter } from "@/app/api/uploadthing/core";
 import api from "@/lib/axios";
 import { usePdfStore } from "@/store/usePdfStore";
 import { useDashboardStore } from "@/store/useDashboardStore";
+import { playSuccessSound } from "@/utils/sound";
 
 const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 
@@ -95,6 +96,7 @@ export function PDFUpload() {
           throw new Error("Failed to process file on server");
         }
 
+        playSuccessSound();
         setUploadProgress(100);
         addPdf(res.data.newPDF);
         setSuccess(true);

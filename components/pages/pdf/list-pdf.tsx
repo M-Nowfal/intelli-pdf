@@ -126,7 +126,7 @@ export default function PDFList() {
                       className="text-base font-semibold line-clamp-1 leading-tight"
                       title={pdf.title}
                     >
-                      {pdf.title}
+                      {pdf.title.replaceAll("_", " ")}
                     </CardTitle>
                     <div className="text-xs text-muted-foreground flex items-center gap-2">
                       <span className="flex items-center gap-1.5 bg-muted/50 px-2 py-0.5 rounded-md">

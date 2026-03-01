@@ -16,6 +16,7 @@ import { useDashboardStore } from "@/store/useDashboardStore";
 import { cleanMarkdown, copy } from "@/helpers/chat.helper";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { playSuccessSound } from "@/utils/sound";
 
 export default function SummarizePage() {
   const params = useParams();
@@ -46,9 +47,12 @@ export default function SummarizePage() {
   useEffect(() => {
     if (id) {
       fetchSummary(id);
-      if (source === "generated") decrementCredits(20);
+      if (source === "generated") {
+        playSuccessSound();
+        decrementCredits(20);
+      }
     }
-  }, [id, fetchSummary]);
+  }, [id, summary]);
 
   useEffect(() => {
     const loadVoices = () => {

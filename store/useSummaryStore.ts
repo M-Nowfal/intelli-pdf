@@ -22,6 +22,8 @@ export const useSummaryStore = create<SummaryState>((set, get) => ({
   source: null,
 
   fetchSummary: async (pdfId: string) => {
+    if (get().summary) return;
+    
     set({ isSummaryLoading: true, summaryError: null, summary: null });
 
     try {

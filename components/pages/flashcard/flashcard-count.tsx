@@ -16,6 +16,7 @@ import { useState } from "react";
 import { useFlashCardStore } from "@/store/useFlashCardStore";
 import { toast } from "sonner";
 import { useDashboardStore } from "@/store/useDashboardStore";
+import { playSuccessSound } from "@/utils/sound";
 
 interface FlashCardCountProps {
   pdfId: string;
@@ -35,6 +36,7 @@ export function FlashCardCount({ pdfId, isDialogOpen, setIsDialogOpen }: FlashCa
       return;
     }
     if (await generateFlashCards(pdfId, numCardsToGenerate)) {
+      playSuccessSound();
       decrementCredits(20);
     }
   };

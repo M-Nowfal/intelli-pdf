@@ -297,15 +297,15 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
                   )}
                 >
                   {!isUser && (
-                    <Avatar className="h-8 w-8 border shrink-0 mt-1">
+                    <Avatar className="hidden md:block h-8 w-8 border shrink-0 mt-1">
                       <AvatarImage src={BOT} />
                       <AvatarFallback className="bg-primary/10 text-primary">AI</AvatarFallback>
                     </Avatar>
                   )}
 
                   <div className={cn(
-                    "flex flex-col gap-1 max-w-[85%] sm:max-w-[80%]",
-                    isUser ? "items-end" : "items-start"
+                    "flex flex-col gap-1",
+                    isUser ? "items-end max-w-[85%] sm:max-w-[80%]" : "items-start max-w-full md:max-w-[90%]"
                   )}>
 
                     <div

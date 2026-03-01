@@ -19,6 +19,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { playSuccessSound } from "@/utils/sound";
 
 interface QuizSetupProps {
   pdfId: string;
@@ -41,6 +42,7 @@ export function QuizSetup({ pdfId, isOpen, setIsOpen, onQuizReady }: QuizSetupPr
     const quizId = await generateQuiz(pdfId, amount);
 
     if (quizId) {
+      playSuccessSound();
       toast.success("Quiz generated successfully!");
       decrementCredits(20);
       setIsOpen(false);
