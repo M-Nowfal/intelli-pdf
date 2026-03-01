@@ -37,7 +37,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
       set({ isLoading: false });
     }
   },
-  decrementCredits: (amount = 20) => set((state) => ({
+  decrementCredits: (amount) => set((state) => ({
     stats: state.stats ? {
       ...state.stats,
       aiCredits: Math.max(0, state.stats.aiCredits - amount)

@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    if (user.stats.aiCredits < COST - 10) {
+    if (user.stats.aiCredits < COST) {
       return NextResponse.json(
         { message: "Insufficient credits. Please upgrade your plan." },
         { status: 402 }
