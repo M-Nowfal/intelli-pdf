@@ -17,6 +17,7 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import { cleanMarkdown, copy } from "@/helpers/chat.helper";
 import { SourceBadge } from "./source-badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { AxiosError } from "axios";
 
 interface ChatInterfaceProps {
   pdfId: string;
@@ -160,8 +161,9 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
       }
 
       decrementCredits(20);
-    } catch (err) {
-      toast.error("Error generating response");
+    } catch (err: unknown) {
+      if (err instanceof AxiosError && err.response?.status !== 402)
+        toast.error("Error generating response");
     } finally {
       setStreaming(false);
     }

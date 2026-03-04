@@ -123,11 +123,11 @@ export function GeneralTab() {
               <Button
                 variant="secondary"
                 size="sm"
-                className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                className="gap-2 text-red-600 hover:text-red-700 not-sm:bg-red-900/10 hover:bg-red-50 dark:hover:bg-red-900/20"
                 disabled={isUploading || isLoading}
               >
                 <LogOut className="text-red-500" />
-                <span className="text-red-500">Log out</span>
+                <span className="text-red-500 not-sm:hidden">Log out</span>
               </Button>
             }
             title="Log out of your account?"
@@ -145,7 +145,7 @@ export function GeneralTab() {
                 JPG, PNG or GIF. Max size of 3MB.
               </p>
 
-              <input
+              <Input
                 type="file"
                 ref={fileInputRef}
                 className="hidden"

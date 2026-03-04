@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import api from "@/lib/axios";
 import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 export interface Question {
   _id?: string;
@@ -105,7 +106,8 @@ export const useQuizStore = create<QuizState>((set, get) => ({
 
       return res.data._id;
     } catch (err: unknown) {
-      toast.error("Failed to generate quiz");
+      if (err instanceof AxiosError && err.response?.status !== 402)
+        toast.error("Failed to generate quiz");
       return null;
     } finally {
       set({ isLoading: false });

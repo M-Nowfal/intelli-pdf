@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { IFlashcard, IFlashcardItem } from "@/types/flashcard";
 import { toast } from "sonner";
 import api from "@/lib/axios";
+import { AxiosError } from "axios";
 
 interface FlashCardStore {
   flashCards: IFlashcardItem[];
@@ -58,7 +59,8 @@ export const useFlashCardStore = create<FlashCardStore>((set, get) => ({
       isSuccess = true;
     } catch (err: unknown) {
       console.error(err);
-      toast.error("Failed to generate flashcards");
+      if (err instanceof AxiosError && err.response?.status !== 402)
+        toast.error("Failed to generate flashcards");
     } finally {
       set({ isGenerating: false });
     }
