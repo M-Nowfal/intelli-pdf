@@ -13,6 +13,10 @@ const ChatSchema = new Schema<IChat>(
       ref: "PDF",
       required: true
     },
+    isPinned: {
+      type: Boolean,
+      default: false
+    },
     messages: [
       {
         role: {

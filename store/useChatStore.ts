@@ -1,20 +1,8 @@
 import { create } from "zustand";
 import api from "@/lib/axios";
-
-export interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  sources?: number[];
-}
-
-interface ChatItem {
-  _id: string;
-  pdfId: {
-    _id: string;
-    title: string;
-  };
-}
+import { toast } from "sonner";
+import { ChatItem, Message } from "@/types/chat";
+import { sortChatList } from "@/helpers/chat.helper";
 
 interface ChatState {
   chatList: ChatItem[];
@@ -22,13 +10,18 @@ interface ChatState {
   chatId: string;
 
   isLoading: boolean;
+  isPinLoading: boolean;
   isMessagesLoading: boolean;
   isStreaming: boolean;
+  isPinned: boolean;
   isStrict: boolean;
 
   setMessages: (messages: Message[]) => void;
   setStreaming: (status: boolean) => void;
   setChatId: (id: string) => void;
+
+  togglePin: () => void;
+  setPinnedChat: (val: boolean) => void;
 
   setIsStrict: (isStrict: boolean) => void;
 
@@ -50,13 +43,36 @@ export const useChatStore = create<ChatState>((set, get) => ({
   messages: [],
   chatId: "",
   isLoading: false,
+  isPinLoading: false,
   isMessagesLoading: false,
   isStreaming: false,
+  isPinned: false,
   isStrict: true,
 
   setMessages: (messages) => set({ messages }),
   setStreaming: (status) => set({ isStreaming: status }),
   setChatId: (id) => set({ chatId: id }),
+
+  togglePin: async () => {
+    try {
+      set({ isPinLoading: true });
+      const { chatId, isPinned, chatList } = get();
+      const res = await api.patch("/chat/action", { chatId });
+      if (res.data.success) {
+        set({
+          isPinned: !isPinned,
+          chatList: sortChatList(chatList.map(list => list._id === chatId ? { ...list, isPinned: !isPinned } : list))
+        });
+        toast.success(`Chat ${isPinned ? "unpinned" : "pinned"}.`);
+      }
+    } catch (err: unknown) {
+      toast.warning("Failed to pin chat");
+      console.error(err);
+    } finally {
+      set({ isPinLoading: false });
+    }
+  },
+  setPinnedChat: (pin) => set({ isPinned: pin }),
 
   setIsStrict: (isStrict) => set({ isStrict }),
 
@@ -64,7 +80,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set({ isLoading: true });
     try {
       const res = await api.get("/chat/list");
-      set({ chatList: res.data });
+      set({ chatList: sortChatList(res.data as ChatItem[]) });
     } catch (err: unknown) {
       console.error("Failed to fetch chats", err);
     } finally {
@@ -104,7 +120,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     const exists = state.chatList.some((c) => c._id === chat._id);
     if (exists) return state;
 
-    return { chatList: [chat, ...state.chatList] };
+    return { chatList: sortChatList([chat, ...state.chatList]) };
   }),
 
   clearChat: async (chatId) => {

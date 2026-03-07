@@ -12,7 +12,25 @@ export interface IChat {
   _id: string | Types.ObjectId;
   userId: string | Types.ObjectId;
   pdfId: string | Types.ObjectId;
+  isPinned: boolean;
   messages: IChatMessage[];
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface Message {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  sources?: number[];
+}
+
+export interface ChatItem {
+  _id: string;
+  isPinned: boolean;
+  updatedAt: Date;
+  pdfId: {
+    _id: string;
+    title: string;
+  };
 }

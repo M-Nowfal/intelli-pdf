@@ -16,7 +16,8 @@ import {
   LucideIcon,
   ListChecks,
   ScrollText,
-  Palette
+  Palette,
+  Pin
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent,
@@ -47,6 +48,7 @@ type SubMenuItem = {
   title: string;
   url: string;
   icon?: LucideIcon;
+  isPinned?: boolean;
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -79,7 +81,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       title: "AI Chat", url: "/chat", icon: Sparkles, items: [
         { title: "New Chat", url: "/chat", icon: MessageCircleDashed },
         ...chatList.map(list => (
-          { title: formatChatListTitle(list.pdfId.title), url: `/chat/${list.pdfId._id}` }
+          {
+            title: formatChatListTitle(list.pdfId.title),
+            url: `/chat/${list.pdfId._id}`,
+            isPinned: list.isPinned
+          }
         ))
       ]
     },
@@ -153,6 +159,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 >
                                   <div className="flex items-center gap-2">
                                     {subItem.icon && <subItem.icon className="h-4 w-4" />}
+                                    {subItem.isPinned && <Pin className="h-4 w-4 text-muted-foreground" fill="currentColor" />}
                                     <span className="line-clamp-1 max-w-38">{subItem.title}</span>
                                   </div>
                                   {isActive(subItem.url) && <div className="w-2 h-2 bg-accent-foreground rounded-full" />}

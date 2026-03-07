@@ -1,3 +1,4 @@
+import { ChatItem } from "@/types/chat";
 import { toast } from "sonner";
 
 export function copy(text: string): void {
@@ -21,4 +22,15 @@ export function cleanMarkdown(text: string): string {
     .replace(/\n{3,}/g, "\n\n")
     .replace(/[ \t]+/g, " ")
     .trim();
+}
+
+export function sortChatList(chatList: ChatItem[]): ChatItem[] {
+  const sortedList = chatList.sort((a, b) => {
+    return (
+      (Number(b.isPinned) - Number(a.isPinned)) ||
+      (new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    );
+  });
+  
+  return sortedList;
 }

@@ -5,7 +5,7 @@ import {
   DropdownMenu, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { EllipsisVertical, Eraser, ExternalLink, MessageCircleDashedIcon, Pin, Trash2, Upload } from "lucide-react";
+import { EllipsisVertical, Eraser, ExternalLink, MessageCircleDashedIcon, Pin, PinOff, Trash2, Upload } from "lucide-react";
 import { useChatStore } from "@/store/useChatStore";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -26,7 +26,11 @@ interface ChatActionProps {
 }
 
 export function ChatActionMenu({ activePdf }: ChatActionProps) {
-  const { clearChat, deleteChat, chatId, isStrict, setIsStrict } = useChatStore();
+  const {
+    clearChat, deleteChat, chatId,
+    isStrict, setIsStrict, isPinned,
+    togglePin, isPinLoading
+  } = useChatStore();
   const router = useRouter();
 
   const handleClear = async () => {
@@ -68,7 +72,7 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
             prefetch
           >
             <h1 className="text-sm font-medium truncate max-w-32">
-              {formatChatListTitle(activePdf?.title || "")}
+              {formatChatListTitle(activePdf?.title.replaceAll("_", " ") || "")}
             </h1>
             <ExternalLink size={15} />
           </Link>
@@ -79,9 +83,23 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="cursor-pointer p-2" disabled>
-          <Pin className="mr-2 h-4 w-4" />
-          Pin
+        <DropdownMenuItem
+          className="cursor-pointer p-2"
+          onSelect={(e) => e.preventDefault()}
+          onClick={togglePin}
+          disabled={isPinLoading}
+        >
+          {isPinned ? (
+            <>
+              <PinOff className="mr-2 h-4 w-4" />
+              Unpin
+            </>
+          ) : (
+            <>
+              <Pin className="mr-2 h-4 w-4" />
+              Pin
+            </>
+          )}
         </DropdownMenuItem>
 
         <DropdownMenuItem className="cursor-pointer p-2" onClick={() => router.push("/chat")}>

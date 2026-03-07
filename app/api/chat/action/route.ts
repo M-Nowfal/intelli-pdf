@@ -70,3 +70,29 @@ export async function DELETE(req: NextRequest) {
     );
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const { chatId } = await req.json();
+
+    if (!chatId) {
+      return NextResponse.json({ message: "ChatId is required" }, { status: 400 });
+    }
+
+    const chat = await Chat.findById(chatId);
+    if (!chat) {
+      return NextResponse.json({ message: "No Chat found" }, { status: 404 });
+    }
+
+    chat.isPinned = !chat.isPinned;
+    await chat.save();
+
+    return NextResponse.json({ success: true });
+  } catch (err: unknown) {
+    console.error("Chat Action API Error:", err);
+    return NextResponse.json(
+      { message: "Internal Server Error", error: err instanceof Error ? err.message : "Unknown error" },
+      { status: 500 }
+    );
+  }
+}

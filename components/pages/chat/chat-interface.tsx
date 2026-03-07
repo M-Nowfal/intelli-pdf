@@ -10,7 +10,7 @@ import { BOT } from "@/utils/constants";
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
 import api from "@/lib/axios";
-import { useChatStore, Message } from "@/store/useChatStore";
+import { useChatStore } from "@/store/useChatStore";
 import { MarkDown } from "@/components/common/react-markdown";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
@@ -18,6 +18,7 @@ import { cleanMarkdown, copy } from "@/helpers/chat.helper";
 import { SourceBadge } from "./source-badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { AxiosError } from "axios";
+import { Message } from "@/types/chat";
 
 interface ChatInterfaceProps {
   pdfId: string;
@@ -26,17 +27,10 @@ interface ChatInterfaceProps {
 
 export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
   const {
-    messages,
-    isMessagesLoading,
-    fetchMessages,
-    addMessage,
-    updateMessageContent,
-    setStreaming,
-    isStreaming,
-    addChat,
-    fetchChatList,
-    setChatId,
-    isStrict
+    messages, isMessagesLoading, fetchMessages,
+    addMessage, updateMessageContent, setStreaming,
+    isStreaming, addChat, fetchChatList,
+    setChatId, isStrict, setPinnedChat, chatList
   } = useChatStore();
   const { decrementCredits } = useDashboardStore();
   const { mobileNav, isKeyboardActive, setIsKeyboardActive, isMobile } = useSettingsStore();
@@ -56,6 +50,8 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
   useEffect(() => {
     if (pdfId) {
       fetchMessages(pdfId);
+      let pin = chatList.some(list => list.isPinned && list.pdfId._id === pdfId);
+      setPinnedChat(pin);
     }
   }, [pdfId, fetchMessages]);
 
@@ -130,7 +126,9 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
         if (newChatId) {
           addChat({
             _id: newChatId,
-            pdfId: { _id: pdfId, title }
+            pdfId: { _id: pdfId, title },
+            isPinned: false,
+            updatedAt: new Date()
           });
           setChatId(newChatId);
         } else {
