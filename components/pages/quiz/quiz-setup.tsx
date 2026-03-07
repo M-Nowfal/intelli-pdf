@@ -42,7 +42,7 @@ export function QuizSetup({ pdfId, isOpen, setIsOpen, onQuizReady }: QuizSetupPr
     const quizId = await generateQuiz(pdfId, amount);
 
     if (quizId) {
-      playSuccessSound();
+      playSuccessSound(2);
       toast.success("Quiz generated successfully!");
       decrementCredits(20);
       setIsOpen(false);

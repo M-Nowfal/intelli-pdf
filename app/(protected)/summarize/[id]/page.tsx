@@ -48,7 +48,7 @@ export default function SummarizePage() {
     if (id) {
       fetchSummary(id);
       if (source === "generated") {
-        playSuccessSound();
+        playSuccessSound(2);
         decrementCredits(20);
       }
     }

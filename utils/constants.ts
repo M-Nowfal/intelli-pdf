@@ -8,7 +8,10 @@ const APP_NAME: "Intelli-PDF" = "Intelli-PDF";
 
 const BOT: string = "/bot.png";
 
-const SUCCESS_SOUND: string = "/sounds/success.mp3";
+const SOUND = {
+  success1: "/sounds/success1.mp3",
+  success2: "/sounds/success2.mp3"
+};
 
 const NEXTAUTH_SECRET: string = process.env.NEXTAUTH_SECRET!;
 
@@ -39,7 +42,7 @@ export {
   DB_URI, DB_NAME,
   ICON, APP_NAME,
   BOT,
-  SUCCESS_SOUND,
+  SOUND,
   NEXTAUTH_SECRET,
   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET,
   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS,

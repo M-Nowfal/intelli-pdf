@@ -36,7 +36,7 @@ export function FlashCardCount({ pdfId, isDialogOpen, setIsDialogOpen }: FlashCa
       return;
     }
     if (await generateFlashCards(pdfId, numCardsToGenerate)) {
-      playSuccessSound();
+      playSuccessSound(2);
       decrementCredits(20);
     }
   };
