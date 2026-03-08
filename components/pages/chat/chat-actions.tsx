@@ -5,7 +5,7 @@ import {
   DropdownMenu, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { EllipsisVertical, Eraser, ExternalLink, MessageCircleDashedIcon, Pin, PinOff, Trash2, Upload } from "lucide-react";
+import { EllipsisVertical, Eraser, ExternalLink, MessageCircleDashedIcon, Pin, PinOff, Share2, Trash2 } from "lucide-react";
 import { useChatStore } from "@/store/useChatStore";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -108,8 +108,8 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
         </DropdownMenuItem>
 
         <DropdownMenuItem className="cursor-pointer p-2" disabled>
-          <Upload className="mr-2 h-4 w-4" />
-          Export Chat
+          <Share2 className="mr-2 h-4 w-4" />
+          Share
         </DropdownMenuItem>
 
         <Alert
