@@ -101,7 +101,7 @@ export function LoginForm({
       }
 
       toast.success("Logged in successfully");
-      router.push("/dashboard");
+      window.location.assign("/dashboard");
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
     } finally {
