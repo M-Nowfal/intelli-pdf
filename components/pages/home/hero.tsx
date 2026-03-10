@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -6,7 +9,8 @@ import {
   FileText,
   Layers,
   Sparkles,
-  Zap
+  Zap,
+  Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +19,44 @@ import { usePathname } from "next/navigation";
 
 export function Hero() {
   const pathname = usePathname();
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+    window.addEventListener("appinstalled", () => {
+      setIsInstallable(false);
+      setDeferredPrompt(null);
+    });
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+
+    deferredPrompt.prompt();
+
+    const { outcome } = await deferredPrompt.userChoice;
+
+    if (outcome === 'accepted') {
+      console.log('User accepted the install prompt');
+      setIsInstallable(false);
+    } else {
+      console.log('User dismissed the install prompt');
+    }
+
+    setDeferredPrompt(null);
+  };
 
   return (
     <section className={`${pathname === "/" ? "pt-10" : ""} relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-background`}>
@@ -76,15 +118,27 @@ export function Hero() {
             generate summaries, flashcards, and quizzes instantly.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-6">
+          <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 w-full sm:w-auto mt-6">
             <Button size="lg" className="h-14 px-10 text-lg gap-2 shadow-lg shadow-primary/20" asChild>
               <Link href="/dashboard" prefetch>
                 Try for Free <ArrowRight className="h-5 w-5" />
               </Link>
             </Button>
+
             <Button variant="outline" size="lg" className="h-14 px-10 text-lg backdrop-blur-sm bg-background/50" asChild>
               <Link href="#features">Learn More</Link>
             </Button>
+
+            {isInstallable && (
+              <Button
+                size="lg"
+                className="h-14 px-10 text-lg gap-2 text-white border-0 transition-all duration-500 bg-linear-to-r from-neutral-500 via-orange-500 to-neutral-800 dark:from-neutral-900 dark:via-orange-600 dark:to-neutral-900 bg-size-[200%_auto] hover:bg-position-[right_center]"
+                onClick={handleInstallClick}
+              >
+                <Download className="h-5 w-5" />
+                Install App
+              </Button>
+            )}
           </div>
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-sm font-medium text-muted-foreground">
