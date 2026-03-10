@@ -12,7 +12,7 @@ export async function sendCreditAwardedMail(email: string, name: string) {
     await transporter.sendMail({
       from: `"Intelli-PDF" <${SMTP_USER}>`,
       to: email,
-      subject: "You earned 500 Free Credits! 🎉",
+      subject: "You earned 250 Free Credits! 🎉",
       html: creditAwardMailTemplate(name),
       text: `High five, ${name}! ✋\n\n` +
         `Your friend just joined Intelli-PDF using your link.\n\n` +
