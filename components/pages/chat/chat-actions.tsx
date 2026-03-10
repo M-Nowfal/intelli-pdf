@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { 
   EllipsisVertical, Eraser, ExternalLink, MessageCircleDashedIcon, 
-  Pin, PinOff, Share2, Trash2, Copy, Check, Share, Loader2 
+  Pin, PinOff, Share2, Trash2, Copy, Check, Share, 
 } from "lucide-react";
 import { useChatStore } from "@/store/useChatStore";
 import { useRouter } from "next/navigation";
