@@ -181,7 +181,8 @@ export default function SharedChatPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen max-w-5xl mx-auto overflow-hidden bg-background">
+    // CHANGED: Removed h-screen and overflow-hidden, added min-h-screen
+    <div className="flex flex-col min-h-screen max-w-5xl mx-auto bg-background">
       <div className="flex shrink-0 p-4 md:p-6 border-b bg-muted/20 items-center justify-between gap-4">
         <div className="flex flex-col min-w-0">
           <h1 className="text-xl md:text-2xl font-bold flex items-center gap-2">
@@ -199,7 +200,8 @@ export default function SharedChatPage() {
         )}
       </div>
 
-      <div className="flex-1 w-full p-4 overflow-y-auto hide-scrollbar">
+      {/* CHANGED: Removed overflow-y-auto and hide-scrollbar */}
+      <div className="flex-1 w-full p-4">
         <div className="flex flex-col space-y-10 pb-4 mt-4">
           {chat.messages.map((message: any, i: number) => {
             const isUser = message.role === "user";
@@ -245,14 +247,14 @@ export default function SharedChatPage() {
 
                   {!isUser && (
                     <div className="flex items-center gap-2 mt-1 select-none">
-                      <div className="flex items-center gap-2 transition-opacity duration-200 opacity-70 hover:opacity-100">
+                      <div className="flex items-center gap-2">
 
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-8 gap-1.5 text-muted-foreground hover:text-foreground hover:bg-muted"
+                              className="h-8 gap-1.5"
                               onClick={() => handleCopy(msgId, message.content)}
                             >
                               {isCopied ? (
@@ -304,7 +306,6 @@ export default function SharedChatPage() {
                                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                                       <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                                     </span>
-                                    <span className="text-xs">Stop</span>
                                   </>
                                 ) : (
                                   <Volume2 className="h-3.5 w-3.5" />
