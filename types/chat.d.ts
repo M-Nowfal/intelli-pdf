@@ -13,6 +13,7 @@ export interface IChat {
   userId: string | Types.ObjectId;
   pdfId: string | Types.ObjectId;
   isPinned: boolean;
+  isShared: boolean;
   messages: IChatMessage[];
   createdAt: Date;
   updatedAt: Date;

@@ -20,6 +20,7 @@ interface ChatState {
   setStreaming: (status: boolean) => void;
   setChatId: (id: string) => void;
 
+  toggleShare: (chatId: string, isShared: boolean) => Promise<string | null>;
   togglePin: () => void;
   setPinnedChat: (val: boolean) => void;
 
@@ -52,6 +53,20 @@ export const useChatStore = create<ChatState>((set, get) => ({
   setMessages: (messages) => set({ messages }),
   setStreaming: (status) => set({ isStreaming: status }),
   setChatId: (id) => set({ chatId: id }),
+
+  toggleShare: async (chatId, isShared) => {
+    try {
+      const res = await api.patch("/chat/share", { chatId, isShared });
+      if (res.data.success) {
+        return res.data.shareUrl;
+      }
+      return null;
+    } catch (err: unknown) {
+      toast.error("Failed to update share settings.");
+      console.error(err);
+      return null;
+    }
+  },
 
   togglePin: async () => {
     try {

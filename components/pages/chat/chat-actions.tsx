@@ -29,7 +29,7 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
   const {
     clearChat, deleteChat, chatId,
     isStrict, setIsStrict, isPinned,
-    togglePin, isPinLoading
+    togglePin, isPinLoading, toggleShare
   } = useChatStore();
   const router = useRouter();
 
@@ -46,6 +46,22 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
     await deleteChat(chatId, () => {
       toast.success("Chat deleted permanently.");
       router.push("/chat");
+    });
+  };
+
+  const handleShare = async () => {
+    const promise = toggleShare(chatId, true);
+
+    toast.promise(promise, {
+      loading: 'Generating share link...',
+      success: (url) => {
+        if (url) {
+          navigator.clipboard.writeText(url);
+          return "Link copied to clipboard!";
+        }
+        return "Chat shared successfully!";
+      },
+      error: 'Failed to share chat.',
     });
   };
 
@@ -107,7 +123,13 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
           New Chat
         </DropdownMenuItem>
 
-        <DropdownMenuItem className="cursor-pointer p-2" disabled>
+        <DropdownMenuItem 
+          className="cursor-pointer p-2"
+          onSelect={(e) => {
+            e.preventDefault();
+            handleShare();
+          }}
+        >
           <Share2 className="mr-2 h-4 w-4" />
           Share
         </DropdownMenuItem>
