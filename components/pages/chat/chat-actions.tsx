@@ -6,14 +6,14 @@ import {
   DropdownMenu, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { 
-  Dialog, DialogContent, DialogDescription, 
-  DialogFooter, DialogHeader, DialogTitle 
+import {
+  Dialog, DialogContent, DialogDescription,
+  DialogFooter, DialogHeader, DialogTitle
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { 
-  EllipsisVertical, Eraser, ExternalLink, MessageCircleDashedIcon, 
-  Pin, PinOff, Share2, Trash2, Copy, Check, Share, 
+import {
+  EllipsisVertical, Eraser, ExternalLink, MessageCircleDashedIcon,
+  Pin, PinOff, Share2, Trash2, Copy, Check, Share, Lock
 } from "lucide-react";
 import { useChatStore } from "@/store/useChatStore";
 import { useRouter } from "next/navigation";
@@ -37,7 +37,7 @@ interface ChatActionProps {
 
 export function ChatActionMenu({ activePdf }: ChatActionProps) {
   const {
-    clearChat, deleteChat, chatId,
+    clearChat, deleteChat, chatId, chatList,
     isStrict, setIsStrict, isPinned,
     togglePin, isPinLoading, toggleShare
   } = useChatStore();
@@ -47,6 +47,9 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
   const [shareUrl, setShareUrl] = useState("");
   const [isShareLoading, setIsShareLoading] = useState(false);
   const [hasCopied, setHasCopied] = useState(false);
+
+  const currentChat = chatList.find((c) => c._id === chatId);
+  const isShared = currentChat?.isShared || false;
 
   const handleClear = async () => {
     try {
@@ -61,6 +64,15 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
     await deleteChat(chatId, () => {
       toast.success("Chat deleted permanently.");
       router.push("/chat");
+    });
+  };
+
+  const handleStopSharing = async () => {
+    const promise = toggleShare(chatId, false);
+    toast.promise(promise, {
+      loading: 'Revoking link...',
+      success: 'Chat is no longer public.',
+      error: 'Failed to stop sharing.',
     });
   };
 
@@ -126,7 +138,7 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
             Chat Actions
           </TooltipContent>
         </Tooltip>
-        
+
         <DropdownMenuContent align="start" className="min-w-48 mt-3 me-5">
           <DropdownMenuLabel className="truncate max-w-50">
             <Link
@@ -171,13 +183,29 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
             New Chat
           </DropdownMenuItem>
 
-          <DropdownMenuItem 
-            className="cursor-pointer p-2"
-            onSelect={onShareClick}
-          >
-            <Share2 className="mr-2 h-4 w-4" />
-            Share
-          </DropdownMenuItem>
+          {isShared ? (
+            <DropdownMenuItem
+              className="cursor-pointer p-2 text-orange-500 focus:text-orange-600"
+              onSelect={(e) => {
+                e.preventDefault();
+                handleStopSharing();
+              }}
+            >
+              <Lock className="mr-2 h-4 w-4 text-orange-500/80" />
+              Stop Sharing
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem
+              className="cursor-pointer p-2"
+              onSelect={(e) => {
+                e.preventDefault();
+                onShareClick();
+              }}
+            >
+              <Share2 className="mr-2 h-4 w-4" />
+              Share
+            </DropdownMenuItem>
+          )}
 
           <Alert
             trigger={
@@ -226,7 +254,7 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
               Anyone with this link will be able to view this read-only chat session.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="flex items-center space-x-2 mt-2">
             {isShareLoading ? (
               <div className="flex items-center justify-center w-full p-4">
@@ -234,31 +262,31 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
               </div>
             ) : (
               <>
-                <Input 
-                  value={shareUrl} 
-                  readOnly 
-                  className="flex-1 bg-muted/50 focus-visible:ring-0" 
+                <Input
+                  value={shareUrl}
+                  readOnly
+                  className="flex-1 bg-muted/50 focus-visible:ring-0"
                 />
                 <Button size="icon" variant="secondary" onClick={handleCopyLink}>
-                  {hasCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                  {hasCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </>
             )}
           </div>
 
           <DialogFooter className="flex-row gap-2 mt-4">
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               variant="outline"
               onClick={() => setIsShareDialogOpen(false)}
               className="flex-1"
             >
               Cancel
             </Button>
-            <Button 
-              type="button" 
-              disabled={isShareLoading || !shareUrl} 
-              onClick={handleNativeShare} 
+            <Button
+              type="button"
+              disabled={isShareLoading || !shareUrl}
+              onClick={handleNativeShare}
               className="gap-2 flex-1"
             >
               <Share className="h-4 w-4" />

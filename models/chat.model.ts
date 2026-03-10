@@ -17,7 +17,10 @@ const ChatSchema = new Schema<IChat>(
       type: Boolean,
       default: false
     },
-    isShared: { type: Boolean, default: false },
+    isShared: { 
+      type: Boolean, 
+      default: false 
+    },
     messages: [
       {
         role: {

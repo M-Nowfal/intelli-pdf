@@ -53,6 +53,13 @@ export async function GET(req: NextRequest) {
       .populate("pdfId", "title")
       .lean();
 
+    if (!chat?.isShared) {
+      return NextResponse.json(
+        { message: "The owner has stopped sharing this chat." },
+        { status: 403 }
+      );
+    }
+
     if (!chat) {
       return NextResponse.json(
         { message: "Chat not found or is not public" },

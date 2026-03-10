@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useParams, notFound } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { MarkDown } from "@/components/common/react-markdown";
 import api from "@/lib/axios";
 import { Loader } from "@/components/ui/loader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Check, Copy, Pause, Play, RotateCcw, Volume2 } from "lucide-react";
+import { Check, Copy, Pause, Play, RotateCcw, Volume2, Lock, MessageCircleDashedIcon, RefreshCcw, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BOT } from "@/utils/constants";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -21,10 +21,12 @@ export default function SharedChatPage() {
   const params = useParams();
   const id = params?.id as string;
   const { data: session } = useSession();
+  const router = useRouter();
 
   const [chat, setChat] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const [isUnshared, setIsUnshared] = useState(false);
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
@@ -34,6 +36,30 @@ export default function SharedChatPage() {
   const currentUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const isCancelledRef = useRef<boolean>(false);
   const { isMobile } = useSettingsStore();
+
+  useEffect(() => {
+    const fetchSharedChat = async () => {
+      try {
+        const res = await api.get(`/chat/share?chatid=${id}`);
+        if (!res.data.success) {
+          setIsError(true);
+          return;
+        }
+        setChat(res.data.chat);
+      } catch (err: any) {
+        if (err.response?.status === 403) {
+          setIsUnshared(true);
+        } else {
+          console.error("Failed to fetch chat", err);
+          setIsError(true);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (id) fetchSharedChat();
+  }, [id]);
 
   useEffect(() => {
     const fetchSharedChat = async () => {
@@ -176,8 +202,47 @@ export default function SharedChatPage() {
     );
   }
 
-  if (isError || !chat) {
-    return notFound();
+  if (isUnshared) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[85vh] p-4 text-center bg-background">
+        <div className="p-4 bg-muted/50 rounded-full mb-6">
+          <Lock className="w-12 h-12 text-muted-foreground" />
+        </div>
+        <h1 className="text-2xl md:text-3xl font-bold mb-3">Link Revoked</h1>
+        <p className="text-muted-foreground mb-8 max-w-sm">
+          The owner of this document has stopped sharing this chat session. It is no longer publicly accessible.
+        </p>
+        <Button asChild className="rounded-full">
+          <Link href="/" prefetch>Try Intelli-PDF for Free</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  if (!isError || !chat) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[85vh] p-4 text-center bg-background">
+        <div className="p-4 bg-red-500/10 rounded-full mb-6">
+          <MessageCircleDashedIcon className="w-12 h-12 text-red-500" />
+        </div>
+        <h1 className="text-2xl md:text-3xl font-bold mb-3">Chat Not Found</h1>
+        <p className="text-muted-foreground mb-8 max-w-sm">
+          We couldn't load this chat session. The link might be broken, or the chat may have been permanently deleted.
+        </p>
+        <div className="flex gap-5 items-center">
+          <Button asChild className="rounded-full">
+            <Link href="/" prefetch>
+              <ArrowLeft />
+              Back
+            </Link>
+          </Button>
+          <Button className="rounded-full" onClick={() => router.refresh()}>
+            <RefreshCcw />
+            Refresh
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -29,6 +29,7 @@ export interface Message {
 export interface ChatItem {
   _id: string;
   isPinned: boolean;
+  isShared?: boolean;
   updatedAt: Date;
   pdfId: {
     _id: string;

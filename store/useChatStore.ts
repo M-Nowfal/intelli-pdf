@@ -58,6 +58,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
     try {
       const res = await api.patch("/chat/share", { chatId, isShared });
       if (res.data.success) {
+        set((state) => ({
+          chatList: state.chatList.map((chat) =>
+            chat._id === chatId ? { ...chat, isShared } : chat
+          )
+        }));
         return res.data.shareUrl;
       }
       return null;
