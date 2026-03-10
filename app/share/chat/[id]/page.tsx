@@ -181,7 +181,6 @@ export default function SharedChatPage() {
   }
 
   return (
-    // CHANGED: Removed h-screen and overflow-hidden, added min-h-screen
     <div className="flex flex-col min-h-screen max-w-5xl mx-auto bg-background">
       <div className="flex shrink-0 p-4 md:p-6 border-b bg-muted/20 items-center justify-between gap-4">
         <div className="flex flex-col min-w-0">
@@ -200,7 +199,6 @@ export default function SharedChatPage() {
         )}
       </div>
 
-      {/* CHANGED: Removed overflow-y-auto and hide-scrollbar */}
       <div className="flex-1 w-full p-4">
         <div className="flex flex-col space-y-10 pb-4 mt-4">
           {chat.messages.map((message: any, i: number) => {
