@@ -219,7 +219,7 @@ export default function SharedChatPage() {
     );
   }
 
-  if (!isError || !chat) {
+  if (isError || !chat) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[85vh] p-4 text-center bg-background">
         <div className="p-4 bg-red-500/10 rounded-full mb-6">
