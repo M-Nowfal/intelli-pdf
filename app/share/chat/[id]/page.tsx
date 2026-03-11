@@ -247,7 +247,7 @@ export default function SharedChatPage() {
 
   return (
     <div className="flex flex-col min-h-screen max-w-5xl mx-auto bg-background">
-      <div className="flex shrink-0 p-4 md:p-6 border-b bg-muted/20 items-center justify-between gap-4">
+      <div className="flex shrink-0 p-4 md:p-6 border-b items-center justify-between gap-4">
         <div className="flex flex-col min-w-0">
           <h1 className="text-xl md:text-2xl font-bold flex items-center gap-2">
             Shared Chat Session
