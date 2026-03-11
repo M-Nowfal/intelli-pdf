@@ -38,8 +38,9 @@ interface ChatActionProps {
 export function ChatActionMenu({ activePdf }: ChatActionProps) {
   const {
     clearChat, deleteChat, chatId, chatList,
-    isStrict, setIsStrict, isPinned, isLoading,
-    togglePin, isPinLoading, toggleShare
+    isStrict, setIsStrict, isPinned,
+    togglePin, isPinLoading, toggleShare,
+    isLoading, isMessagesLoading
   } = useChatStore();
   const router = useRouter();
 
@@ -128,11 +129,11 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
       <DropdownMenu modal={false}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <DropdownMenuTrigger asChild disabled={isLoading}>
+            {(!isLoading && !isMessagesLoading) && <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
                 <EllipsisVertical className="h-4 w-4" />
               </Button>
-            </DropdownMenuTrigger>
+            </DropdownMenuTrigger>}
           </TooltipTrigger>
           <TooltipContent side="bottom">
             Chat Actions
