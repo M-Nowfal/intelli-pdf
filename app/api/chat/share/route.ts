@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { Chat } from "@/models/chat.model";
 import { APP_URL } from "@/utils/constants";
+import "@/models/pdf.model";
 
 export async function PATCH(req: NextRequest) {
   try {

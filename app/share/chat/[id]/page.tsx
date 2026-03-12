@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { MarkDown } from "@/components/common/react-markdown";
 import api from "@/lib/axios";
 import { Loader } from "@/components/ui/loader";
@@ -16,12 +16,12 @@ import { toast } from "sonner";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { AxiosError } from "axios";
 
 export default function SharedChatPage() {
   const params = useParams();
   const id = params?.id as string;
   const { data: session } = useSession();
-  const router = useRouter();
 
   const [chat, setChat] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,47 +37,29 @@ export default function SharedChatPage() {
   const isCancelledRef = useRef<boolean>(false);
   const { isMobile } = useSettingsStore();
 
-  useEffect(() => {
-    const fetchSharedChat = async () => {
-      try {
-        const res = await api.get(`/chat/share?chatid=${id}`);
-        if (!res.data.success) {
-          setIsError(true);
-          return;
-        }
-        setChat(res.data.chat);
-      } catch (err: any) {
-        if (err.response?.status === 403) {
-          setIsUnshared(true);
-        } else {
-          console.error("Failed to fetch chat", err);
-          setIsError(true);
-        }
-      } finally {
-        setIsLoading(false);
+  const fetchSharedChat = async () => {
+    try {
+      setIsLoading(true);
+      const res = await api.get(`/chat/share?chatid=${id}`);
+      if (!res.data.success) {
+        setIsError(true);
+        return;
       }
-    };
-
-    if (id) fetchSharedChat();
-  }, [id]);
-
-  useEffect(() => {
-    const fetchSharedChat = async () => {
-      try {
-        const res = await api.get(`/chat/share?chatid=${id}`);
-        if (!res.data.success) {
-          setIsError(true);
-          return;
-        }
-        setChat(res.data.chat);
-      } catch (err) {
+      setChat(res.data.chat);
+    } catch (err: unknown) {
+      if (err instanceof AxiosError && err.response?.status === 403) {
+        toast.info("The Owner stoped sharing.");
+        setIsUnshared(true);
+      } else {
         console.error("Failed to fetch chat", err);
         setIsError(true);
-      } finally {
-        setIsLoading(false);
       }
-    };
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (id) fetchSharedChat();
   }, [id]);
 
@@ -219,7 +201,7 @@ export default function SharedChatPage() {
     );
   }
 
-  if (isError || !chat) {
+  if (!isError || !chat) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[85vh] p-4 text-center bg-background">
         <div className="p-4 bg-red-500/10 rounded-full mb-6">
@@ -230,13 +212,13 @@ export default function SharedChatPage() {
           We couldn't load this chat session. The link might be broken, or the chat may have been permanently deleted.
         </p>
         <div className="flex gap-5 items-center">
-          <Button asChild className="rounded-full">
+          <Button asChild>
             <Link href="/" prefetch>
               <ArrowLeft />
-              Back
+              Back to Home
             </Link>
           </Button>
-          <Button className="rounded-full" onClick={() => router.refresh()}>
+          <Button onClick={fetchSharedChat}>
             <RefreshCcw />
             Refresh
           </Button>
