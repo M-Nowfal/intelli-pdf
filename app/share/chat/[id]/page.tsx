@@ -48,7 +48,7 @@ export default function SharedChatPage() {
       setChat(res.data.chat);
     } catch (err: unknown) {
       if (err instanceof AxiosError && err.response?.status === 403) {
-        toast.info("The Owner stoped sharing.");
+        toast.info("The Owner has stoped sharing.");
         setIsUnshared(true);
       } else {
         console.error("Failed to fetch chat", err);
@@ -194,9 +194,15 @@ export default function SharedChatPage() {
         <p className="text-muted-foreground mb-8 max-w-sm">
           The owner of this document has stopped sharing this chat session. It is no longer publicly accessible.
         </p>
-        <Button asChild className="rounded-full">
-          <Link href="/" prefetch>Try Intelli-PDF for Free</Link>
-        </Button>
+        {!session ? (
+          <Button asChild className="rounded-full">
+            <Link href="/" prefetch>Try Intelli-PDF for Free</Link>
+          </Button>
+        ) : (
+          <Button asChild className="rounded-full">
+            <Link href="/dashboard" prefetch>Go to My Dashboard</Link>
+          </Button>
+        )}
       </div>
     );
   }

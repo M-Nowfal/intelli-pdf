@@ -132,7 +132,7 @@ export function Hero() {
             {isInstallable && (
               <Button
                 size="lg"
-                className="h-14 px-10 text-lg gap-2 text-white border-0 transition-all duration-500 bg-linear-to-r from-neutral-950 via-neutral-300 to-neutral-800 dark:from-neutral-200 dark:via-neutral-900 dark:to-neutral-200 bg-size-[200%_auto] hover:bg-position-[right_center]"
+                className="h-14 px-10 text-lg gap-2 text-white border-0 transition-all duration-500 bg-linear-to-r from-neutral-950 via-neutral-400 to-neutral-800 dark:from-neutral-50 dark:via-neutral-800 dark:to-neutral-50 bg-size-[200%_auto] hover:bg-position-[right_center]"
                 onClick={handleInstallClick}
               >
                 <Download className="h-5 w-5" />
