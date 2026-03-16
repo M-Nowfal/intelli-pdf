@@ -31,7 +31,7 @@ export function HomeLayout({
   const { getActivePdf } = usePdfStore();
   const { mobileNav, isKeyboardActive } = useSettingsStore();
 
-  const paths = ["/login", "/signup", "/otp", "/signout", "/forgot-password"];
+  const paths = ["/login", "/signup", "/otp", "/forgot-password"];
   const isAuthPath = () => paths.some(path => path === pathname);
   const hideHeader = isAuthPath();
 
