@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { pdfId, amount } = await req.json();
+    const { pdfId, amount, difficulty } = await req.json();
 
     if (!pdfId || !amount) {
       return NextResponse.json({ message: "Missing fields" }, { status: 400 });
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 
     let quizDoc = await Quiz.findOne({ userId: session.user.id, pdfId });
 
-    const prompt = GENERATE_QUIZ_PROMPT(contextText, amount, quizDoc?.questions || []);
+    const prompt = GENERATE_QUIZ_PROMPT(contextText, amount, quizDoc?.questions || [], difficulty || "medium");
 
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();

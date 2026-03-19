@@ -98,16 +98,27 @@ export const GENERATE_FLASHCARD_PROMPT = (text: string, count: number = 5, previ
   `;
 };
 
-export const GENERATE_QUIZ_PROMPT = (text: string, amount: number = 5, previousQuestions: any[] = []) => {
+export const GENERATE_QUIZ_PROMPT = (text: string, amount: number = 5, previousQuestions: any[] = [], difficulty: string = "medium") => {
   const historyContext = previousQuestions?.length
     ? previousQuestions.map((q: any) => q.question).join(" | ")
     : "";
+
+  let difficultyInstruction = "";
+  if (difficulty === "easy") {
+    difficultyInstruction = "DIFFICULTY - EASY: Focus on basic facts, clear definitions, and direct recall of surface-level information.";
+  } else if (difficulty === "hard") {
+    difficultyInstruction = "DIFFICULTY - HARD: Focus on complex synthesis, deep analysis, nuanced details, conceptual applications, and critical thinking. Make the distractors (wrong options) highly plausible.";
+  } else {
+    difficultyInstruction = "DIFFICULTY - MEDIUM: Focus on general comprehension, relationships between concepts, and applying ideas from the text.";
+  }
 
   return `
     You are an expert examiner creating a precise multiple-choice quiz.
     
     OBJECTIVE:
     Generate exactly ${amount} distinct multiple-choice questions based on the text.
+
+    ${difficultyInstruction}
 
     ${historyContext ? `
     CRITICAL INSTRUCTION - AVOID DUPLICATES:

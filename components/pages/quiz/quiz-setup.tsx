@@ -18,6 +18,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { playSuccessSound } from "@/utils/sound";
 
@@ -31,6 +38,7 @@ interface QuizSetupProps {
 export function QuizSetup({ pdfId, isOpen, setIsOpen, onQuizReady }: QuizSetupProps) {
   const { generateQuiz, isLoading } = useQuizStore();
   const [amount, setAmount] = useState(5);
+  const [difficulty, setDifficulty] = useState("medium");
   const { decrementCredits } = useDashboardStore();
 
   const handleGenerate = async () => {
@@ -39,7 +47,7 @@ export function QuizSetup({ pdfId, isOpen, setIsOpen, onQuizReady }: QuizSetupPr
       return;
     }
 
-    const quizId = await generateQuiz(pdfId, amount);
+    const quizId = await generateQuiz(pdfId, amount, difficulty);
 
     if (quizId) {
       playSuccessSound(2);
@@ -65,7 +73,7 @@ export function QuizSetup({ pdfId, isOpen, setIsOpen, onQuizReady }: QuizSetupPr
         onInteractOutside={(e) => isLoading && e.preventDefault()}
         showCloseButton={!isLoading}
       >
-        <DialogHeader className="mb-5">
+        <DialogHeader className="mb-2">
           <DialogTitle className="flex items-center gap-2">
             <BrainCircuit className="w-5 h-5 text-primary" />
             Quiz Setup
@@ -75,23 +83,41 @@ export function QuizSetup({ pdfId, isOpen, setIsOpen, onQuizReady }: QuizSetupPr
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-2 mb-3">
-          <Label htmlFor="question-amount">Number of Questions</Label>
-          <div className="flex flex-col gap-1">
-            <Input
-              id="question-amount"
-              type="number"
-              min={3}
-              max={50}
-              value={amount}
-              onChange={(e) => setAmount(parseInt(e.target.value) || 0)}
-              className="text-center text-lg"
-              disabled={isLoading}
-            />
-            <span className="text-sm text-muted-foreground shrink-0">
-              You can generate a minimum of 3 and a maximum of 50 questions in one request.
-            </span>
+        <div className="flex flex-col gap-4 mb-3">
+          
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="question-amount">Number of Questions</Label>
+            <div className="flex flex-col gap-1">
+              <Input
+                id="question-amount"
+                type="number"
+                min={3}
+                max={50}
+                value={amount}
+                onChange={(e) => setAmount(parseInt(e.target.value) || 0)}
+                className="text-center text-lg"
+                disabled={isLoading}
+              />
+              <span className="text-sm text-muted-foreground shrink-0">
+                You can generate a minimum of 3 and a maximum of 50 questions in one request.
+              </span>
+            </div>
           </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="difficulty-level">Difficulty Level</Label>
+            <Select value={difficulty} onValueChange={setDifficulty} disabled={isLoading}>
+              <SelectTrigger id="difficulty-level" className="w-full">
+                <SelectValue placeholder="Select difficulty" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="easy">Easy (Basic Recall)</SelectItem>
+                <SelectItem value="medium">Medium (Comprehension)</SelectItem>
+                <SelectItem value="hard">Hard (Deep Analysis)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
         </div>
 
         <Separator />
@@ -100,7 +126,7 @@ export function QuizSetup({ pdfId, isOpen, setIsOpen, onQuizReady }: QuizSetupPr
           <Button
             onClick={handleGenerate}
             disabled={isLoading}
-            className="w-full"
+            className="w-full mt-2"
           >
             {isLoading ? (
               <>

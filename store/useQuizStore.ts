@@ -28,7 +28,7 @@ interface QuizState {
 
   fetchQuizzes: () => Promise<void>;
   loadQuiz: (id: string) => Promise<void>;
-  generateQuiz: (pdfId: string, amount: number) => Promise<string | null>;
+  generateQuiz: (pdfId: string, amount: number, difficulty: string) => Promise<string | null>;
   submitScore: (quizId: string, score: number) => Promise<void>;
   deleteQuiz: (quizId: string) => Promise<void>;
   resetCurrentQuiz: () => void;
@@ -74,10 +74,10 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     }
   },
 
-  generateQuiz: async (pdfId, amount) => {
+  generateQuiz: async (pdfId, amount, difficulty) => {
     set({ isLoading: true });
     try {
-      const res = await api.post("/quiz/generate", { pdfId, amount });
+      const res = await api.post("/quiz/generate", { pdfId, amount, difficulty });
 
       const quiz = get().currentQuiz;
       if (quiz) {
