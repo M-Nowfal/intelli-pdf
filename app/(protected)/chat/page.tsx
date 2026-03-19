@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function AIChatPage() {
   return (
-    <div className="p-4 space-y-8">
+    <div className="p-4 space-y-8 animate-up">
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
           <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 shadow-sm">

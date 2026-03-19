@@ -13,7 +13,7 @@ export function Dashboard() {
     isLoading ? (
       <DashboardSkeloton />
     ) : (
-      <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background w-full">
+      <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background w-full animate-up">
         <DashboardTitle />
         <DashboardStats />
         <DashboardRecentActivity />

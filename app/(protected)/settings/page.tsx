@@ -20,7 +20,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
     : "general";
 
   return (
-    <div className="p-4">
+    <div className="p-4 animate-up">
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 shadow-sm">

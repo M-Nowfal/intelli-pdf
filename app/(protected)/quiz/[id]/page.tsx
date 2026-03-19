@@ -46,7 +46,7 @@ export default function ActiveQuizPage({ params }: { params: Promise<{ id: strin
 
   if (!currentQuiz) {
     return (
-      <div className="space-y-4 p-4">
+      <div className="space-y-4 p-4 animate-up">
         <div className="flex items-center gap-2">
           <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 shadow-sm">
             <BrainCircuit className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
@@ -66,8 +66,8 @@ export default function ActiveQuizPage({ params }: { params: Promise<{ id: strin
   }
 
   return (
-    <div className="p-4 flex flex-col items-center justify-center">
-      <div className="mb-8 flex flex-col md:flex-row items-center justify-between w-full">
+    <div className="p-4 flex flex-col items-center justify-center animate-up">
+      <div className="mb-8 md:mb-15 flex flex-col md:flex-row items-center justify-between w-full">
         <div className="text-start w-full">
           <div className="flex items-center gap-2">
             <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 shadow-sm">

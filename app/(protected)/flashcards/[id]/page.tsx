@@ -11,7 +11,7 @@ export default async function FlashcardsPage({ params }: PageProps) {
   const { id } = await params;
 
   return (
-    <div className="p-4">
+    <div className="p-4 animate-up">
       <FlashcardView pdfId={id} />
     </div>
   );

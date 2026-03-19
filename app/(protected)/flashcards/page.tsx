@@ -8,7 +8,7 @@ export const metadata = {
 export default async function SelectPDFToGenerateFlashCardPage() {
 
   return (
-    <div className="p-4 space-y-8">
+    <div className="p-4 space-y-8 animate-up">
       <FlashCardList />
     </div>
   );

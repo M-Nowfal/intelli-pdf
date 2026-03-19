@@ -52,6 +52,8 @@
     "nodemailer": "^7.0.12",
     "onnxruntime-node": "^1.24.1",
     "pdf-parse": "1.1.1",
+    "radix-ui": "^1.4.3",
+    "razorpay": "^2.9.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hook-form": "^7.69.0",

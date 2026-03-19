@@ -15,7 +15,7 @@ const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
 
 type Params = { params: Promise<{ id: string }> };
 
-export async function POST(_req: NextRequest, { params }: Params) {
+export async function POST(req: NextRequest, { params }: Params) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user) {
@@ -23,27 +23,36 @@ export async function POST(_req: NextRequest, { params }: Params) {
     }
 
     const { id: pdfId } = await params;
-
     if (!pdfId) {
       return new NextResponse("PDF ID is required", { status: 400 });
     }
 
+    const body = await req.json().catch(() => ({}));
+    const { action, length, customPrompt } = body;
+
     await connectDB();
 
-    const user = await User.findById(session.user.id);
+    const existingSummary = await Summary.findOne({ 
+      pdfId, userId: session.user?.id 
+    }).populate("pdfId", "title");
 
-    if (user.stats.aiCredits < COST) {
-      return NextResponse.json(
-        { message: "Insufficient credits. Please upgrade your plan." },
-        { status: 402 }
-      );
+    const pdfRecord = await PDF.findById(pdfId);
+    if (!pdfRecord) {
+      return new NextResponse("PDF not found", { status: 404 });
     }
 
-    const existingSummary = await Summary.findOne(
-      { pdfId, userId: session.user?.id }
-    ).populate("pdfId", "title");
+    if (action === "check") {
+      if (existingSummary) {
+         return NextResponse.json({
+           summary: existingSummary.content,
+           pdfTitle: existingSummary.pdfId.title,
+           source: "database"
+         });
+      }
+      return NextResponse.json({ exists: false, pdfTitle: pdfRecord.title });
+    }
 
-    if (existingSummary) {
+    if (existingSummary && action !== "regenerate") {
       return NextResponse.json({
         summary: existingSummary.content,
         pdfTitle: existingSummary.pdfId.title,
@@ -51,9 +60,12 @@ export async function POST(_req: NextRequest, { params }: Params) {
       });
     }
 
-    const pdfRecord = await PDF.findById(pdfId);
-    if (!pdfRecord) {
-      return new NextResponse("PDF not found", { status: 404 });
+    const user = await User.findById(session.user.id);
+    if (user.stats.aiCredits < COST) {
+      return NextResponse.json(
+        { message: "Insufficient credits. Please upgrade your plan." },
+        { status: 402 }
+      );
     }
 
     const embeddings = await Embedding.find({ pdfId }).sort({
@@ -62,35 +74,29 @@ export async function POST(_req: NextRequest, { params }: Params) {
     });
 
     if (!embeddings || embeddings.length === 0) {
-      return new NextResponse("No content found for this PDF (Processings might be incomplete)", { status: 404 });
+      return new NextResponse("No content found for this PDF.", { status: 404 });
     }
 
-    const fullText = embeddings
-      .map((e) => e.content)
-      .join("\n")
-      .substring(0, 30000);
-
+    const fullText = embeddings.map((e) => e.content).join("\n").substring(0, 30000);
     const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
 
-    const prompt = GENERATE_SUMMARY_PROMPT(fullText);
+    const prompt = GENERATE_SUMMARY_PROMPT(fullText, length, customPrompt);
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const aiSummary = response.text();
 
     try {
-      await Summary.create({
-        pdfId,
-        userId: session.user.id,
-        content: aiSummary,
-      });
+      await Summary.findOneAndUpdate(
+        { pdfId, userId: session.user.id },
+        { $set: { content: aiSummary } },
+        { upsert: true, new: true } 
+      );
 
       const { newStreak, today } = await calculateStreak(session.user.id);
 
       await User.findByIdAndUpdate(session.user.id, {
-        $inc: {
-          "stats.aiCredits": -20
-        },
+        $inc: { "stats.aiCredits": -COST },
         $set: {
           "stats.studyStreak.streak": newStreak,
           "stats.studyStreak.lastActive": today

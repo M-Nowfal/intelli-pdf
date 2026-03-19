@@ -4,10 +4,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 export function QuizSkeleton() {
   return (
     <div className="flex justify-center items-center w-full h-[90vh] p-4">
-      <Card className="w-full max-w-2xl m-auto shadow-lg">
+      <Card className="w-full max-w-3xl m-auto shadow-lg">
         <CardHeader>
           <p className="text-center animate-pulse text-muted-foreground text-lg font-medium">Generating Quizzes, Please wait</p>
-          <div className="flex justify-between items-center mb-2">
+          <div className="flex justify-between items-center my-2">
             <Skeleton className="h-5 w-24 bg-primary/10" />
             <Skeleton className="h-5 w-10 bg-primary/10" />
           </div>

@@ -13,34 +13,82 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import api from "@/lib/axios";
+import { AxiosError } from "axios";
 
 export default function UpgradePage() {
+  const { data: session } = useSession();
   const features = [
     "Unlimited PDF Uploads",
+    "Zero Credit Limits",
     "Advanced AI Chat (Gemini Flash)",
     "Document Summarization",
     "Instant Flashcard Generation",
     "AI-Powered Quiz Creation",
     "Priority Processing Speed",
-    "Early Access to New Features",
     "24/7 Priority Support",
   ];
 
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handlePayment = async () => {
+    try {
+      const razorPayResponse = await loadRazorpayScript();
+      if (!razorPayResponse) return toast.error("Failed to load payment gateway.");
+
+      const res = await api.post("/payment/create-order");
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: res.data.amount,
+        currency: "INR",
+        name: "Intelli-AI",
+        description: "1 Month Pro Access",
+        order_id: res.data.orderId,
+        handler: function () {
+          toast.success("Payment successful! Upgrading your account...");
+        },
+        prefill: {
+          name: session?.user.name || "",
+          email: session?.user.email || "",
+        },
+        theme: {
+          color: "#171717",
+        },
+      };
+
+      const paymentObject = new (window as any).Razorpay(options);
+      paymentObject.open();
+    } catch (err: unknown) {
+      const errMessage = err instanceof AxiosError ? err.response?.data.error : "Something went wrong.";
+      toast.error(errMessage);
+    }
+  };
+
   return (
-    <div className="min-h-[calc(100vh-4rem)] w-full bg-background flex flex-col items-center justify-center py-12 px-4 md:px-6">
-      
+    <div className="min-h-[calc(100vh-4rem)] w-full bg-background flex flex-col items-center justify-center py-12 px-4 md:px-6 animate-up">
+
       <div className="text-center mb-10 max-w-3xl">
         <h1 className="text-3xl md:text-5xl font-bold tracking-tight not-sm:max-w-5/6 m-auto mb-5">
           Unlock the full power of <span className="text-primary">Intelli-AI</span>
         </h1>
         <p className="text-muted-foreground text-lg md:text-xl">
-          Supercharge your learning experience with our Pro plan. Get unlimited access to AI tools, faster processing, and exclusive features.
+          Supercharge your learning experience with our Pro plan. Get one month of full, unrestricted access to all AI tools with zero credit limits.
         </p>
       </div>
 
       <div className="w-full max-w-5xl">
         <Card className="grid lg:grid-cols-2 relative border-primary/20 shadow-2xl overflow-hidden bg-card">
-          
+
           <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-primary/20 blur-3xl rounded-full pointer-events-none"></div>
           <div className="absolute top-0 w-full h-1 bg-linear-to-r from-transparent via-primary to-transparent" />
 
@@ -60,17 +108,17 @@ export default function UpgradePage() {
             <CardContent className="w-full mt-8 p-0">
               <div className="flex flex-col max-w-sm mx-auto items-center justify-center bg-muted/50 py-8 px-6 rounded-2xl border border-border/50 shadow-sm">
                 <Badge variant="secondary" className="mb-4 bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 px-3 py-1">
-                  100% OFF • LIMITED TIME
+                  97% OFF • LIMITED TIME OFFER
                 </Badge>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-extrabold tracking-tight">₹0</span>
-                  <span className="text-muted-foreground line-through text-xl">₹12,000</span>
+                  <span className="text-5xl font-extrabold tracking-tight">₹49</span>
+                  <span className="text-muted-foreground line-through text-xl">₹1,499</span>
                 </div>
-                <span className="text-muted-foreground font-medium mt-1">/ year</span>
-                
+                <span className="text-muted-foreground font-medium mt-1">/ month</span>
+
                 <div className="mt-4 pt-4 border-t border-border/50 w-full text-center">
-                   <p className="text-xs text-muted-foreground font-medium">
-                    Free for all users during beta period
+                  <p className="text-xs text-muted-foreground font-medium">
+                    1 month full access • No credit limits
                   </p>
                 </div>
               </div>
@@ -78,7 +126,7 @@ export default function UpgradePage() {
           </div>
 
           <div className="flex flex-col justify-center p-6 lg:p-10 bg-muted/10 relative z-10">
-            
+
             <Separator className="lg:hidden mb-8" />
 
             <CardContent className="space-y-6 p-0">
@@ -101,13 +149,13 @@ export default function UpgradePage() {
             </CardContent>
 
             <CardFooter className="flex flex-col gap-4 mt-8 p-0">
-              <Button size="lg" className="w-full text-lg font-semibold h-14 shadow-xl shadow-primary/20 transition-transform hover:scale-[1.02]"
-                onClick={() => toast.success("Free Access Claimed.")}
+              <Button size="lg" className="w-full text-lg font-semibold h-14 shadow-xl shadow-orange-600/20 text-white hover:scale-[1.02] transition-all duration-500 bg-linear-to-r from-orange-700 via-orange-400 to-orange-700 dark:from-orange-900 dark:via-orange-500 dark:to-orange-900 bg-size-[200%_auto] hover:bg-position-[right_center]"
+                onClick={handlePayment}
               >
-                Claim Free Access
+                Unlock Pro Access for ₹49
               </Button>
               <p className="text-xs text-center text-muted-foreground">
-                No credit card required • Cancel anytime • Secure
+                Cancel anytime • Secure encrypted payment
               </p>
             </CardFooter>
           </div>

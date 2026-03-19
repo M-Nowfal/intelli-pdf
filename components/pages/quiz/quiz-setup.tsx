@@ -89,7 +89,7 @@ export function QuizSetup({ pdfId, isOpen, setIsOpen, onQuizReady }: QuizSetupPr
               disabled={isLoading}
             />
             <span className="text-sm text-muted-foreground shrink-0">
-              (Min: 3 Questions) (Max: 50 Questions)
+              You can generate a minimum of 3 and a maximum of 50 questions in one request.
             </span>
           </div>
         </div>
@@ -108,7 +108,7 @@ export function QuizSetup({ pdfId, isOpen, setIsOpen, onQuizReady }: QuizSetupPr
                 Generating
               </>
             ) : (
-              "Start Quiz"
+              "Start Quiz (20 Credits)"
             )}
           </Button>
         </DialogFooter>

@@ -6,21 +6,23 @@ export const GENERATE_CHAT_PROMPT = (contextText: string, userQuestion: string, 
 
   const flexibleModeInstructions = `
     1. PRIORITIZE CONTEXT: Use the provided "CONTEXT" as your primary source.
-    2. SUPPLEMENTAL KNOWLEDGE: If the context is insufficient or if the user asks for more detail, you are encouraged to use your broader knowledge (simulating a web search) to provide a comprehensive and helpful answer.
+    2. SUPPLEMENTAL KNOWLEDGE: If the context is insufficient or if the user asks for more detail, you are encouraged to use your broader knowledge to provide a comprehensive and helpful answer.
     3. If you use external knowledge, briefly mention that it's additional information not found in the PDF.`;
 
   return (`
     You are an intelligent teaching assistant named "Intelli-AI".
-    Traits: Friendly, Concise, Professional, and Educational.
+    Traits: Friendly, Extremely Concise, Professional, and Direct.
 
-    GOAL: Help the student understand their PDF document.
+    GOAL: Help the student understand their PDF document quickly and directly.
 
     YOUR OPERATING MODE: ${isStrict ? "STRICT PDF ONLY" : "FLEXIBLE LEARNING (PDF + WEB KNOWLEDGE)"}
 
     INSTRUCTIONS:
     ${isStrict ? strictModeInstructions : flexibleModeInstructions}
-    4. FORMATTING: Use clear Markdown. Use bold text for key terms and bullet points for lists.
-    5. If the PDF context is provided, always reference the relevant parts.
+    4. DIRECT ANSWERS FIRST (CRITICAL): If the user asks a Yes/No question (e.g., "Can AI think effectively?", "Is this true?"), YOU MUST start your response with a clear "Yes." or "No.".
+    5. EXTREME CONCISENESS: For simple questions, keep your explanation to 1 or 2 short sentences max. Do not write long paragraphs unless the user specifically uses words like "explain", "detail", or "summarize".
+    6. FORMATTING: Use clear Markdown. Use bold text for key terms and bullet points for lists.
+    7. If the PDF context is provided, always reference the relevant parts.
 
     CONTEXT:
     ${contextText}
@@ -32,18 +34,22 @@ export const GENERATE_CHAT_PROMPT = (contextText: string, userQuestion: string, 
   `);
 };
 
-export const GENERATE_SUMMARY_PROMPT = (text: string) => `
+export const GENERATE_SUMMARY_PROMPT = (text: string, length: string = "standard", customPrompt: string = "") => `
   You are an expert academic and technical summarizer. 
   
-  Please provide a comprehensive, structured, and easy-to-understand summary of the following document.
+  Please provide a structured, and easy-to-understand summary of the following document.
   
-  **Directives:**
+  **Summary Detail Level:** Make the summary **${length}** in length.
+  
+  ${customPrompt.trim() !== "" ? `**USER SPECIFIC INSTRUCTIONS (CRITICAL):**\n${customPrompt}\n` : ""}
+  
+  **General Directives:**
   1. **Structure**: 
      - Start with a **Core Thesis** or **Executive Summary** (H2).
      - Use **H3 headers (###)** to break down key sections.
      - Use **bullet points** for readability.
   
-  2. **Technical Content (CRITICAL)**:
+  2. **Technical Content**:
      - If the document contains programming concepts, **YOU MUST include code examples**.
      - Extract or synthesize brief, illustrative code snippets to explain concepts (e.g., "Here is how a loop works in Python...").
      - Format all code using markdown code blocks with the correct language tag (e.g., \`\`\`python ... \`\`\`).
@@ -116,12 +122,13 @@ export const GENERATE_QUIZ_PROMPT = (text: string, amount: number = 5, previousQ
     STRICT JSON OUTPUT RULES:
     1. Return ONLY a raw JSON array.
     2. NO markdown formatting or code blocks.
-    3. Each object must have:
+    3. Keep the options (answers) CONCISE and BRIEF (maximum 10-15 words per option). Distill the core concept rather than extracting long, full sentences from the text.
+    4. Each object must have:
        - "question": string
-       - "options": array of exactly 4 unique strings
+       - "options": array of exactly 4 unique, concise strings
        - "answer": string (must be an exact match to one of the options)
 
     CONTEXT:
-    ${text.substring(0, 15000)} 
+    ${text} 
   `;
 };

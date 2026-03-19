@@ -94,7 +94,7 @@ export function QuizInterface({ quiz }: { quiz: QuizItem }) {
     const isPassing = calculatedScore >= 60;
     return (
       <div className="flex justify-center">
-        <Card className="w-full max-w-lg shadow-xl border-t-8 border-t-primary">
+        <Card className="w-full max-w-3xl shadow-xl border-t-8 border-t-primary">
           <CardHeader className="flex flex-col items-center gap-2">
             <Trophy className={cn("w-12 h-12", isPassing ? "text-yellow-500" : "text-gray-400")} />
             <CardTitle className="text-3xl font-bold">Quiz Complete!</CardTitle>
@@ -122,10 +122,10 @@ export function QuizInterface({ quiz }: { quiz: QuizItem }) {
             </div>
           </CardContent>
           <CardFooter className="flex justify-center gap-4">
-            <Button variant="outline" onClick={handleRetake}>
+            <Button variant="outline" className="flex-1" onClick={handleRetake}>
               <RefreshCcw className="w-4 h-4 mr-2" /> Retake
             </Button>
-            <Button onClick={() => router.push("/quiz")}>
+            <Button className="flex-1" onClick={() => router.push("/quiz")}>
               All Quizzes
             </Button>
           </CardFooter>
@@ -136,7 +136,7 @@ export function QuizInterface({ quiz }: { quiz: QuizItem }) {
 
   return (
     <div className="flex justify-center w-full">
-      <Card className="w-full max-w-2xl m-auto shadow-lg">
+      <Card className="w-full max-w-4xl m-auto shadow-lg">
         <CardHeader>
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-muted-foreground">Question {currentIndex + 1} / {questions.length}</span>

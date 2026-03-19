@@ -79,6 +79,9 @@ export function FlashCardCount({ pdfId, isDialogOpen, setIsDialogOpen }: FlashCa
               className="col-span-4"
             />
           </div>
+          <span className="text-sm text-muted-foreground shrink-0">
+            You can generate a minimum of 3 and a maximum of 50 cards in one request.
+          </span>
         </div>
         <DialogFooter>
           <Button
@@ -87,7 +90,7 @@ export function FlashCardCount({ pdfId, isDialogOpen, setIsDialogOpen }: FlashCa
             disabled={numCardsToGenerate === 0 || isGenerating}
             className="w-full"
           >
-            {isGenerating ? "Creating" : "Generate"}
+            {isGenerating ? "Creating" : "Generate (20 Credits)"}
             {isGenerating && <Loader />}
           </Button>
         </DialogFooter>

@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function QuizListPage() {
   return (
-    <div className="p-4">
+    <div className="p-4 animate-up">
       <QuizList />
     </div>
   );

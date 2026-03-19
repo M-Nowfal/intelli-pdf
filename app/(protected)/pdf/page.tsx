@@ -8,7 +8,7 @@ export const metadata = {
 export default async function PDFPage() {
 
   return (
-    <div className="p-4 mx-auto w-full">
+    <div className="p-4 mx-auto w-full animate-up">
       <PDFList />
     </div>
   );

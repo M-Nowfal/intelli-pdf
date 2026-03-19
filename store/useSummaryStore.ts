@@ -7,8 +7,9 @@ interface SummaryState {
   isSummaryLoading: boolean;
   summaryError: string | null;
   source: "database" | "generated" | null;
+  needsGeneration: boolean;
 
-  fetchSummary: (pdfId: string) => Promise<void>;
+  fetchSummary: (pdfId: string, options?: { action?: "check" | "generate" | "regenerate", length?: string, customPrompt?: string }) => Promise<void>;
   fetchSummaryList: () => Promise<void>;
   removeSummary: (id: string) => void;
   deleteSummary: (id: string, onSuccess: () => void) => void;
@@ -20,53 +21,64 @@ export const useSummaryStore = create<SummaryState>((set, get) => ({
   isSummaryLoading: false,
   summaryError: null,
   source: null,
+  needsGeneration: false,
 
-  fetchSummary: async (pdfId: string) => {
-    if (get().summary) return;
-    
-    set({ isSummaryLoading: true, summaryError: null, summary: null });
+  fetchSummary: async (pdfId: string, options = { action: "generate" }) => {
+    if (get().summary && options.action === "check") return;
+
+    set({
+      isSummaryLoading: true,
+      summaryError: null,
+      needsGeneration: false
+    });
 
     try {
-      const res = await api.post(`/summary/${pdfId}`);
+      const res = await api.post(`/summary/${pdfId}`, options);
 
-      if (res.status !== 200) {
-        throw new Error("Failed to fetch summary");
+      if (res.status === 200 && res.data.exists === false) {
+        set({ needsGeneration: true, isSummaryLoading: false, summary: null });
+        return;
       }
+
+      if (res.status !== 200)
+        throw new Error("Failed to fetch summary");
 
       const { pdfTitle, summary, source } = res.data;
 
       set((state) => {
         const exists = state.summaryList.some((item) => item.id === pdfId);
-        
         let newSummaryList = state.summaryList;
+
         if (!exists) {
-           newSummaryList = [{ id: pdfId, title: pdfTitle }, ...state.summaryList];
+          newSummaryList = [{ id: pdfId, title: pdfTitle }, ...state.summaryList];
         }
 
         return {
           summary: { title: pdfTitle, content: summary },
           summaryList: newSummaryList,
-          source
+          source,
+          needsGeneration: false
         };
       });
     } catch (err: unknown) {
       console.error(err);
-      set({ summaryError: "Could not generate summary. Please try again later." });
+      set({ summaryError: "Could not process summary. Please try again later." });
     } finally {
       set({ isSummaryLoading: false });
     }
   },
+
   fetchSummaryList: async () => {
     try {
-      if (get().summaryList.length > 0) return;
+      if (get().summaryList.length > 0)
+        return;
 
       set({ isSummaryLoading: true, summaryError: null });
 
       const res = await api.get(`/summary`);
 
-      if (res.status !== 200) {
+      if (res.status !== 200)
         throw new Error("Failed to fetch summary list");
-      }
 
       set({ summaryList: res.data });
     } catch (err: unknown) {
@@ -76,25 +88,27 @@ export const useSummaryStore = create<SummaryState>((set, get) => ({
       set({ isSummaryLoading: false });
     }
   },
-  removeSummary: (id) => set(state => {
-    return { summaryList: state.summaryList.filter(list => list.id !== id) };
-  }),
+
+  removeSummary: (id) => set(state => ({
+    summaryList: state.summaryList.filter(list => list.id !== id)
+  })),
+
   deleteSummary: async (id, onSuccess) => {
     try {
       set({ isSummaryLoading: true, summaryError: null });
 
       const res = await api.delete(`/summary?pdfId=${id}`);
 
-      if (res.status !== 200) {
+      if (res.status !== 200)
         throw new Error("Failed to delete summary");
-      }
 
-      set({ summaryList: get().summaryList.filter(list => list.id !== id) });
+      set({
+        summaryList: get().summaryList.filter(list => list.id !== id),
+        summary: null
+      });
 
-      if (onSuccess) {
+      if (onSuccess)
         onSuccess();
-      }
-
     } catch (err: unknown) {
       console.error(err);
       set({ summaryError: "Deletion failed, please try again later." });

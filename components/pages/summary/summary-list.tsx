@@ -38,7 +38,7 @@ export function SummaryList() {
   const handleCreateNew = () => router.push("/summarize/select");
 
   return (
-    <div className="flex flex-col h-full p-4 space-y-8">
+    <div className="flex flex-col h-full p-4 space-y-8 animate-up">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">
           <div className="flex items-center gap-3">

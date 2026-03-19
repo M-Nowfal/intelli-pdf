@@ -27,15 +27,15 @@ export function Settings({ tab }: { tab: string }) {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="general" className="space-y-6">
+        <TabsContent value="general" className="space-y-6 animate-up">
           <GeneralTab />
         </TabsContent>
 
-        <TabsContent value="billing" className="space-y-6">
+        <TabsContent value="billing" className="space-y-6 animate-up">
           <BillingTab />
         </TabsContent>
 
-        <TabsContent value="appearance" className="space-y-6">
+        <TabsContent value="appearance" className="space-y-6 animate-up">
           <AppearanceTab />
         </TabsContent>
       </Tabs>

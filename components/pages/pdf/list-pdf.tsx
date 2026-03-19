@@ -136,7 +136,7 @@ export default function PDFList() {
                     </div>
                   </div>
 
-                  <div className="bg-primary/10 p-2.5 rounded-xl text-primary shrink-0">
+                  <div className="bg-primary/10 p-2.5 rounded-xl text-primary shrink-0 group-hover:bg-primary group-hover:text-background transition-colors duration-300">
                     <FileText className="h-5 w-5" />
                   </div>
                 </CardHeader>
