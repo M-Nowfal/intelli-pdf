@@ -59,7 +59,7 @@ export function Hero() {
   };
 
   return (
-    <section className={`${pathname === "/" ? "pt-10" : ""} relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-background`}>
+    <section className={`${pathname === "/" ? "pt-10" : ""} animate-up relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden bg-background`}>
       <div className="absolute inset-0 w-full h-full bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-primary/5 via-background to-background pointer-events-none" />
       <div className="absolute -top-24 -left-24 w-72 h-72 md:w-96 md:h-96 bg-primary/10 rounded-full blur-3xl opacity-70 animate-pulse pointer-events-none" />
       <div className="absolute -bottom-24 -right-24 w-72 h-72 md:w-96 md:h-96 bg-blue-500/10 rounded-full blur-3xl opacity-70 animate-pulse delay-1000 pointer-events-none" />
@@ -97,7 +97,7 @@ export function Hero() {
         title="Flashcards Created"
       />
 
-      <div className="relative z-10 px-4 md:px-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-both">
+      <div className="relative z-10 px-4 md:px-8 fill-mode-both">
         <div className="mx-auto flex max-w-4xl flex-col items-center gap-8 text-center">
 
           <Badge variant="secondary" className="px-4 py-2 gap-2 text-sm backdrop-blur-md bg-secondary/80 border-secondary-foreground/10 shadow-sm">
