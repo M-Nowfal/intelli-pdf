@@ -158,7 +158,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
         updateMessageContent(aiMessageId, accumulatedText);
       }
 
-      decrementCredits(20);
+      decrementCredits(10);
     } catch (err: unknown) {
       if (err instanceof AxiosError && err.response?.status !== 402)
         toast.error("Error generating response");
@@ -485,9 +485,12 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
             </Button>
           </div>
         </form>
-        <div className={`flex justify-center md:justify-between mt-2 px-5 ${isKeyboardActive && mobileNav ? "hidden md:flex" : ""}`}>
+        <div className={`flex justify-center sm:justify-between gap-3 mt-2 px-5 ${isKeyboardActive && mobileNav ? "hidden md:flex" : ""}`}>
           <p className="not-md:hidden text-xs text-muted-foreground text-center">
             Press <kbd className="font-sans">Enter</kbd> to send, <kbd className="font-sans">Shift + Enter</kbd> for new line
+          </p>
+          <p className="hidden sm:block text-xs text-muted-foreground text-center">
+            Each question require 10 credits
           </p>
           <p className={`text-xs text-muted-foreground text-center ${mobileNav ? "hidden md:block" : ""}`}>
             Intelli-AI can make mistakes, so double-check it

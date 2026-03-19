@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    if (user.stats.aiCredits < COST) {
+    if (user.stats.aiCredits < COST - 10) {
       return NextResponse.json(
         { message: "Insufficient credits. Please upgrade your plan." },
         { status: 402 }
@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
 
           await User.findByIdAndUpdate(session.user.id, {
             $inc: {
-              "stats.aiCredits": -20
+              "stats.aiCredits": -10
             }
           });
 
