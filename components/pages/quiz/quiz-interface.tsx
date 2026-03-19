@@ -19,31 +19,39 @@ export function QuizInterface({ quiz }: { quiz: QuizItem }) {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [isFinished, setIsFinished] = useState(false);
   const [calculatedScore, setCalculatedScore] = useState(quiz.score || 0);
+  const [shuffledOptions, setShuffledOptions] = useState<string[]>([]);
 
   const questions = quiz.questions;
   const currentQuestion = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
 
   useEffect(() => {
+    if (currentQuestion?.options) {
+      const shuffled = [...currentQuestion.options];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      setShuffledOptions(shuffled);
+    }
+  }, [currentQuestion]);
+
+  useEffect(() => {
     if (isFinished) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      const options = currentQuestion.options;
+      const options = shuffledOptions;
       const currentSelectionIndex = options.indexOf(selectedAnswer);
 
       if (e.key === "ArrowDown") {
         e.preventDefault();
         const nextIndex = (currentSelectionIndex + 1) % options.length;
         setSelectedAnswer(options[nextIndex]);
-      }
-
-      else if (e.key === "ArrowUp") {
+      } else if (e.key === "ArrowUp") {
         e.preventDefault();
         const prevIndex = (currentSelectionIndex - 1 + options.length) % options.length;
         setSelectedAnswer(options[prevIndex]);
-      }
-
-      else if (e.key === "Enter" && selectedAnswer) {
+      } else if (e.key === "Enter" && selectedAnswer) {
         e.preventDefault();
         handleNext();
       }
@@ -51,7 +59,7 @@ export function QuizInterface({ quiz }: { quiz: QuizItem }) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedAnswer, currentIndex, isFinished]);
+  }, [selectedAnswer, currentIndex, isFinished, shuffledOptions]);
 
   const handleNext = () => {
     if (!selectedAnswer) return;
@@ -149,11 +157,15 @@ export function QuizInterface({ quiz }: { quiz: QuizItem }) {
         </CardHeader>
         <CardContent>
           <RadioGroup value={selectedAnswer} onValueChange={setSelectedAnswer} className="space-y-3">
-            {currentQuestion?.options?.map((option, idx) => (
-              <div key={idx} className={cn(
-                "flex items-center space-x-2 border rounded-xl p-4 cursor-pointer transition-all hover:bg-accent",
-                selectedAnswer === option ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border"
-              )}>
+            {shuffledOptions.map((option, idx) => (
+              <div 
+                key={idx} 
+                onClick={() => setSelectedAnswer(option)} 
+                className={cn(
+                  "flex items-center space-x-2 border rounded-xl p-4 cursor-pointer transition-all hover:bg-accent",
+                  selectedAnswer === option ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border"
+                )}
+              >
                 <RadioGroupItem value={option} id={`opt-${idx}`} />
                 <Label htmlFor={`opt-${idx}`} className="flex-1 cursor-pointer text-base">{option}</Label>
               </div>
