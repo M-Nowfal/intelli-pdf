@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { ToasterProvider } from "@/providers/toaster-provider";
-import { HomeLayout } from "@/layout/home-layout";
+import { Layout } from "@/layout/layout";
 import { AuthProvider } from "@/providers/session-provider";
 import { Analytics } from "@vercel/analytics/next";
 
@@ -57,9 +57,9 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <ToasterProvider />
-            <HomeLayout>
+            <Layout>
               {children}
-            </HomeLayout>
+            </Layout>
           </ThemeProvider>
         </AuthProvider>
         <Analytics />

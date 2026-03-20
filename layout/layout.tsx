@@ -19,8 +19,9 @@ import Link from "next/link";
 import { MobileNav } from "./mobile-nav";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { cn } from "@/lib/utils";
+import { vibrate } from "@/lib/haptics";
 
-export function HomeLayout({
+export function Layout({
   children,
 }: {
   children: React.ReactNode;
@@ -54,7 +55,7 @@ export function HomeLayout({
               ) : isAuthenticated ? (
                 <>
                   {pathname.startsWith("/chat/") && <ChatActionMenu activePdf={getActivePdf()!} />}
-                  <Link href="/settings" prefetch>
+                  <Link href="/settings" prefetch onClick={() => vibrate()}>
                     <UserAvatar />
                   </Link>
                 </>

@@ -70,7 +70,7 @@ export function Footer() {
               </svg>
               <span className="sr-only">Twitter</span>
             </Link>
-            <Link href="#" className="text-muted-foreground hover:text-foreground">
+            <Link href="https://github.com/M-Nowfal/intelli-pdf" className="text-muted-foreground hover:text-foreground">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -87,7 +87,7 @@ export function Footer() {
               </svg>
               <span className="sr-only">GitHub</span>
             </Link>
-            <Link href="#" className="text-muted-foreground hover:text-foreground">
+            <Link href="mailto:intellipdf2026@gmail.com" className="text-muted-foreground hover:text-foreground">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
