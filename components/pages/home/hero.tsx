@@ -65,7 +65,7 @@ export function Hero() {
       <div className="absolute -bottom-24 -right-24 w-72 h-72 md:w-96 md:h-96 bg-blue-500/10 rounded-full blur-3xl opacity-70 animate-pulse delay-1000 pointer-events-none" />
 
       <FloatingDoc
-        className="top-[5%] left-[2%] md:top-[15%] md:left-[10%] -rotate-12 animate-float-slow"
+        className="top-[5%] left-[2%] md:top-[15%] md:left-[10%] -rotate-12 not-md:animate-float-slow"
         delay="0s"
         icon={<FileText className="h-full w-full text-blue-600" />}
         bgClass="bg-blue-500/10"
@@ -73,7 +73,7 @@ export function Hero() {
       />
 
       <FloatingDoc
-        className="top-[8%] right-[2%] md:top-[20%] md:right-[12%] rotate-6 animate-float"
+        className="top-[8%] right-[2%] md:top-[20%] md:right-[12%] rotate-6 not-md:animate-float"
         delay="2s"
         icon={<Sparkles className="h-full w-full text-yellow-600" />}
         bgClass="bg-yellow-500/10"
@@ -81,7 +81,7 @@ export function Hero() {
       />
 
       <FloatingDoc
-        className="bottom-[8%] left-[5%] md:bottom-[20%] md:left-[15%] rotate-12 animate-float-reverse"
+        className="bottom-[8%] left-[5%] md:bottom-[20%] md:left-[15%] rotate-12 not-md:animate-float-reverse"
         delay="1s"
         size="sm"
         icon={<BrainCircuit className="h-full w-full text-purple-600" />}
@@ -90,7 +90,7 @@ export function Hero() {
       />
 
       <FloatingDoc
-        className="bottom-[8%] right-[5%] md:bottom-[25%] md:right-[20%] -rotate-6 animate-float-slow"
+        className="bottom-[8%] right-[5%] md:bottom-[25%] md:right-[20%] -rotate-6 not-md:animate-float-slow"
         delay="3s"
         icon={<Layers className="h-full w-full text-green-600" />}
         bgClass="bg-green-500/10"

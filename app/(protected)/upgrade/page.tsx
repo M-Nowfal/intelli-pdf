@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import api from "@/lib/axios";
 import { AxiosError } from "axios";
+import { MONTHLY_TOTAL_AMOUNT, PRO_ACCESS_AMOUNT } from "@/utils/constants";
 
 export default function UpgradePage() {
   const { data: session } = useSession();
@@ -74,6 +75,8 @@ export default function UpgradePage() {
     }
   };
 
+  const discount = 100 - (PRO_ACCESS_AMOUNT / MONTHLY_TOTAL_AMOUNT) * 100;
+
   return (
     <div className="min-h-[calc(100vh-4rem)] w-full bg-background flex flex-col items-center justify-center py-12 px-4 md:px-6 animate-up">
 
@@ -108,11 +111,11 @@ export default function UpgradePage() {
             <CardContent className="w-full mt-8 p-0">
               <div className="flex flex-col max-w-sm mx-auto items-center justify-center bg-muted/50 py-8 px-6 rounded-2xl border border-border/50 shadow-sm">
                 <Badge variant="secondary" className="mb-4 bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 px-3 py-1">
-                  97% OFF • LIMITED TIME OFFER
+                  {Math.round(discount)}% OFF • LIMITED TIME OFFER
                 </Badge>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-extrabold tracking-tight">₹49</span>
-                  <span className="text-muted-foreground line-through text-xl">₹1,499</span>
+                  <span className="text-5xl font-extrabold tracking-tight">₹{PRO_ACCESS_AMOUNT.toLocaleString()}</span>
+                  <span className="text-muted-foreground line-through text-xl">₹{MONTHLY_TOTAL_AMOUNT.toLocaleString()}</span>
                 </div>
                 <span className="text-muted-foreground font-medium mt-1">/ month</span>
 
@@ -152,7 +155,7 @@ export default function UpgradePage() {
               <Button size="lg" className="w-full text-lg font-semibold h-14 shadow-xl shadow-orange-600/20 text-white hover:scale-[1.02] transition-all duration-500 bg-linear-to-r from-orange-700 via-orange-400 to-orange-700 dark:from-orange-900 dark:via-orange-500 dark:to-orange-900 bg-size-[200%_auto] hover:bg-position-[right_center]"
                 onClick={handlePayment}
               >
-                Unlock Pro Access for ₹49
+                Unlock Pro Access for ₹{PRO_ACCESS_AMOUNT.toLocaleString()}
               </Button>
               <p className="text-xs text-center text-muted-foreground">
                 Cancel anytime • Secure encrypted payment
