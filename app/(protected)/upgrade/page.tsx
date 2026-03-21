@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import api from "@/lib/axios";
 import { AxiosError } from "axios";
-import { MONTHLY_TOTAL_AMOUNT, PRO_ACCESS_AMOUNT } from "@/utils/constants";
+import { MONTHLY_TOTAL_AMOUNT, PRO_ACCESS_AMOUNT, RAZORPAY_KEY_ID } from "@/utils/constants";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -60,7 +60,7 @@ export default function UpgradePage() {
       const res = await api.post("/payment/create-order");
 
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        key: RAZORPAY_KEY_ID,
         amount: res.data.amount,
         currency: "INR",
         name: "Intelli-PDF",
