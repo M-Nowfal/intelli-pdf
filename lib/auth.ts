@@ -120,7 +120,8 @@ export const authOptions: NextAuthOptions = {
           User.findByIdAndUpdate(token.id, {
             $set: {
               "subscription.tier": "free",
-              "subscription.expiresAt": null
+              "subscription.expiresAt": null,
+              "stats.lastClaimedAt": new Date(Date.now() - 24 * 60 * 60 * 1000)
             }
           }).exec();
         }

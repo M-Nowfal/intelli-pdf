@@ -107,7 +107,7 @@ export function BillingTab() {
               "font-medium",
               isOverLimit || isProUser ? "text-amber-600 dark:text-amber-500" : "text-muted-foreground"
             )}>
-              {(isClaiming || isLoading) ? <Loader size={12} /> : (isProUser ? "Unlimited" : `${currentCredits} / ${maxCredits}`)}
+              {(isClaiming || isLoading) ? <Loader size={12} /> : `${currentCredits} ${isProUser ? "(Unlimited)" : ""} / ${maxCredits}`}
               {isOverLimit && <span className="text-xs ml-1.5 font-normal">(+Bonus)</span>}
             </span>
           </div>
@@ -115,7 +115,7 @@ export function BillingTab() {
             value={progressPercentage}
             className={cn(
               "h-2",
-              isOverLimit && "[&>div]:bg-amber-500"
+              isOverLimit || isProUser && "[&>div]:bg-amber-500"
             )}
           />
         </div>
@@ -126,7 +126,7 @@ export function BillingTab() {
               <CreditCard className="h-4 w-4 text-primary" />
             </div>
             <div>
-              <p className="text-sm font-medium">Free Plan</p>
+              <p className="text-sm font-medium">{isProUser ? "Pro" : "Free"} Plan</p>
               <p className="text-xs text-muted-foreground">Currently Active</p>
             </div>
           </div>

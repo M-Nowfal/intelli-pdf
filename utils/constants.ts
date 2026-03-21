@@ -42,7 +42,7 @@ const CLOUDINARY_API_KEY: string = process.env.CLOUDINARY_API_KEY!;
 const CLOUDINARY_API_SECRET: string = process.env.CLOUDINARY_API_SECRET!;
 
 const MONTHLY_TOTAL_AMOUNT: number = 1499;
-const PRO_ACCESS_AMOUNT: number = 9;
+const PRO_ACCESS_AMOUNT: number = 29;
 const PRO_ACCESS_LIMIT: number = Date.now() + 30 * 24 * 60 * 60 * 1000;
 
 const RAZORPAY_KEY_ID: string = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!;

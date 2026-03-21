@@ -12,9 +12,22 @@ export async function POST() {
     if (!session?.user?.id) return new NextResponse("Unauthorized", { status: 401 });
 
     await connectDB();
-    
+
     const user = await User.findById(session.user.id);
     if (!user) return NextResponse.json({ message: "User not found" }, { status: 404 });
+
+    if (user?.subscription?.tier === "pro") {
+      const proExpiryDate = new Date(user.subscription.expiresAt).toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: `You have unlimited credits upto ${proExpiryDate}`
+      }, { status: 200 });
+    }
 
     const now = new Date();
     const lastClaim = user.stats.lastClaimedAt ? new Date(user.stats.lastClaimedAt) : new Date(user.createdAt);
@@ -22,9 +35,9 @@ export async function POST() {
     const daysSinceLastClaim = differenceInCalendarDays(now, lastClaim);
 
     if (daysSinceLastClaim < 1) {
-      return NextResponse.json({ 
-        success: false, 
-        message: "You have already claimed your credits for today. Come back tomorrow!" 
+      return NextResponse.json({
+        success: false,
+        message: "You have already claimed your credits for today. Come back tomorrow!"
       }, { status: 400 });
     }
 
@@ -35,8 +48,8 @@ export async function POST() {
       $set: { "stats.lastClaimedAt": now }
     });
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       creditsAdded: creditsToAward,
       daysCounted: daysSinceLastClaim,
       message: `Success! You claimed ${creditsToAward} credits for ${daysSinceLastClaim} day(s).`

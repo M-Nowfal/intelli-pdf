@@ -40,6 +40,7 @@ export default function UpgradePage() {
     "Document Summarization",
     "Instant Flashcard Generation",
     "AI-Powered Quiz Creation",
+    "Instant 1000 credits"
   ];
 
   const loadRazorpayScript = () => {

@@ -19,7 +19,8 @@ export async function GET(req: Request) {
       {
         $set: {
           "subscription.tier": "free",
-          "subscription.expiresAt": null
+          "subscription.expiresAt": null,
+          "stats.lastClaimedAt": new Date(Date.now() - 24 * 60 * 60 * 1000)
         }
       }
     );
