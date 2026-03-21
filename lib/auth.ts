@@ -71,19 +71,16 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user, account, trigger, session }) {
+    async jwt({ token, user, trigger, session }) {
+      await connectDB();
+
       if (user) {
-        await connectDB();
+        const dbUser = await User.findOne({ email: user.email }).select("avatar subscription");
 
-        if (account?.provider === "google") {
-          const dbUser = await User.findOne({ email: user.email });
-
-          if (dbUser) {
-            token.id = dbUser._id.toString();
-            token.picture = dbUser.avatar;
-          } else {
-            token.picture = user.image;
-          }
+        if (dbUser) {
+          token.id = dbUser._id.toString();
+          token.picture = dbUser.avatar || user.image;
+          token.subscription = dbUser.subscription;
         } else {
           token.id = user.id;
           token.picture = user.image;
@@ -91,27 +88,41 @@ export const authOptions: NextAuthOptions = {
       }
 
       if (trigger === "update" && session) {
-        if (session.name) {
-          token.name = session.name;
-        }
-        if (session.image !== undefined) {
-          token.picture = session.image;
+        if (session.name) token.name = session.name;
+        if (session.image !== undefined) token.picture = session.image;
+
+        if (token.id) {
+          const dbUser = await User.findById(token.id).select("subscription");
+          if (dbUser) {
+            token.subscription = dbUser.subscription;
+          }
         }
       }
 
       if (!user && token.id) {
-        await connectDB();
-        const dbUser = await User.findById(token.id).select("avatar");
-        if (dbUser?.avatar) {
-          token.picture = dbUser.avatar;
+        if (!token.picture || !token.subscription) {
+          const dbUser = await User.findById(token.id).select("avatar subscription");
+          if (dbUser) {
+            if (!token.picture && dbUser.avatar) token.picture = dbUser.avatar;
+            token.subscription = dbUser.subscription;
+          }
         }
       }
 
-      if (token.id) {
-        await connectDB();
-        const dbUser = await User.findById(token.id).select("avatar");
-        if (dbUser?.avatar) {
-          token.picture = dbUser.avatar;
+      if (token.subscription?.tier === "pro" && token.subscription.expiresAt) {
+        const expirationDate = new Date(token.subscription.expiresAt).getTime();
+        const isExpired = Date.now() > expirationDate;
+
+        if (isExpired) {
+          token.subscription.tier = "free";
+          token.subscription.expiresAt = null;
+
+          User.findByIdAndUpdate(token.id, {
+            $set: {
+              "subscription.tier": "free",
+              "subscription.expiresAt": null
+            }
+          }).exec();
         }
       }
 
@@ -128,6 +139,9 @@ export const authOptions: NextAuthOptions = {
         if (token.picture) {
           session.user.image = token.picture;
         }
+        if (token.subscription) {
+          (session.user as any).subscription = token.subscription;
+        }
       }
       return session;
     },
@@ -137,8 +151,8 @@ export const authOptions: NextAuthOptions = {
         try {
           const cookieStore = await cookies();
           const intent = cookieStore.get("auth_intent")?.value;
-
           const referralCode = cookieStore.get("referral_code")?.value;
+
           await connectDB();
 
           const existingUser = await User.findOne({ email: user.email });
@@ -180,6 +194,11 @@ export const authOptions: NextAuthOptions = {
                   lastActive: Date.now()
                 },
                 aiCredits: 1000
+              },
+              subscription: {
+                tier: "free",
+                expiresAt: null,
+                lastOrderId: null
               },
               provider: "google"
             });

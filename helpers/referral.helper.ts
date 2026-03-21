@@ -16,7 +16,7 @@ export async function sendCreditAwardedMail(email: string, name: string) {
       html: creditAwardMailTemplate(name),
       text: `High five, ${name}! ✋\n\n` +
         `Your friend just joined Intelli-PDF using your link.\n\n` +
-        `We have added +500 Credits to your account.\n` +
+        `We have added +250 Credits to your account.\n` +
         `You can use these immediately to generate more quizzes and summaries.\n\n` +
         `Check your balance here: ${APP_URL}/settings?tab=billing\n\n` +
         `Keep sharing to earn unlimited rewards!\n` +

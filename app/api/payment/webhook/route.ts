@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { connectDB } from "@/lib/db";
 import { User } from "@/models/user.model";
+import { PRO_ACCESS_LIMIT } from "@/utils/constants";
 
 export async function POST(req: NextRequest) {
   const rawBody = await req.text();
@@ -22,13 +23,16 @@ export async function POST(req: NextRequest) {
     const paymentData = event.payload.payment.entity;
     
     const userId = paymentData.notes.userId;
+    const orderId = paymentData.order_id;
 
     await connectDB();
     
     await User.findByIdAndUpdate(userId, {
       $set: {
-        "isPro": true,
-        "proExpiryDate": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+        "subscription.tier": "pro",
+        "subscription.expiresAt": new Date(PRO_ACCESS_LIMIT),
+        "subscription.lastOrderId": orderId,
+        "stats.aiCredits": 1000
       }
     });
 

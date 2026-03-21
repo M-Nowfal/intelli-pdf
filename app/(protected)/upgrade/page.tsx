@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Sparkles, Zap, Shield, Crown } from "lucide-react";
+import { Check, Sparkles, Zap, Shield, Crown, CalendarRange } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,9 +17,22 @@ import { useSession } from "next-auth/react";
 import api from "@/lib/axios";
 import { AxiosError } from "axios";
 import { MONTHLY_TOTAL_AMOUNT, PRO_ACCESS_AMOUNT } from "@/utils/constants";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function UpgradePage() {
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
+  const router = useRouter();
+
+  const isProUser = session?.user?.subscription?.tier === "pro";
+  const proExpiryDate = session?.user?.subscription?.expiresAt
+    ? new Date(session.user.subscription.expiresAt).toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+    : "Lifetime";
+
   const features = [
     "Unlimited PDF Uploads",
     "Zero Credit Limits",
@@ -27,8 +40,6 @@ export default function UpgradePage() {
     "Document Summarization",
     "Instant Flashcard Generation",
     "AI-Powered Quiz Creation",
-    "Priority Processing Speed",
-    "24/7 Priority Support",
   ];
 
   const loadRazorpayScript = () => {
@@ -52,15 +63,30 @@ export default function UpgradePage() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: res.data.amount,
         currency: "INR",
-        name: "Intelli-AI",
+        name: "Intelli-PDF",
         description: "1 Month Pro Access",
         order_id: res.data.orderId,
-        handler: function () {
-          toast.success("Payment successful! Upgrading your account...");
+        handler: async function (response: any) {
+          try {
+            toast.loading("Verifying payment...", { id: "payment-toast" });
+
+            await api.post("/payment/verify", {
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature
+            });
+
+            toast.success("Payment successful! Welcome to Pro.", { id: "payment-toast" });
+
+            await update();
+            router.push("/dashboard");
+          } catch (err: unknown) {
+            toast.error("Payment verification failed. Please contact support.", { id: "payment-toast" });
+          }
         },
         prefill: {
-          name: session?.user.name || "",
-          email: session?.user.email || "",
+          name: session?.user?.name || "",
+          email: session?.user?.email || "",
         },
         theme: {
           color: "#171717",
@@ -70,16 +96,56 @@ export default function UpgradePage() {
       const paymentObject = new (window as any).Razorpay(options);
       paymentObject.open();
     } catch (err: unknown) {
-      const errMessage = err instanceof AxiosError ? err.response?.data.error : "Something went wrong.";
+      const errMessage = err instanceof AxiosError ? err.response?.data?.error : "Something went wrong.";
       toast.error(errMessage);
     }
   };
 
   const discount = 100 - (PRO_ACCESS_AMOUNT / MONTHLY_TOTAL_AMOUNT) * 100;
 
+  if (isProUser) {
+    return (
+      <div className="min-h-[calc(100vh-4rem)] w-full bg-background flex flex-col items-center justify-center py-12 px-4 animate-up">
+        <Card className="max-w-md w-full border-primary/20 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 -mt-10 h-32 w-32 bg-primary/20 blur-3xl rounded-full pointer-events-none"></div>
+
+          <CardHeader className="text-center pb-6 relative z-10">
+            <div className="flex justify-center mb-4">
+              <div className="p-4 bg-primary/10 rounded-full ring-1 ring-primary/20">
+                <Crown className="h-10 w-10 text-primary" />
+              </div>
+            </div>
+            <CardTitle className="text-3xl font-bold">You are a Pro</CardTitle>
+            <CardDescription className="text-base mt-2">
+              You currently have full, unrestricted access to all Intelli-PDF features.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-4 relative z-10">
+            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border border-border/50">
+              <div className="flex items-center gap-3">
+                <CalendarRange className="h-5 w-5 text-muted-foreground" />
+                <span className="font-medium">Access expires on</span>
+              </div>
+              <span className="font-bold text-foreground">{proExpiryDate}</span>
+            </div>
+          </CardContent>
+
+          <CardFooter className="flex flex-col gap-3 relative z-10">
+            <Button asChild className="w-full h-12 text-md font-semibold">
+              <Link href="/dashboard">Return to Dashboard</Link>
+            </Button>
+            <p className="text-xs text-center text-muted-foreground">
+              To manage your billing details, visit your <Link href="/settings?tab=billing" className="underline hover:text-primary">account settings</Link>.
+            </p>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-[calc(100vh-4rem)] w-full bg-background flex flex-col items-center justify-center py-12 px-4 md:px-6 animate-up">
-
       <div className="text-center mb-10 max-w-3xl">
         <h1 className="text-3xl md:text-5xl font-bold tracking-tight not-sm:max-w-5/6 m-auto mb-5">
           Unlock the full power of <span className="text-primary">Intelli-AI</span>
@@ -91,7 +157,6 @@ export default function UpgradePage() {
 
       <div className="w-full max-w-5xl">
         <Card className="grid lg:grid-cols-2 relative border-primary/20 shadow-2xl overflow-hidden bg-card">
-
           <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 bg-primary/20 blur-3xl rounded-full pointer-events-none"></div>
           <div className="absolute top-0 w-full h-1 bg-linear-to-r from-transparent via-primary to-transparent" />
 
@@ -129,9 +194,7 @@ export default function UpgradePage() {
           </div>
 
           <div className="flex flex-col justify-center p-6 lg:p-10 bg-muted/10 relative z-10">
-
             <Separator className="lg:hidden mb-8" />
-
             <CardContent className="space-y-6 p-0">
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -154,6 +217,7 @@ export default function UpgradePage() {
             <CardFooter className="flex flex-col gap-4 mt-8 p-0">
               <Button size="lg" className="w-full text-lg font-semibold h-14 shadow-xl shadow-orange-600/20 text-white hover:scale-[1.02] transition-all duration-500 bg-linear-to-r from-orange-700 via-orange-400 to-orange-700 dark:from-orange-900 dark:via-orange-500 dark:to-orange-900 bg-size-[200%_auto] hover:bg-position-[right_center]"
                 onClick={handlePayment}
+                disabled={isProUser}
               >
                 Unlock Pro Access for ₹{PRO_ACCESS_AMOUNT.toLocaleString()}
               </Button>

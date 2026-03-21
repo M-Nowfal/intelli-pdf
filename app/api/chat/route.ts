@@ -5,7 +5,7 @@ import { Embedding } from "@/models/embedding.model";
 import { Chat } from "@/models/chat.model";
 import { getEmbeddings } from "@/lib/embeddings";
 import mongoose from "mongoose";
-import { COST, GEMINI_MODEL, GOOGLE_API_KEY } from "@/utils/constants";
+import { CHAT_COST, GEMINI_MODEL, GOOGLE_API_KEY } from "@/utils/constants";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { GENERATE_CHAT_PROMPT } from "@/lib/prompts";
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    if (user.stats.aiCredits < COST - 10) {
+    if (user.stats.aiCredits < CHAT_COST) {
       return NextResponse.json(
         { message: "Insufficient credits. Please upgrade your plan." },
         { status: 402 }
@@ -118,11 +118,13 @@ export async function POST(req: NextRequest) {
             }
           );
 
-          await User.findByIdAndUpdate(session.user.id, {
-            $inc: {
-              "stats.aiCredits": -10
-            }
-          });
+          if (session?.user?.subscription?.tier !== "pro") {
+            await User.findByIdAndUpdate(session.user.id, {
+              $inc: {
+                "stats.aiCredits": -CHAT_COST
+              }
+            });
+          }
 
           controller.close();
         } catch (err: unknown) {

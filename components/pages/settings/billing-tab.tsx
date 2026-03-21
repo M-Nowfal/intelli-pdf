@@ -14,11 +14,14 @@ import { Loader } from "@/components/ui/loader";
 import { APP_URL } from "@/utils/constants";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export function BillingTab() {
+  const { data: session } = useSession();
   const { stats, isLoading, fetchStats, refetchStats } = useDashboardStore();
   const [isCopied, setIsCopied] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
+  const isProUser = session?.user?.subscription?.tier === "pro";
 
   useEffect(() => {
     fetchStats();
@@ -99,12 +102,12 @@ export function BillingTab() {
 
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="font-medium">Monthly Credits</span>
+            <span className="font-medium">Credits Remaining</span>
             <span className={cn(
               "font-medium",
-              isOverLimit ? "text-amber-600 dark:text-amber-500" : "text-muted-foreground"
+              isOverLimit || isProUser ? "text-amber-600 dark:text-amber-500" : "text-muted-foreground"
             )}>
-              {(isClaiming || isLoading) ? <Loader size={12} /> : currentCredits} / {maxCredits}
+              {(isClaiming || isLoading) ? <Loader size={12} /> : (isProUser ? "Unlimited" : `${currentCredits} / ${maxCredits}`)}
               {isOverLimit && <span className="text-xs ml-1.5 font-normal">(+Bonus)</span>}
             </span>
           </div>

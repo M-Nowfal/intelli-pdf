@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { User } from "@/models/user.model";
 import { differenceInCalendarDays } from "date-fns";
+import { DAILY_CREDIT_AWARD } from "@/utils/constants";
 
 export async function POST() {
   try {
@@ -27,7 +28,7 @@ export async function POST() {
       }, { status: 400 });
     }
 
-    const creditsToAward = daysSinceLastClaim * 50;
+    const creditsToAward = daysSinceLastClaim * DAILY_CREDIT_AWARD;
 
     await User.findByIdAndUpdate(session.user.id, {
       $inc: { "stats.aiCredits": creditsToAward },

@@ -20,8 +20,10 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { vibrate } from "@/lib/haptics";
+import { useSession } from "next-auth/react";
 
 export function DashboardStats() {
+  const { data: session } = useSession();
   const { stats, fetchStats, isLoading, error } = useDashboardStore();
   const router = useRouter();
 
@@ -37,6 +39,7 @@ export function DashboardStats() {
   const currentCredits = stats?.aiCredits || 0;
   const isOverLimit = currentCredits > maxCredits;
   const progressPercentage = Math.min(100, (currentCredits / maxCredits) * 100);
+  const isProUser = session?.user?.subscription?.tier === "pro";
 
   function navigate(url: string) {
     vibrate();
@@ -94,16 +97,16 @@ export function DashboardStats() {
           <CardTitle className="text-sm font-medium">AI Credits</CardTitle>
           <Brain className={cn(
             "h-4 w-4",
-            isOverLimit ? "text-amber-600 dark:text-amber-500" : "text-muted-foreground"
+            isOverLimit || isProUser ? "text-amber-600 dark:text-amber-500" : "text-muted-foreground"
           )} />
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
             <div className={cn(
               "text-2xl font-bold",
-              isOverLimit && "text-amber-600 dark:text-amber-500"
+              isOverLimit || isProUser && "text-amber-600 dark:text-amber-500"
             )}>
-              {isLoading ? <Loader size={15} /> : currentCredits}
+              {isLoading ? <Loader size={15} /> : (isProUser ? "Unlimited" : currentCredits)}
             </div>
 
             {isOverLimit && (
@@ -117,7 +120,7 @@ export function DashboardStats() {
             value={progressPercentage}
             className={cn(
               "mt-2 h-2",
-              isOverLimit && "[&>div]:bg-amber-500"
+              (isOverLimit || isProUser) && "[&>div]:bg-amber-500"
             )}
           />
         </CardContent>

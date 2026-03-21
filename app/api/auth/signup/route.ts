@@ -65,6 +65,11 @@ export async function POST(req: NextRequest) {
         },
         aiCredits: 1000
       },
+      subscription: {
+        tier: "free",
+        expiresAt: null,
+        lastOrderId: null
+      },
       provider: "credentials"
     });
 

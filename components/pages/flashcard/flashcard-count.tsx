@@ -17,6 +17,8 @@ import { useFlashCardStore } from "@/store/useFlashCardStore";
 import { toast } from "sonner";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { playSuccessSound } from "@/utils/sound";
+import { useSession } from "next-auth/react";
+import { COST } from "@/utils/constants";
 
 interface FlashCardCountProps {
   pdfId: string;
@@ -25,9 +27,11 @@ interface FlashCardCountProps {
 }
 
 export function FlashCardCount({ pdfId, isDialogOpen, setIsDialogOpen }: FlashCardCountProps) {
+  const { data: session } = useSession();
   const [numCardsToGenerate, setNumCardsToGenerate] = useState(0);
   const { generateFlashCards, isGenerating, isLoading } = useFlashCardStore();
   const { decrementCredits } = useDashboardStore();
+  const isProUser = session?.user?.subscription?.tier === "pro";
 
   const handleGenerate = async () => {
     setIsDialogOpen(false);
@@ -37,7 +41,8 @@ export function FlashCardCount({ pdfId, isDialogOpen, setIsDialogOpen }: FlashCa
     }
     if (await generateFlashCards(pdfId, numCardsToGenerate)) {
       playSuccessSound(2);
-      decrementCredits(20);
+      if (!isProUser)
+        decrementCredits(20);
     }
   };
 
@@ -90,7 +95,7 @@ export function FlashCardCount({ pdfId, isDialogOpen, setIsDialogOpen }: FlashCa
             disabled={numCardsToGenerate === 0 || isGenerating}
             className="w-full"
           >
-            {isGenerating ? "Creating" : "Generate (20 Credits)"}
+            {isGenerating ? "Creating" : `Generate (${isProUser ? 0 : COST} Credits)`}
             {isGenerating && <Loader />}
           </Button>
         </DialogFooter>

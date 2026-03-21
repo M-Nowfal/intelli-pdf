@@ -8,7 +8,7 @@ import pdfParse from "pdf-parse";
 import { UTApi } from "uploadthing/server";
 import { User } from "@/models/user.model";
 import { calculateStreak } from "@/lib/study-streak";
-import { COST } from "@/utils/constants";
+import { PDF_UPLOAD_COST } from "@/utils/constants";
 
 const utapi = new UTApi();
 
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
     const user = await User.findById(session.user.id);
 
-    if (user.stats.aiCredits < COST) {
+    if (user.stats.aiCredits < PDF_UPLOAD_COST) {
       return NextResponse.json(
         { message: "Insufficient credits. Please upgrade your plan." },
         { status: 402 }
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
     await User.findByIdAndUpdate(session.user.id, {
       $inc: {
         "stats.totalDocuments": 1,
-        "stats.aiCredits": -20
+        "stats.aiCredits": session?.user?.subscription?.tier !== "pro" ? -PDF_UPLOAD_COST : 0
       },
       $set: {
         "stats.studyStreak.streak": newStreak,

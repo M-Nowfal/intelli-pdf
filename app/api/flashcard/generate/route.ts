@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
     await User.findByIdAndUpdate(session.user.id, {
       $inc: {
         "stats.flashcardsMastered": !flashcardDoc ? 1 : 0,
-        "stats.aiCredits": -20
+        "stats.aiCredits": session?.user?.subscription?.tier !== "pro" ? -COST : 0
       },
       $set: {
         "stats.studyStreak.streak": newStreak,

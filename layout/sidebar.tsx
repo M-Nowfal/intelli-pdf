@@ -35,7 +35,7 @@ import { APP_NAME } from "@/utils/constants";
 import { signOut } from "next-auth/react";
 import { Alert } from "@/components/common/alert";
 import { UserAvatar } from "@/components/common/avatar";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useChatStore } from "@/store/useChatStore";
@@ -56,7 +56,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isMobile, toggleSidebar } = useSidebar();
   const pathname = usePathname();
   const { chatList, fetchChatList, isLoading } = useChatStore();
-  const router = useRouter();
 
   useEffect(() => {
     fetchChatList();
@@ -216,52 +215,56 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 align="end"
                 sideOffset={6}
               >
-                <DropdownMenuItem
-                  className="p-0 font-normal cursor-pointer"
-                  onSelect={() => {
-                    vibrate();
-                    setTimeout(() => {
-                      router.push("/settings");
+                <DropdownMenuItem asChild>
+                  <Link
+                    href="/settings"
+                    prefetch
+                    className="p-0 font-normal cursor-pointer w-full"
+                    onClick={() => {
+                      vibrate();
                       if (isMobile) toggleSidebar();
-                    }, 150);
-                  }}
-                >
-                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                    <UserAvatar />
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-medium">{name}</span>
-                      <span className="truncate text-xs">{email}</span>
+                    }}
+                  >
+                    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm w-full">
+                      <UserAvatar />
+                      <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-medium">{name}</span>
+                        <span className="truncate text-xs">{email}</span>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem
-                    onSelect={() => {
-                      vibrate();
-                      setTimeout(() => {
-                        router.push("/upgrade");
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/upgrade"
+                      prefetch
+                      className="cursor-pointer w-full"
+                      onClick={() => {
+                        vibrate();
                         if (isMobile) toggleSidebar();
-                      }, 150);
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <Sparkles />
-                    Upgrade to Pro
+                      }}
+                    >
+                      <Sparkles />
+                      Upgrade to Pro
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onSelect={() => {
-                      vibrate();
-                      setTimeout(() => {
-                        router.push("/settings?tab=appearance");
+
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/settings?tab=appearance"
+                      prefetch
+                      className="cursor-pointer w-full"
+                      onClick={() => {
+                        vibrate();
                         if (isMobile) toggleSidebar();
-                      }, 150);
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <Palette />
-                    Appearance
+                      }}
+                    >
+                      <Palette />
+                      Appearance
+                    </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
@@ -282,6 +285,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
-    </Sidebar >
+    </Sidebar>
   );
 }

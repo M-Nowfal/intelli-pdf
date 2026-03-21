@@ -96,7 +96,9 @@ export async function POST(req: NextRequest, { params }: Params) {
       const { newStreak, today } = await calculateStreak(session.user.id);
 
       await User.findByIdAndUpdate(session.user.id, {
-        $inc: { "stats.aiCredits": -COST },
+        $inc: { 
+          "stats.aiCredits": session?.user?.subscription?.tier !== "pro" ? -COST : 0
+        },
         $set: {
           "stats.studyStreak.streak": newStreak,
           "stats.studyStreak.lastActive": today

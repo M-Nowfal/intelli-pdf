@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Send, Bot, StopCircle, Copy, Check, Volume2, Pause, Play, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import TextareaAutosize from "react-textarea-autosize";
-import { BOT } from "@/utils/constants";
+import { BOT, CHAT_COST } from "@/utils/constants";
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
 import api from "@/lib/axios";
@@ -19,6 +19,7 @@ import { SourceBadge } from "./source-badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { AxiosError } from "axios";
 import { Message } from "@/types/chat";
+import { useSession } from "next-auth/react";
 
 interface ChatInterfaceProps {
   pdfId: string;
@@ -26,6 +27,7 @@ interface ChatInterfaceProps {
 }
 
 export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
+  const { data: session } = useSession();
   const {
     messages, isMessagesLoading, fetchMessages,
     addMessage, updateMessageContent, setStreaming,
@@ -157,8 +159,8 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
 
         updateMessageContent(aiMessageId, accumulatedText);
       }
-
-      decrementCredits(10);
+      if (session?.user?.subscription?.tier !== "pro")
+        decrementCredits(10);
     } catch (err: unknown) {
       if (err instanceof AxiosError && err.response?.status !== 402)
         toast.error("Error generating response");
@@ -490,7 +492,7 @@ export function ChatInterface({ pdfId, title }: ChatInterfaceProps) {
             Press <kbd className="font-sans">Enter</kbd> to send, <kbd className="font-sans">Shift + Enter</kbd> for new line
           </p>
           <p className="hidden sm:block text-xs text-muted-foreground text-center">
-            Each question require 10 credits
+            Each question require {CHAT_COST} credits
           </p>
           <p className={`text-xs text-muted-foreground text-center ${mobileNav ? "hidden md:block" : ""}`}>
             Intelli-AI can make mistakes, so double-check it

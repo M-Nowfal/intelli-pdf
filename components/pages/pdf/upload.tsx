@@ -37,12 +37,15 @@ import api from "@/lib/axios";
 import { usePdfStore } from "@/store/usePdfStore";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { playSuccessSound } from "@/utils/sound";
+import { useSession } from "next-auth/react";
+import { PDF_UPLOAD_COST } from "@/utils/constants";
 
 const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
 export function PDFUpload() {
+  const { data: session } = useSession();
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -51,6 +54,7 @@ export function PDFUpload() {
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
   const { addPdf } = usePdfStore();
   const { decrementCredits } = useDashboardStore();
+  const isProUser = session?.user?.subscription?.tier === "pro";
 
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -100,7 +104,8 @@ export function PDFUpload() {
         setUploadProgress(100);
         addPdf(res.data.newPDF);
         setSuccess(true);
-        decrementCredits(20);
+        if (!isProUser)
+          decrementCredits(50);
         toast.success("PDF uploaded & processed successfully!");
       } catch (err: any) {
         await api.delete(`/uploadthing/delete?publicId=${uploadedFile.key}`);
@@ -443,7 +448,7 @@ export function PDFUpload() {
                 {isLoading ? "Processing..." : (
                   <>
                     <Save className="h-5 w-5" />
-                    Save & Process
+                    Save & Process ({isProUser ? 0 : PDF_UPLOAD_COST} Credits)
                   </>
                 )}
               </Button>

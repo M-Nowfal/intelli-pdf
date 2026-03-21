@@ -20,12 +20,16 @@ import { cleanMarkdown, copy } from "@/helpers/chat.helper";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { playSuccessSound } from "@/utils/sound";
+import { useSession } from "next-auth/react";
+import { COST } from "@/utils/constants";
 
 export default function SummarizePage() {
+  const { data: session } = useSession();
   const params = useParams();
   const id = params?.id as string;
   const router = useRouter();
   const { isMobile } = useSettingsStore();
+  const isProUser = session?.user?.subscription?.tier === "pro";
 
   const [lengthPref, setLengthPref] = useState("standard");
   const [customPromptPref, setCustomPromptPref] = useState("");
@@ -61,7 +65,8 @@ export default function SummarizePage() {
   useEffect(() => {
     if (summary && source === "generated") {
       playSuccessSound(2);
-      decrementCredits(20);
+      if (!isProUser)
+        decrementCredits(20);
       setShowConfig(false);
     }
   }, [summary, source]);
@@ -259,8 +264,8 @@ export default function SummarizePage() {
                   {isSummaryLoading
                     ? "Generating Analysis..."
                     : summary
-                      ? "Regenerate Summary (20 Credits)"
-                      : "Generate Summary (20 Credits)"}
+                      ? `Regenerate Summary (${isProUser ? 0 : COST} Credits)`
+                      : `Generate Summary (${isProUser ? 0 : COST} Credits)`}
                 </span>
               </Button>
             </div>

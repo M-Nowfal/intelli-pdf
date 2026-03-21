@@ -18,15 +18,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { playSuccessSound } from "@/utils/sound";
+import { useSession } from "next-auth/react";
+import { COST } from "@/utils/constants";
 
 interface QuizSetupProps {
   pdfId: string;
@@ -36,10 +38,12 @@ interface QuizSetupProps {
 }
 
 export function QuizSetup({ pdfId, isOpen, setIsOpen, onQuizReady }: QuizSetupProps) {
+  const { data: session } = useSession();
   const { generateQuiz, isLoading } = useQuizStore();
   const [amount, setAmount] = useState(5);
   const [difficulty, setDifficulty] = useState("medium");
   const { decrementCredits } = useDashboardStore();
+  const isProUser = session?.user?.subscription?.tier === "pro";
 
   const handleGenerate = async () => {
     if (amount < 3 || amount > 50) {
@@ -52,7 +56,8 @@ export function QuizSetup({ pdfId, isOpen, setIsOpen, onQuizReady }: QuizSetupPr
     if (quizId) {
       playSuccessSound(2);
       toast.success("Quiz generated successfully!");
-      decrementCredits(20);
+      if (!isProUser)
+        decrementCredits(20);
       setIsOpen(false);
       onQuizReady();
     }
@@ -67,8 +72,8 @@ export function QuizSetup({ pdfId, isOpen, setIsOpen, onQuizReady }: QuizSetupPr
         </Button>
       </DialogTrigger>
 
-      <DialogContent 
-        className="sm:max-w-md" 
+      <DialogContent
+        className="sm:max-w-md"
         onOpenAutoFocus={(e) => e.preventDefault()}
         onInteractOutside={(e) => isLoading && e.preventDefault()}
         showCloseButton={!isLoading}
@@ -84,7 +89,7 @@ export function QuizSetup({ pdfId, isOpen, setIsOpen, onQuizReady }: QuizSetupPr
         </DialogHeader>
 
         <div className="flex flex-col gap-4 mb-3">
-          
+
           <div className="flex flex-col gap-2">
             <Label htmlFor="question-amount">Number of Questions</Label>
             <div className="flex flex-col gap-1">
@@ -134,7 +139,7 @@ export function QuizSetup({ pdfId, isOpen, setIsOpen, onQuizReady }: QuizSetupPr
                 Generating
               </>
             ) : (
-              "Start Quiz (20 Credits)"
+              `Start Quiz (${isProUser ? 0 : COST} Credits)`
             )}
           </Button>
         </DialogFooter>

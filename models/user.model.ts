@@ -43,6 +43,21 @@ const UserSchema = new Schema<IUser>({
       default: Date.now
     }
   },
+  subscription: {
+    tier: {
+      type: String,
+      enum: ["free", "pro"],
+      default: "free"
+    },
+    expiresAt: {
+      type: Date,
+      default: null
+    },
+    lastOrderId: {
+      type: String,
+      default: null
+    }
+  },
   password: {
     type: String
   },
