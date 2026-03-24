@@ -15,12 +15,18 @@ import { vibrate } from "@/lib/haptics";
 export function AppearanceTab() {
   const { setTheme, theme } = useTheme();
 
-  const { haptics, setHaptics, mobileNav, setMobileNav, isMobile } = useSettingsStore();
+  const { 
+    haptics, setHaptics, mobileNav, 
+    setMobileNav, isMobile, isMuted,
+    toggleMute 
+  } = useSettingsStore();
 
   const handleToggle = (checked: boolean) => {
     setHaptics(checked);
     if (checked) vibrate();
   };
+
+  const isMobileDevice = isMobile();
 
   return (
     <Card className="mb-5">
@@ -101,42 +107,60 @@ export function AppearanceTab() {
         </div>
 
       </CardContent>
-      {isMobile() && <CardFooter className="flex flex-col gap-5 border-t px-6 py-4">
+      <CardFooter className="flex flex-col gap-5 border-t px-6 py-4">
+        {isMobileDevice && <>
+          <div className="flex items-center justify-between w-full">
+            <div className="space-y-0.5">
+              <Label className="text-base">Haptic Feedback</Label>
+              <p className="text-xs text-muted-foreground">
+                {haptics
+                  ? "Vibrations are currently enabled."
+                  : "Vibrations are turned off for a simpler experience."}
+              </p>
+            </div>
+            <Switch
+              checked={haptics}
+              onCheckedChange={handleToggle}
+            />
+          </div>
+          <Separator />
+          <div className="flex items-center justify-between w-full">
+            <div className="space-y-0.5">
+              <Label className="text-base">Bottom Navigation Bar</Label>
+              <p className="text-xs text-muted-foreground">
+                {mobileNav
+                  ? "The menu bar is visible at the bottom of mobile screens."
+                  : "The menu bar is hidden on mobile screens."}
+              </p>
+            </div>
+            <Switch
+              checked={mobileNav}
+              onCheckedChange={() => {
+                vibrate();
+                setMobileNav(!mobileNav);
+              }}
+            />
+          </div>
+          <Separator />
+        </>}
         <div className="flex items-center justify-between w-full">
           <div className="space-y-0.5">
-            <Label className="text-base">Haptic Feedback</Label>
+            <Label className="text-base">Mute UI Sounds</Label>
             <p className="text-xs text-muted-foreground">
-              {haptics
-                ? "Vibrations are currently enabled."
-                : "Vibrations are turned off for a simpler experience."}
+              {isMuted
+                ? "Sound effects are currently muted."
+                : "Sound effects are enabled for a richer experience."}
             </p>
           </div>
           <Switch
-            checked={haptics}
-            onCheckedChange={handleToggle}
-          />
-        </div>
-
-        <Separator />
-
-        <div className="flex items-center justify-between w-full">
-          <div className="space-y-0.5">
-            <Label className="text-base">Bottom Navigation Bar</Label>
-            <p className="text-xs text-muted-foreground">
-              {mobileNav
-                ? "The menu bar is visible at the bottom of mobile screens."
-                : "The menu bar is hidden on mobile screens."}
-            </p>
-          </div>
-          <Switch
-            checked={mobileNav}
+            checked={isMuted}
             onCheckedChange={() => {
               vibrate();
-              setMobileNav(!mobileNav);
+              toggleMute();
             }}
           />
         </div>
-      </CardFooter>}
+      </CardFooter>
     </Card>
   );
 }

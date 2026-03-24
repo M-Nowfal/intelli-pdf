@@ -7,20 +7,23 @@ interface SettingsStore {
   haptics: boolean;
   mobileNav: boolean;
   isKeyboardActive: boolean;
+  isMuted: boolean;
   isMobile: () => boolean;
 
   setHaptics: (value: boolean) => void;
   setMobileNav: (value: boolean) => void;
+  toggleMute: () => void;
   setIsKeyboardActive: (value: boolean) => void;
   deleteAccount: () => Promise<void>;
 }
 
 export const useSettingsStore = create<SettingsStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       haptics: true,
       mobileNav: false,
       isKeyboardActive: false,
+      isMuted: false,
 
       isMobile: () => {
         if (typeof navigator === "undefined") return false;
@@ -33,6 +36,7 @@ export const useSettingsStore = create<SettingsStore>()(
       setHaptics: (value: boolean) => set({ haptics: value }),
       setMobileNav: (value: boolean) => set({ mobileNav: value }),
       setIsKeyboardActive: (value: boolean) => set({ isKeyboardActive: value }),
+      toggleMute: () => set({ isMuted: !get().isMuted }),
 
       deleteAccount: async () => {
         try {
@@ -48,7 +52,8 @@ export const useSettingsStore = create<SettingsStore>()(
       name: 'user-settings',
       partialize: (state) => ({
         haptics: state.haptics,
-        mobileNav: state.mobileNav
+        mobileNav: state.mobileNav,
+        isMuted: state.isMuted
       }),
     }
   )

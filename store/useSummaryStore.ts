@@ -13,6 +13,7 @@ interface SummaryState {
   fetchSummaryList: () => Promise<void>;
   removeSummary: (id: string) => void;
   deleteSummary: (id: string, onSuccess: () => void) => void;
+  markAsViewed: () => void;
 }
 
 export const useSummaryStore = create<SummaryState>((set, get) => ({
@@ -116,4 +117,5 @@ export const useSummaryStore = create<SummaryState>((set, get) => ({
       set({ isSummaryLoading: false });
     }
   },
+  markAsViewed: () => set({ source: "database" }),
 }));

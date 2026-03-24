@@ -42,7 +42,8 @@ export default function SummarizePage() {
     source,
     needsGeneration,
     fetchSummary,
-    deleteSummary
+    deleteSummary,
+    markAsViewed
   } = useSummaryStore();
 
   const { decrementCredits } = useDashboardStore();
@@ -68,6 +69,7 @@ export default function SummarizePage() {
       if (!isProUser)
         decrementCredits(20);
       setShowConfig(false);
+      markAsViewed();
     }
   }, [summary, source]);
 
