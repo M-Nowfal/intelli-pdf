@@ -21,7 +21,7 @@ api.interceptors.response.use(
         description: "You need more credits to perform this action.",
         action: {
           label: "Upgrade",
-          onClick: () => window.location.href = "/settings?tab=billing"
+          onClick: () => window.location.href = "/upgrade"
         },
         duration: 5000,
       });
