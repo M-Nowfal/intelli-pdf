@@ -53,7 +53,7 @@ export function PDFUpload() {
   const [success, setSuccess] = useState(false);
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
   const { addPdf } = usePdfStore();
-  const { decrementCredits } = useDashboardStore();
+  const { decrementCredits, incDocumentCount } = useDashboardStore();
   const isProUser = session?.user?.subscription?.tier === "pro";
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -103,6 +103,7 @@ export function PDFUpload() {
         playSuccessSound();
         setUploadProgress(100);
         addPdf(res.data.newPDF);
+        incDocumentCount(1);
         setSuccess(true);
         if (!isProUser)
           decrementCredits(50);

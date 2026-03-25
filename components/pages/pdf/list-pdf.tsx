@@ -26,6 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useDashboardStore } from "@/store/useDashboardStore";
 
 export default function PDFList() {
   const {
@@ -34,6 +35,7 @@ export default function PDFList() {
   } = usePdfStore();
   const { removeSummary } = useSummaryStore();
   const { removeChatFromList } = useChatStore();
+  const { incDocumentCount } = useDashboardStore();
   const removePDF = useMutate("DELETE");
   const router = useRouter();
 
@@ -55,6 +57,7 @@ export default function PDFList() {
       removePdf(pdfId);
       removeChatFromList(pdfId);
       removeSummary(pdfId);
+      incDocumentCount(-1);
     }
   };
 

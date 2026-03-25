@@ -9,6 +9,7 @@ interface DashboardStore {
   fetchStats: (refetch?: boolean) => Promise<void>;
   decrementCredits: (amount: number) => void;
   refetchStats: () => Promise<void>;
+  incDocumentCount: (count: number) => void;
 }
 
 export const useDashboardStore = create<DashboardStore>((set, get) => ({
@@ -43,5 +44,11 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
       aiCredits: Math.max(0, state.stats.aiCredits - amount)
     } : null
   })),
-  refetchStats: () => get().fetchStats(true)
+  refetchStats: () => get().fetchStats(true),
+  incDocumentCount: (count: number) => set((state) => ({
+    stats: state.stats ? {
+      ...state.stats,
+      totalDocuments: state.stats.totalDocuments + count
+    } : null
+  })),
 }));
