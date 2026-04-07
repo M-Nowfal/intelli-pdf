@@ -74,7 +74,7 @@ export default function ActiveQuizPage({ params }: { params: Promise<{ id: strin
               <BrainCircuit className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             </div>
             <h1 className="text-2xl font-bold">
-              {typeof currentQuiz.pdfId === 'object' ? currentQuiz.pdfId.title.replaceAll("_", " ") : 'Quiz Session'}
+              {typeof currentQuiz.pdfId === 'object' ? currentQuiz.pdfId.title : 'Quiz Session'}
             </h1>
           </div>
           <p className="text-muted-foreground ms-2 mt-2">

@@ -101,7 +101,7 @@ function FlashcardDeckItem({
   item: any;
   onDelete: () => void;
 }) {
-  const pdfTitle = item.pdfId?.title.replaceAll("_", " ") || "Untitled Document";
+  const pdfTitle = item.pdfId?.title || "Untitled Document";
   const cardCount = item.cards?.length || 0;
 
   return (

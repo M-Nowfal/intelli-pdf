@@ -71,7 +71,7 @@ export function DashboardRecentActivity() {
               </div>
               <div className="flex-1 space-y-1">
                 <p className="text-sm font-medium leading-tight line-clamp-1">
-                  {pdf.title.replaceAll("_", " ")}
+                  {pdf.title}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {formatDistanceToNow(new Date(pdf.createdAt), { addSuffix: true })} • {formatFileSize(pdf.fileSize)}

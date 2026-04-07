@@ -28,7 +28,7 @@ export function Alert({ trigger, title, description, onContinue, loading }: Aler
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader className="text-start">
-          <AlertDialogTitle className="line-clamp-1">{title.replaceAll("_", " ")}</AlertDialogTitle>
+          <AlertDialogTitle className="line-clamp-1">{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-row justify-end">

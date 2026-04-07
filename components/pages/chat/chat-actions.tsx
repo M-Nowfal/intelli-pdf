@@ -149,7 +149,7 @@ export function ChatActionMenu({ activePdf }: ChatActionProps) {
               prefetch
             >
               <h1 className="text-sm font-medium truncate max-w-32">
-                {formatChatListTitle(activePdf?.title.replaceAll("_", " ") || "")}
+                {formatChatListTitle(activePdf?.title || "")}
               </h1>
               <ExternalLink size={15} />
             </Link>

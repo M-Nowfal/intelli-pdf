@@ -326,8 +326,8 @@ export default function SummarizePage() {
         </div>
       </div>
 
-      <Card className="w-full max-w-4xl mx-auto mt-2 shadow-lg border-border bg-card overflow-hidden">
-        <CardHeader className="space-y-1 bg-muted/20">
+      <Card className="gap-0 pt-0 w-full max-w-4xl mx-auto mt-2 shadow-lg border-border bg-card overflow-hidden">
+        <CardHeader className="space-y-1 py-5 bg-muted/30">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-primary">
               <div className="p-2 bg-primary/10 rounded-full">
@@ -385,14 +385,14 @@ export default function SummarizePage() {
 
           {summary?.title && (
             <CardTitle className="text-2xl sm:text-3xl font-bold mt-2 leading-tight">
-              {summary.title.replaceAll("_", " ")}
+              {summary.title}
             </CardTitle>
           )}
         </CardHeader>
 
         <Separator />
 
-        <CardContent>
+        <CardContent className="mt-5">
           {summaryError ? (
             <Alert variant="destructive" className="bg-destructive/5 border-destructive/20">
               <AlertCircle className="h-4 w-4" />

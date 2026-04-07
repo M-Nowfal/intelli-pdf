@@ -69,7 +69,7 @@ export function QuizList() {
                       className="line-clamp-1 text-lg leading-tight"
                       title={typeof quiz.pdfId === 'object' ? quiz.pdfId.title : 'Unknown Document'}
                     >
-                      {typeof quiz.pdfId === 'object' ? quiz.pdfId.title.replaceAll("_", " ") : 'Unknown Document'}
+                      {typeof quiz.pdfId === 'object' ? quiz.pdfId.title : 'Unknown Document'}
                     </CardTitle>
                     <span className="text-xs text-muted-foreground flex items-center gap-1">
                       <BookOpen className="w-3 h-3 shrink-0" />

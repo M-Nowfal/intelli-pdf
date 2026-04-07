@@ -77,7 +77,7 @@ export function SelectPDF() {
                   className="text-base font-semibold line-clamp-1 leading-tight"
                   title={pdf.title}
                 >
-                  {pdf.title.replaceAll("_", " ")}
+                  {pdf.title}
                 </CardTitle>
 
                 <div className="text-xs text-muted-foreground flex items-center gap-2">

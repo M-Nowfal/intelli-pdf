@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
     const existingPDF = await PDF.findOne({
       userId: session.user.id,
-      title: fileName
+      title: fileName.replaceAll("_", " ").replace(".pdf", "")
     });
 
     if (existingPDF) {
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
 
     const newPDF = await PDF.create({
       userId: session.user.id,
-      title: fileName,
+      title: fileName.replaceAll("_", " ").replace(".pdf", ""),
       fileUrl: fileUrl,
       publicId: fileKey,
       pages: pageCount,
